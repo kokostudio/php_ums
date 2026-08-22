@@ -1,0 +1,15 @@
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+graft/
+
+# PHP
+vendor/
+.env
+
+# Node
+node_modules/
+package-lock.json
+
+# Logs & DB
+logs/
+*.log
+*.sqlite

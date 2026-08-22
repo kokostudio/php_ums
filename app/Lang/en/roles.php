@@ -1,0 +1,25 @@
+<?php
+// app/Lang/en/roles.php
+return [
+    'title'           => 'Role & Permission Management',
+    'subtitle'        => 'Manage system roles and their assigned permissions.',
+    'add_role'        => 'Add New Role',
+    'edit_role'       => 'Edit Role',
+    'role_name'       => 'Role Name',
+    'description'     => 'Description',
+    'permissions'     => 'Permissions',
+    'permission_matrix' => 'Permission Matrix',
+    'role_info'       => 'Role Information',
+    'module'          => 'Module',
+    'all_in_module'   => 'All in Module',
+    'save_role'       => 'Save Role',
+    'update_role'     => 'Update Role',
+    'super_admin_notice' => 'This is the Super Admin role. It automatically has all permissions. The name cannot be changed.',
+    'permission_hint' => 'Permissions define what actions users with this role can perform in the system.',
+    'deleted'         => 'Role deleted successfully.',
+    'created'         => 'Role created successfully.',
+    'updated'         => 'Role updated successfully.',
+    'cannot_delete_super' => 'Cannot delete Super Admin role.',
+    'total_roles'     => 'Total Roles',
+    'users_in_role'   => 'users',
+];

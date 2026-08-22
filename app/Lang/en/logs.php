@@ -1,0 +1,26 @@
+<?php
+// app/Lang/en/logs.php
+return [
+    'activity_title'    => 'Activity Logs',
+    'activity_subtitle' => 'Track basic user actions and system events.',
+    'audit_title'       => 'Audit Logs',
+    'audit_subtitle'    => 'Detailed history of data modifications (Insert, Update, Delete) across the system.',
+    'user'              => 'User',
+    'action'            => 'Action',
+    'description'       => 'Description',
+    'ip_address'        => 'IP Address',
+    'timestamp'         => 'Date / Time',
+    'table_name'        => 'Table',
+    'record_id'         => 'Record ID',
+    'changes'           => 'Changes',
+    'view_details'      => 'View Details',
+    'change_details'    => 'Change Details',
+    'old_values'        => 'Old Values',
+    'new_values'        => 'New Values',
+    'no_logs'           => 'No logs recorded.',
+    'filter_by_user'    => 'Filter by User',
+    'filter_by_action'  => 'Filter by Action',
+    'all_users'         => 'All Users',
+    'all_actions'       => 'All Actions',
+    'export_csv'        => 'Export CSV',
+];
