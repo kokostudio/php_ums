@@ -13,11 +13,28 @@ class SettingController extends Controller
 {
     public function index($tab = 'general')
     {
-        $tab = in_array($tab, ['general', 'login']) ? $tab : 'general';
+        $tab = in_array($tab, ['general', 'login', 'translations']) ? $tab : 'general';
         $db = Database::getInstance();
         $settings = $db->query("SELECT setting_key, setting_value FROM system_settings")->fetchAll(\PDO::FETCH_KEY_PAIR);
         
-        $this->view('settings/index', ['pageTitle' => 'System Settings', 'settings' => $settings, 'tab' => $tab]);
+        $pivoted = [];
+        if ($tab === 'translations') {
+            $translations = $db->query("SELECT locale, namespace, key_name, text_value FROM translations")->fetchAll(\PDO::FETCH_ASSOC);
+            foreach ($translations as $row) {
+                $groupKey = $row['namespace'] . '.' . $row['key_name'];
+                if (!isset($pivoted[$groupKey])) {
+                    $pivoted[$groupKey] = [
+                        'namespace' => $row['namespace'],
+                        'key_name' => $row['key_name'],
+                        'en' => '',
+                        'th' => ''
+                    ];
+                }
+                $pivoted[$groupKey][$row['locale']] = $row['text_value'];
+            }
+        }
+        
+        $this->view('settings/index', ['pageTitle' => 'System Settings', 'settings' => $settings, 'tab' => $tab, 'translations' => $pivoted]);
     }
 
     public function update($tab = 'general')
@@ -27,7 +44,7 @@ class SettingController extends Controller
 
         // Keys allowed per tab
         $textKeysByTab = [
-            'general' => ['site_name', 'site_footer'],
+            'general' => ['site_name', 'site_footer', 'sidebar_theme'],
             'login'   => ['login_title', 'login_subtitle'],
         ];
         $fileKeysByTab = [
@@ -44,6 +61,10 @@ class SettingController extends Controller
                 if (isset($_POST[$key])) {
                     Settings::set($key, Security::sanitize($_POST[$key]));
                 }
+            }
+
+            if ($tab === 'general') {
+                Settings::set('maintenance_mode', isset($_POST['maintenance_mode']) ? '1' : '0');
             }
 
             // 2. File Uploads
@@ -72,12 +93,50 @@ class SettingController extends Controller
             }
 
             Logger::activity("Updated system settings (tab: {$tab}).");
-            Session::setFlash('success', 'Settings saved successfully.');
+            Session::setFlash('success', __('messages.settings_saved'));
             $this->redirect("/settings/{$tab}");
 
         } catch (\Exception $e) {
-            Session::setFlash('error', 'Failed to update settings: ' . $e->getMessage());
+            Session::setFlash('error', __('messages.failed_update_settings') . ' ' . $e->getMessage());
             $this->redirect("/settings/{$tab}");
+        }
+    }
+
+    public function updateTranslation()
+    {
+        Security::checkCsrf();
+        
+        $namespace = $_POST['namespace'] ?? '';
+        $keyName = $_POST['key_name'] ?? '';
+        $thValue = $_POST['th_value'] ?? '';
+        $enValue = $_POST['en_value'] ?? '';
+
+        if (!$namespace || !$keyName) {
+            echo json_encode(['success' => false, 'message' => 'Missing namespace or key.']);
+            return;
+        }
+
+        try {
+            $db = Database::getInstance();
+            
+            $stmt = $db->prepare("
+                INSERT INTO translations (locale, namespace, key_name, text_value) 
+                VALUES ('th', ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE text_value = VALUES(text_value)
+            ");
+            $stmt->execute([$namespace, $keyName, $thValue]);
+
+            $stmt = $db->prepare("
+                INSERT INTO translations (locale, namespace, key_name, text_value) 
+                VALUES ('en', ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE text_value = VALUES(text_value)
+            ");
+            $stmt->execute([$namespace, $keyName, $enValue]);
+
+            Logger::activity("Updated translation for {$namespace}.{$keyName}");
+            echo json_encode(['success' => true, 'message' => __('messages.translation_updated')]);
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 }

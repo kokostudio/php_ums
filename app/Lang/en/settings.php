@@ -32,4 +32,8 @@ return [
     'settings_saved'  => 'Settings saved successfully.',
     'general_info'    => 'General Information',
     'manage_desc'     => 'Manage general and branding configuration of your application.',
+    
+    'system_status'   => 'System Status',
+    'maintenance_mode'=> 'Maintenance Mode',
+    'maintenance_mode_desc' => 'When active, only Super Admins can access the system.',
 ];

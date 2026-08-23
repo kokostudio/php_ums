@@ -20,4 +20,38 @@ return [
     'password_updated'  => 'Password updated successfully.',
     'wrong_password'    => 'Current password is incorrect.',
     'password_mismatch' => 'New password and confirmation do not match.',
+
+    // 2FA
+    'two_factor'             => 'Two-Factor Authentication',
+    '2fa_enabled'            => 'Two-Factor Authentication is Enabled',
+    '2fa_enabled_desc'       => 'Your account is secured with 2FA. To disable it, please enter your password below.',
+    'current_password_placeholder' => 'Current Password',
+    'disable_2fa'            => 'Disable 2FA',
+    'disable_2fa_confirm'    => 'Are you sure you want to disable 2FA?',
+    '2fa_disabled_desc'      => 'Enhance your account security by enabling Two-Factor Authentication (2FA). Use an authenticator app like Google Authenticator to scan the QR code below.',
+    '2fa_manual_key'         => 'Or enter this setup key manually:',
+    'enter_verification_code'=> 'Enter Verification Code',
+    'verify_and_enable'      => 'Verify & Enable',
+
+    // Sessions
+    'active_sessions'        => 'Active Sessions',
+    'active_sessions_desc'   => 'View and manage devices currently logged into your account.',
+    'manage_sessions'        => 'Manage Sessions',
+    'manage_sessions_desc'   => 'Manage and revoke your active login sessions across all devices.',
+    'back_to_profile'        => 'Back to Profile',
+    'device_browser'         => 'Device & Browser',
+    'ip_address'             => 'IP Address',
+    'last_activity'          => 'Last Activity',
+    'action'                 => 'Action',
+    'unknown_device'         => 'Unknown Device',
+    'unknown_browser'        => 'Unknown Browser',
+    'this_device'            => 'This Device',
+    'revoke'                 => 'Revoke',
+    'revoke_confirm'         => 'Are you sure you want to revoke this session? The user on that device will be logged out.',
+    'current_session'        => 'Current Session',
+    'no_active_sessions'     => 'No active sessions found.',
+
+    // Cropper
+    'crop_profile_picture'   => 'Crop Profile Picture',
+    'apply_crop'             => 'Apply Crop',
 ];

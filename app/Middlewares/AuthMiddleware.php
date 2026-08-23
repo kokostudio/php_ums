@@ -17,6 +17,13 @@ class AuthMiddleware implements MiddlewareInterface
             exit;
         }
 
+        // Check maintenance mode
+        if (\App\Core\Settings::get('maintenance_mode') === '1' && Session::get('role_id') != 1) {
+            // Include maintenance view directly
+            require dirname(__DIR__) . '/Views/errors/maintenance.php';
+            exit;
+        }
+
         return true;
     }
 }

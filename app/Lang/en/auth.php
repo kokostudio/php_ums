@@ -26,4 +26,8 @@ return [
 
     'invalid_credentials' => 'Invalid username or password.',
     'account_inactive'    => 'This account is inactive or suspended.',
+
+    '2fa_desc'            => 'Please open your authenticator app (e.g. Google Authenticator) and enter the 6-digit code.',
+    'verification_code'   => 'Verification Code',
+    'verify_and_login'    => 'Verify & Login',
 ];

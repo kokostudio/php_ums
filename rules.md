@@ -80,12 +80,15 @@
 - **Languages Supported:** ภาษาไทย (`th`) เป็นภาษาหลัก (Default) และภาษาอังกฤษ (`en`) เป็นภาษารอง
 - **Language Storage:** จัดเก็บตัวเลือกภาษาของผู้ใช้ใน Session `$_SESSION['app_locale']` (fallback เป็น `'th'`)
 - **Route Switch:** ใช้ Clean URL `GET /lang/{locale}` เพื่อสลับภาษาและ Redirect กลับหน้าเดิมอัตโนมัติ
-- **Language Files Structure:**
-  - จัดเก็บไฟล์แปลภาษาแบบแยกโมดูลไว้ที่ `app/Lang/{locale}/{module}.php`
-  - ไฟล์คืนค่าเป็น associative array แบบ key-value
+- **Database Storage:**
+  - ข้อมูลการแปลภาษาทั้งหมดถูกเก็บในตาราง `translations` ในฐานข้อมูล (แทนการใช้ไฟล์)
+  - ผู้ดูแลระบบสามารถเพิ่มหรือแก้ไขคำแปลได้ทันทีผ่าน UI หน้า Settings -> Translations โดยไม่ต้องแก้ไขโค้ด
 - **Translation Usage:**
   - ห้าม Hardcode ข้อความ UI (Labels, Buttons, Breadcrumbs, Flash Messages, Descriptions) ใน Views
   - ต้องเรียกใช้ผ่านฟังก์ชันสากล `__('module.key')` หรือ `__('common.key')` เสมอ
-  - รองรับ Parameter แทนที่ placeholder เช่น `__('common.welcome', ['name' => 'Admin'])`
+  - รองรับ Parameter แทนที่ placeholder ด้วยเครื่องหมายโคลอน (:) เช่น `__('common.welcome', ['name' => 'Admin'])` จะแทนที่ `:name` ด้วย 'Admin'
+- **DataTables Global i18n:**
+  - ห้ามใส่ property `language:` แยกต่างหากใน DataTables initialization ของแต่ละหน้า
+  - ระบบมีการตั้งค่า Global Configuration ไว้แล้วใน `app/Views/layouts/app.php` ซึ่งครอบคลุมการแปลภาษา (Th/En) ของ DataTables แบบอัตโนมัติ
 
 

@@ -41,6 +41,8 @@ return [
     'toggle_language'    => 'Toggle Language',
     'logout'             => 'Logout',
     'notifications'      => 'Notifications',
+    'mark_all_read'      => 'Mark all as read',
+    'no_notifications'   => 'No notifications',
     'success'       => 'Success',
     'error'         => 'Error',
     'warning'       => 'Warning',

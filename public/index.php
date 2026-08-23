@@ -32,6 +32,8 @@ $router->get('/lang/{locale}', [\App\Controllers\LangController::class, 'switch'
 // Auth Routes
 $router->get('/login', [\App\Controllers\AuthController::class, 'showLogin']);
 $router->post('/login', [\App\Controllers\AuthController::class, 'login']);
+$router->get('/login/2fa', [\App\Controllers\AuthController::class, 'show2faForm']);
+$router->post('/login/2fa', [\App\Controllers\AuthController::class, 'verify2faLogin']);
 $router->post('/logout', [\App\Controllers\AuthController::class, 'logout']);
 
 // Forgot/Reset Password
@@ -69,12 +71,27 @@ $router->get('/logs/audit/data', [\App\Controllers\LogController::class, 'auditD
 // System Settings Routes
 $router->get('/settings', [\App\Controllers\SettingController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
 $router->get('/settings/{tab}', [\App\Controllers\SettingController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/settings/translations/update', [\App\Controllers\SettingController::class, 'updateTranslation'], [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/settings/{tab}', [\App\Controllers\SettingController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
 
 // Profile Routes
 $router->get('/profile', [\App\Controllers\ProfileController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/profile', [\App\Controllers\ProfileController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/profile/password', [\App\Controllers\ProfileController::class, 'updatePassword'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/profile/2fa/enable', [\App\Controllers\ProfileController::class, 'enable2fa'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/profile/2fa/disable', [\App\Controllers\ProfileController::class, 'disable2fa'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/profile/sessions', [\App\Controllers\ProfileController::class, 'sessions'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/profile/sessions/{id}/revoke', [\App\Controllers\ProfileController::class, 'revokeSession'], [\App\Middlewares\AuthMiddleware::class]);
+
+// --- API Routes (Stateless / JWT) ---
+$router->post('/api/v1/login', [\App\Controllers\Api\AuthController::class, 'login']);
+$router->get('/api/v1/me', [\App\Controllers\Api\AuthController::class, 'me'], [\App\Middlewares\JwtMiddleware::class]);
+
+// --- Internal API Routes (Session-based) ---
+$router->get('/api/notifications', [\App\Controllers\NotificationController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/api/notifications/read', [\App\Controllers\NotificationController::class, 'markAsRead'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/api/notifications/read-all', [\App\Controllers\NotificationController::class, 'markAllAsRead'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/api/search', [\App\Controllers\SearchController::class, 'search'], [\App\Middlewares\AuthMiddleware::class]);
 
 $router->get('/', function() {
     header('Location: /login');

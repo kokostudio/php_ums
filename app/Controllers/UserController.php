@@ -136,7 +136,7 @@ class UserController extends Controller
 
         // Basic Validation
         if (empty($username) || empty($email) || empty($password)) {
-            Session::setFlash('error', 'All fields are required.');
+            Session::setFlash('error', __('messages.all_fields_required'));
             $this->redirect('/users/create');
         }
 
@@ -144,7 +144,7 @@ class UserController extends Controller
         $stmt = $db->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
         $stmt->execute(['username' => $username, 'email' => $email]);
         if ($stmt->fetch()) {
-            Session::setFlash('error', 'Username or Email already exists.');
+            Session::setFlash('error', __('messages.user_exists'));
             $this->redirect('/users/create');
         }
 
@@ -164,10 +164,10 @@ class UserController extends Controller
             Logger::activity("Created user: {$username}");
             Logger::audit('users', $newId, 'insert', null, ['username' => $username, 'email' => $email, 'role_id' => $roleId]);
 
-            Session::setFlash('success', 'User created successfully.');
+            Session::setFlash('success', __('messages.user_created'));
             $this->redirect('/users');
         } catch (\Exception $e) {
-            Session::setFlash('error', 'Failed to create user. Please try again.');
+            Session::setFlash('error', __('messages.failed_create_user'));
             $this->redirect('/users/create');
         }
     }
@@ -186,7 +186,7 @@ class UserController extends Controller
         $user = $stmt->fetch();
 
         if (!$user) {
-            Session::setFlash('error', 'User not found.');
+            Session::setFlash('error', __('messages.user_not_found'));
             $this->redirect('/users');
         }
 
@@ -260,7 +260,7 @@ class UserController extends Controller
         Logger::audit('users', $realId, 'update', $oldUser, $newUser);
         Logger::activity("Updated user profile: {$username}");
 
-        Session::setFlash('success', 'User updated successfully.');
+        Session::setFlash('success', __('messages.user_updated'));
         $this->redirect('/users');
     }
 
@@ -292,7 +292,7 @@ class UserController extends Controller
             
             $this->json(['success' => true, 'message' => 'User deleted successfully.']);
         } else {
-            $this->json(['success' => false, 'message' => 'User not found.'], 404);
+            $this->json(['success' => false, 'message' => __('messages.user_not_found')], 404);
         }
     }
 }

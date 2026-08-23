@@ -50,6 +50,8 @@ return [
     'toggle_language'    => 'เปลี่ยนภาษา',
     'logout'             => 'ออกจากระบบ',
     'notifications'      => 'การแจ้งเตือน',
+    'mark_all_read'      => 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด',
+    'no_notifications'   => 'ไม่มีการแจ้งเตือน',
 
     // Flash
     'success'       => 'สำเร็จ',

@@ -39,6 +39,23 @@
 - เข้าถึงได้ง่ายๆ โดยคลิกขยายที่มุมซ้ายล่าง/มุมขวาของ Sidebar ตรงแถบข้อมูลผู้ใช้
 - _พิกัดไฟล์:_ `app/Views/profile/` และ `app/Controllers/ProfileController.php`
 
+### 6. 🌐 Language Switcher Location
+- ได้ทำการย้ายปุ่มสลับภาษา (TH/EN) ออกจากแถบ Navbar ด้านบน เพื่อความสะอาดตา และนำมาจัดวางไว้ในเมนู **Settings (การตั้งค่า) > General Info** แทนเรียบร้อยแล้ว
+
+## Phase 5: Complete Localization (Completed)
+- **Profile & Sessions:** Fully translated hardcoded texts and configured DataTables/SweetAlert logic with `__()` keys.
+- **Dashboard:** Updated Chart.js labels, tooltips, and static text.
+- **Global Layout:** Translated the Notifications dropdown and logout confirmation dialogs.
+- **Authentication:** Translated the `2fa.php`, `forgot-password.php`, and `reset-password.php` forms.
+- **System Settings:** Localized the "System Status" and "Maintenance Mode" toggle.
+- **Logs:** Translated Audit Logs & Activity Logs, including the JSON change diff modal.
+- **Roles & Users:** Synchronized Delete confirmation dialogs to use the global `common` translations.
+
+## Phase 6: Dynamic Database Translations (Completed)
+- **Database Schema:** Created a new `translations` table and migrated all existing `app/Lang/*/*.php` files directly into the database.
+- **Core Refactoring:** Rewrote `App\Core\Lang` to automatically fetch translation texts from the database.
+- **Settings UI:** Added a new **Translations** tab in the System Settings, featuring a DataTables interface where administrators can edit both English and Thai translations dynamically.
+
 ---
 
 ## สิ่งที่คุณขอมาและผมได้จัดการให้ครบแล้ว

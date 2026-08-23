@@ -41,6 +41,8 @@ use App\Core\Session;
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Animate.css for smooth Toast animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         body { font-family: 'Prompt', sans-serif; }
 
@@ -105,19 +107,74 @@ $bgStyle = $bgImage ? "background-image: url('" . htmlspecialchars($bgImage) . "
             </p>
         </div>
 
-        <!-- Flash Messages -->
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
+        <!-- Flash Messages (Toast Notifications) -->
         <?php if ($flashSuccess = Session::getFlash('success')): ?>
-            <div class="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start shadow-sm">
-                <i class="ph-fill ph-check-circle text-emerald-500 text-xl mr-3 mt-0.5"></i>
-                <p class="text-sm text-emerald-800 font-medium"><?= htmlspecialchars($flashSuccess) ?></p>
-            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        width: 'auto',
+                        customClass: {
+                            popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
+                            title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown animate__faster'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp animate__faster'
+                        },
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: <?= json_encode(htmlspecialchars($flashSuccess)) ?>
+                    });
+                });
+            </script>
         <?php endif; ?>
         
         <?php if ($flashError = Session::getFlash('error')): ?>
-            <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start shadow-sm">
-                <i class="ph-fill ph-warning-circle text-red-500 text-xl mr-3 mt-0.5"></i>
-                <p class="text-sm text-red-800 font-medium"><?= htmlspecialchars($flashError) ?></p>
-            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        width: 'auto',
+                        customClass: {
+                            popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
+                            title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown animate__faster'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp animate__faster'
+                        },
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'error',
+                        title: <?= json_encode(htmlspecialchars($flashError)) ?>
+                    });
+                });
+            </script>
         <?php endif; ?>
 
         <!-- Content -->

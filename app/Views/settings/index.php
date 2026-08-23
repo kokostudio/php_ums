@@ -22,8 +22,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-6 py-3 text-gray-400 dark:text-slate-600 opacity-60 cursor-not-allowed" title="<?= __('settings.coming_soon') ?>">
-                        <i class="ph ph-envelope-simple mr-3 text-lg"></i> <?= __('settings.email_settings') ?>
+                    <a href="/settings/translations" class="flex items-center px-6 py-3 transition-colors <?= $tab === 'translations' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-medium border-r-2 border-blue-600 dark:border-blue-500' : 'text-gray-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800' ?>">
+                        <i class="ph ph-translate mr-3 text-lg"></i> <?= __('settings.trans_title') ?>
                     </a>
                 </li>
             </ul>
@@ -85,7 +85,94 @@
                             <input type="file" id="site_favicon" name="site_favicon" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-slate-800 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-slate-700">
                         </div>
                     </div>
+                    <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.lang_switch_title') ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3"><?= __('settings.lang_switch_desc') ?></p>
+                        
+                        <?php $currentLocale = \App\Core\Lang::locale(); ?>
+                        <div class="inline-flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1 text-sm font-medium border border-gray-200 dark:border-slate-700">
+                            <a href="/lang/th" class="px-6 py-2 rounded-md <?= $currentLocale === 'th' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm font-bold' : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white' ?> transition-all flex items-center">
+                                🇹🇭 ภาษาไทย
+                            </a>
+                            <a href="/lang/en" class="px-6 py-2 rounded-md <?= $currentLocale === 'en' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm font-bold' : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white' ?> transition-all flex items-center">
+                                🇬🇧 English
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-50 dark:border-slate-800">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.sidebar_theme') ?? 'ธีมสีของแถบข้าง (Sidebar Color Theme)' ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3"><?= __('settings.sidebar_theme_desc') ?? 'ปรับเปลี่ยนเฉดสีสำหรับแผงเมนูด้านซ้ายของระบบควบคุมหลัก' ?></p>
+                        
+                        <?php $currentTheme = $settings['sidebar_theme'] ?? 'slate'; ?>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-2xl">
+                            <!-- Slate Dark -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800/40 <?= $currentTheme === 'slate' ? 'border-blue-600 dark:border-blue-500 bg-blue-50/20 dark:bg-blue-900/10 ring-2 ring-blue-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="slate" class="sr-only" <?= $currentTheme === 'slate' ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 shadow-inner mb-2.5 flex items-center justify-center">
+                                    <?php if ($currentTheme === 'slate'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Slate Dark</span>
+                            </label>
+
+                            <!-- Midnight Black -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800/40 <?= $currentTheme === 'black' ? 'border-blue-600 dark:border-blue-500 bg-blue-50/20 dark:bg-blue-900/10 ring-2 ring-blue-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="black" class="sr-only" <?= $currentTheme === 'black' ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-full bg-zinc-950 border border-zinc-800 shadow-inner mb-2.5 flex items-center justify-center">
+                                    <?php if ($currentTheme === 'black'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Midnight</span>
+                            </label>
+
+                            <!-- Deep Indigo -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800/40 <?= $currentTheme === 'indigo' ? 'border-blue-600 dark:border-blue-500 bg-blue-50/20 dark:bg-blue-900/10 ring-2 ring-blue-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="indigo" class="sr-only" <?= $currentTheme === 'indigo' ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-full bg-indigo-950 border border-indigo-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                    <?php if ($currentTheme === 'indigo'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Deep Indigo</span>
+                            </label>
+
+                            <!-- Emerald Forest -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800/40 <?= $currentTheme === 'emerald' ? 'border-blue-600 dark:border-blue-500 bg-blue-50/20 dark:bg-blue-900/10 ring-2 ring-blue-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="emerald" class="sr-only" <?= $currentTheme === 'emerald' ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-full bg-emerald-950 border border-emerald-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                    <?php if ($currentTheme === 'emerald'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Emerald</span>
+                            </label>
+
+                            <!-- Rose Crimson -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800/40 <?= $currentTheme === 'rose' ? 'border-blue-600 dark:border-blue-500 bg-blue-50/20 dark:bg-blue-900/10 ring-2 ring-blue-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="rose" class="sr-only" <?= $currentTheme === 'rose' ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-full bg-rose-950 border border-rose-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                    <?php if ($currentTheme === 'rose'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Crimson</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="mt-6 pt-6 border-t border-gray-50 dark:border-slate-800">
+                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-4"><i class="ph ph-shield-warning mr-2 text-amber-500"></i><?= __('settings.system_status') ?></h4>
+                    <label class="flex items-center cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" name="maintenance_mode" value="1" class="sr-only" <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' ?>>
+                            <div class="block bg-gray-200 dark:bg-slate-700 w-10 h-6 rounded-full transition-colors"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></div>
+                        </div>
+                        <div class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300">
+                            <?= __('settings.maintenance_mode') ?>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 font-normal mt-0.5"><?= __('settings.maintenance_mode_desc') ?></p>
+                        </div>
+                    </label>
+                </div>
+                
+                <style>
+                    input:checked ~ .block { background-color: #ef4444; }
+                    input:checked ~ .dot { transform: translateX(100%); }
+                </style>
 
                 <div class="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800">
                     <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center">
@@ -93,6 +180,39 @@
                     </button>
                 </div>
             </form>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const themeRadios = document.querySelectorAll('input[name="sidebar_theme"]');
+                    const activeClasses = ['border-blue-600', 'dark:border-blue-500', 'bg-blue-50/20', 'dark:bg-blue-900/10', 'ring-2', 'ring-blue-500/10'];
+                    const inactiveClasses = ['border-gray-200', 'dark:border-slate-800'];
+                    
+                    themeRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            // Reset all labels
+                            themeRadios.forEach(r => {
+                                const label = r.closest('label');
+                                label.classList.remove(...activeClasses);
+                                label.classList.add(...inactiveClasses);
+                                const icon = label.querySelector('.ph-check');
+                                if (icon) icon.remove();
+                            });
+                            
+                            // Set active label
+                            if (this.checked) {
+                                const activeLabel = this.closest('label');
+                                activeLabel.classList.remove(...inactiveClasses);
+                                activeLabel.classList.add(...activeClasses);
+                                
+                                const iconContainer = activeLabel.querySelector('div.w-8.h-8');
+                                if (iconContainer && !activeLabel.querySelector('.ph-check')) {
+                                    iconContainer.insertAdjacentHTML('beforeend', '<i class="ph ph-check text-white text-xs"></i>');
+                                }
+                            }
+                        });
+                    });
+                });
+            </script>
 
             <?php elseif ($tab === 'login'): ?>
             <!-- ===== LOGIN PAGE TAB ===== -->
@@ -154,6 +274,179 @@
                     </button>
                 </div>
             </form>
+
+            <?php elseif ($tab === 'translations'): ?>
+            <!-- ===== TRANSLATIONS TAB ===== -->
+            <?php 
+                $namespaces = [];
+                if (isset($translations)) {
+                    $namespaces = array_unique(array_column($translations, 'namespace'));
+                    sort($namespaces);
+                }
+            ?>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-3 gap-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-0">
+                    <i class="ph ph-translate mr-2"></i><?= __('settings.trans_title') ?>
+                </h3>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <select id="namespaceFilter" class="w-full sm:w-48 pl-3 pr-8 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                        <option value=""><?= __('common.all') ?? 'All Namespaces' ?></option>
+                        <?php foreach ($namespaces as $ns): ?>
+                            <option value="<?= htmlspecialchars($ns) ?>"><?= htmlspecialchars($ns) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="relative w-full sm:w-auto">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="customTranslationSearch" placeholder="<?= __('common.search') ?? 'Search...' ?>" class="w-full sm:w-72 pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-slate-500">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table id="translationsTable" class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                            <th class="p-4 font-medium rounded-tl-lg"><?= __('settings.trans_namespace') ?></th>
+                            <th class="p-4 font-medium"><?= __('settings.trans_key') ?></th>
+                            <th class="p-4 font-medium"><?= __('settings.trans_th_value') ?></th>
+                            <th class="p-4 font-medium"><?= __('settings.trans_en_value') ?></th>
+                            <th class="p-4 font-medium rounded-tr-lg text-right"><?= __('common.actions') ?></th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-gray-700 dark:text-slate-300">
+                        <?php if (isset($translations)): ?>
+                        <?php foreach ($translations as $groupKey => $row): ?>
+                        <tr class="border-b border-gray-50 dark:border-slate-800 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="p-4"><span class="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold"><?= htmlspecialchars($row['namespace']) ?></span></td>
+                            <td class="p-4 font-mono text-xs"><?= htmlspecialchars($row['key_name']) ?></td>
+                            <td class="p-4 truncate max-w-[200px]" title="<?= htmlspecialchars($row['th'] ?? '') ?>"><?= htmlspecialchars($row['th'] ?? '') ?></td>
+                            <td class="p-4 truncate max-w-[200px]" title="<?= htmlspecialchars($row['en'] ?? '') ?>"><?= htmlspecialchars($row['en'] ?? '') ?></td>
+                            <td class="p-4 text-right">
+                                <button type="button" onclick="editTranslation('<?= htmlspecialchars($row['namespace']) ?>', '<?= htmlspecialchars($row['key_name']) ?>', '<?= htmlspecialchars(addslashes($row['th'] ?? '')) ?>', '<?= htmlspecialchars(addslashes($row['en'] ?? '')) ?>')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors tooltip" data-tippy-content="<?= __('common.edit') ?>">
+                                    <i class="ph ph-pencil-simple text-lg"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Edit Translation Modal -->
+            <div id="editTranslationModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-gray-100 dark:border-slate-800 transition-colors">
+                    <form id="editTranslationForm" onsubmit="saveTranslation(event)">
+                        <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
+                        <input type="hidden" id="edit_namespace" name="namespace">
+                        <input type="hidden" id="edit_key" name="key_name">
+
+                        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center">
+                                <i class="ph ph-translate text-blue-500 dark:text-blue-400 mr-2 text-xl"></i> <?= __('settings.trans_edit') ?>
+                            </h3>
+                            <button type="button" onclick="closeTranslationModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors p-1">
+                                <i class="ph ph-x text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto bg-slate-50 dark:bg-slate-950/50 space-y-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/30 flex items-center mb-4">
+                                <i class="ph ph-info mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <span class="text-sm text-blue-800 dark:text-blue-300 font-mono" id="display_key"></span>
+                            </div>
+                            
+                            <div>
+                                <label for="th_value" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.trans_th_label') ?></label>
+                                <textarea id="th_value" name="th_value" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="en_value" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.trans_en_label') ?></label>
+                                <textarea id="en_value" name="en_value" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end gap-3">
+                            <button type="button" onclick="closeTranslationModal()" class="px-5 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                                <?= __('common.cancel') ?>
+                            </button>
+                            <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                <?= __('common.save') ?>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <script>
+            $(document).ready(function() {
+                if ($('#translationsTable').length) {
+                    var table = $('#translationsTable').DataTable({
+                        pageLength: 25,
+                        dom: 'rt<"bottom flex flex-col sm:flex-row justify-between items-center mt-4"lip><"clear">'
+                    });
+
+                    $('#customTranslationSearch').on('keyup', function() {
+                        table.search(this.value).draw();
+                    });
+
+                    $('#namespaceFilter').on('change', function() {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        // Column 0 is the Namespace column
+                        table.column(0).search(val ? '^' + val + '$' : '', true, false).draw();
+                    });
+                }
+            });
+
+            function editTranslation(ns, key, th, en) {
+                $('#edit_namespace').val(ns);
+                $('#edit_key').val(key);
+                $('#th_value').val(th);
+                $('#en_value').val(en);
+                $('#display_key').text(ns + '.' + key);
+                $('#editTranslationModal').removeClass('hidden');
+            }
+
+            function closeTranslationModal() {
+                $('#editTranslationModal').addClass('hidden');
+            }
+
+            function saveTranslation(e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    url: '/settings/translations/update',
+                    type: 'POST',
+                    data: $('#editTranslationForm').serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '<?= __('common.success') ?>',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '<?= __('common.error') ?>',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '<?= __('common.error') ?>',
+                            text: 'An unexpected error occurred.'
+                        });
+                    }
+                });
+            }
+            </script>
 
             <?php endif; ?>
 

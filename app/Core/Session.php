@@ -12,6 +12,9 @@ class Session
             ini_set('session.use_only_cookies', '1');
             ini_set('session.cookie_samesite', 'Lax');
 
+            $handler = new DatabaseSessionHandler();
+            session_set_save_handler($handler, true);
+
             session_start();
         }
 

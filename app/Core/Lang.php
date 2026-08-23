@@ -73,7 +73,7 @@ class Lang
     }
 
     /**
-     * Lazy-load a language namespace file.
+     * Lazy-load a language namespace file from the database.
      * Tries current locale first, falls back to 'en', then 'th'.
      */
     private static function load(string $namespace): array
@@ -83,16 +83,22 @@ class Lang
             return static::$loaded[$cacheKey];
         }
 
-        $basePath = __DIR__ . '/../../app/Lang/';
-        $locales  = [static::$locale, 'th', 'en'];
+        try {
+            $db = Database::getInstance();
+            $locales = [static::$locale, 'th', 'en'];
 
-        foreach ($locales as $locale) {
-            $file = $basePath . $locale . '/' . $namespace . '.php';
-            if (file_exists($file)) {
-                $data = require $file;
-                static::$loaded[$cacheKey] = is_array($data) ? $data : [];
-                return static::$loaded[$cacheKey];
+            foreach ($locales as $locale) {
+                $stmt = $db->prepare("SELECT key_name, text_value FROM translations WHERE locale = ? AND namespace = ?");
+                $stmt->execute([$locale, $namespace]);
+                $data = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+                if (!empty($data)) {
+                    static::$loaded[$cacheKey] = $data;
+                    return $data;
+                }
             }
+        } catch (\Exception $e) {
+            // Fallback to empty array if DB fails or table not found
         }
 
         static::$loaded[$cacheKey] = [];

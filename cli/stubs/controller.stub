@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+
+class {{CLASS_NAME}} extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return $this->view('{{VIEW_FOLDER}}/index', [
+            'pageTitle' => '{{CLASS_NAME}}'
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return $this->view('{{VIEW_FOLDER}}/create', [
+            'pageTitle' => 'Create {{CLASS_NAME}}'
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store()
+    {
+        // Add store logic
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        // Add show logic
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        // Add edit logic
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update($id)
+    {
+        // Add update logic
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        // Add destroy logic
+    }
+}

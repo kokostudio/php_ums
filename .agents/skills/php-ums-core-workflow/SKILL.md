@@ -172,20 +172,21 @@ body { font-family: 'Prompt', sans-serif; }
 ### 9. Multi-Language (i18n) Workflow & Standards
 
 - **Languages:** Thai (`th`) as default primary, English (`en`) as secondary
-- **Files Location:** `app/Lang/{locale}/{module}.php` (e.g. `app/Lang/th/common.php`, `app/Lang/en/users.php`)
+- **Database Storage:** Translations are stored in the `translations` table, editable via the `/settings/translations` UI.
 - **Usage in Views / Controllers:**
 ```php
 // Basic translation
 <?= __('common.save') ?>
 <?= __('users.title') ?>
 
-// With placeholder replacement
+// With placeholder replacement (database value should be "Welcome :name")
 <?= __('dashboard.welcome_user', ['name' => $username]) ?>
 
 // Read current active locale
 $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 ```
 - **Language Switch Route:** `GET /lang/{locale}` (e.g. `/lang/th`, `/lang/en`)
+- **DataTables Translation:** DO NOT define `language: {}` blocks inside `DataTable()` initialization. DataTables is already configured globally in `layouts/app.php` to handle translations automatically.
 
 ---
 

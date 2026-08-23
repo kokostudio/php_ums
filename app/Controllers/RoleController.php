@@ -57,14 +57,14 @@ class RoleController extends Controller
         $perms = $_POST['permissions'] ?? [];
 
         if (empty($name)) {
-            Session::setFlash('error', 'Role name is required.');
+            Session::setFlash('error', __('messages.role_name_required'));
             $this->redirect('/roles/create');
         }
 
         $stmt = $db->prepare("SELECT id FROM roles WHERE name = :name");
         $stmt->execute(['name' => $name]);
         if ($stmt->fetch()) {
-            Session::setFlash('error', 'Role name already exists.');
+            Session::setFlash('error', __('messages.role_exists'));
             $this->redirect('/roles/create');
         }
 
@@ -86,7 +86,7 @@ class RoleController extends Controller
             Logger::activity("Created role: {$name}");
             Logger::audit('roles', $roleId, 'insert', null, ['name' => $name, 'description' => $description, 'permissions' => $perms]);
 
-            Session::setFlash('success', 'Role created successfully.');
+            Session::setFlash('success', __('messages.role_created'));
             $this->redirect('/roles');
         } catch (\Exception $e) {
             $db->rollBack();
@@ -141,7 +141,7 @@ class RoleController extends Controller
         $perms = $_POST['permissions'] ?? [];
 
         if (empty($name)) {
-            Session::setFlash('error', 'Role name is required.');
+            Session::setFlash('error', __('messages.role_name_required'));
             $this->redirect("/roles/{$id}/edit");
         }
 
@@ -153,7 +153,7 @@ class RoleController extends Controller
         $checkStmt = $db->prepare("SELECT id FROM roles WHERE name = :name AND id != :id");
         $checkStmt->execute(['name' => $name, 'id' => $realId]);
         if ($checkStmt->fetch()) {
-            Session::setFlash('error', 'Role name already exists.');
+            Session::setFlash('error', __('messages.role_exists'));
             $this->redirect("/roles/{$id}/edit");
         }
 
@@ -189,7 +189,7 @@ class RoleController extends Controller
             Logger::activity("Updated role: {$name}");
             Logger::audit('roles', $realId, 'update', ['name' => $oldRole['name'], 'description' => $oldRole['description']], ['name' => $name, 'description' => $description, 'permissions' => $perms]);
 
-            Session::setFlash('success', 'Role updated successfully.');
+            Session::setFlash('success', __('messages.role_updated'));
             $this->redirect('/roles');
         } catch (\Exception $e) {
             $db->rollBack();

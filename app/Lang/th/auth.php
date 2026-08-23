@@ -26,4 +26,8 @@ return [
 
     'invalid_credentials' => 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
     'account_inactive'    => 'บัญชีนี้ถูกระงับการใช้งาน',
+
+    '2fa_desc'            => 'โปรดเปิดแอปยืนยันตัวตนของคุณ (เช่น Google Authenticator) และป้อนรหัส 6 หลัก',
+    'verification_code'   => 'รหัสยืนยัน',
+    'verify_and_login'    => 'ยืนยันและเข้าสู่ระบบ',
 ];
