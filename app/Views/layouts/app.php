@@ -1,46 +1,61 @@
 <?php
-use App\Core\Settings;
-use App\Core\Session;
+    use App\Core\Session;
+    use App\Core\Settings;
 
-$sidebarTheme = Settings::get('sidebar_theme', 'slate');
-$themes = [
-    'slate' => [
-        'bg' => 'bg-slate-900',
+    $sidebarTheme = Settings::get('sidebar_theme', 'slate');
+    $themes       = [
+    'slate'   => [
+        'bg'     => 'bg-slate-900',
         'border' => 'border-slate-800',
-        'footer' => 'bg-slate-950'
+        'footer' => 'bg-slate-950',
     ],
-    'black' => [
-        'bg' => 'bg-neutral-950',
+    'black'   => [
+        'bg'     => 'bg-neutral-950',
         'border' => 'border-neutral-900',
-        'footer' => 'bg-black/40'
+        'footer' => 'bg-black/40',
     ],
-    'indigo' => [
-        'bg' => 'bg-indigo-950',
+    'indigo'  => [
+        'bg'     => 'bg-indigo-950',
         'border' => 'border-indigo-900',
-        'footer' => 'bg-indigo-950/60'
+        'footer' => 'bg-indigo-950/60',
     ],
     'emerald' => [
-        'bg' => 'bg-emerald-950',
+        'bg'     => 'bg-emerald-950',
         'border' => 'border-emerald-900',
-        'footer' => 'bg-emerald-950/60'
+        'footer' => 'bg-emerald-950/60',
     ],
-    'rose' => [
-        'bg' => 'bg-rose-950',
+    'rose'    => [
+        'bg'     => 'bg-rose-950',
         'border' => 'border-rose-900',
-        'footer' => 'bg-rose-950/60'
-    ]
-];
-$theme = $themes[$sidebarTheme] ?? $themes['slate'];
+        'footer' => 'bg-rose-950/60',
+    ],
+    ];
+    $theme = $themes[$sidebarTheme] ?? $themes['slate'];
+    $themePalettes = [
+        'slate' => "{ 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' }",
+        'black' => "{ 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040', 800: '#262626', 900: '#171717', 950: '#0a0a0a' }",
+        'indigo' => "{ 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b' }",
+        'emerald' => "{ 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }",
+        'rose' => "{ 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' }"
+    ];
+    $palette = $themePalettes[$sidebarTheme] ?? $themePalettes['slate'];
+    $sidebarHex = [
+        'slate' => '#0f172a',
+        'black' => '#0a0a0a',
+        'indigo' => '#1e1b4b',
+        'emerald' => '#022c22',
+        'rose' => '#4c0519'
+    ][$sidebarTheme] ?? '#0f172a';
 ?>
 <!DOCTYPE html>
-<html lang="<?= \App\Core\Lang::locale() ?>">
+<html lang="<?php echo \App\Core\Lang::locale() ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(Settings::get('site_name', 'System')) ?></title>
-    
-    <?php $favicon = Settings::get('site_favicon'); if ($favicon): ?>
-        <link rel="icon" href="<?= htmlspecialchars($favicon) ?>">
+    <title><?php echo htmlspecialchars(Settings::get('site_name', 'System')) ?></title>
+
+    <?php $favicon = Settings::get('site_favicon');if ($favicon): ?>
+        <link rel="icon" href="<?php echo htmlspecialchars($favicon) ?>">
     <?php endif; ?>
     <!-- Dark Mode Init Script (Prevents FOUC) -->
     <script>
@@ -58,7 +73,8 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6',
+                        sidebar: '<?php echo $sidebarHex ?>',
+                        primary: <?php echo $palette ?>,
                         secondary: '#64748b',
                     },
                     fontFamily: {
@@ -182,9 +198,9 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
         }
         .dataTables_wrapper .dataTables_length select,
         .dataTables_wrapper .dataTables_filter input {
-            border-radius: 0.5rem; 
-            border: 1px solid #e2e8f0; 
-            padding: 0.4rem 1rem; 
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.4rem 1rem;
             outline: none;
             transition: all 0.2s ease;
             font-size: 0.875rem;
@@ -200,7 +216,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
+
         table.dataTable.no-footer { border-bottom: none; }
         table.dataTable thead th {
             border-bottom: 2px solid #e2e8f0;
@@ -211,9 +227,9 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
             letter-spacing: 0.05em;
             padding: 1rem;
         }
-        table.dataTable tbody th, table.dataTable tbody td { 
-            border-bottom: 1px solid #f1f5f9; 
-            padding: 1rem; 
+        table.dataTable tbody th, table.dataTable tbody td {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 1rem;
             vertical-align: middle;
         }
         table.dataTable tbody tr {
@@ -222,14 +238,14 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
         table.dataTable tbody tr:hover {
             background-color: #f8fafc;
         }
-        
+
         /* Pagination */
         .dataTables_wrapper .dataTables_paginate {
             padding-top: 1rem;
         }
-        .dataTables_wrapper .dataTables_paginate .paginate_button { 
-            border-radius: 0.5rem !important; 
-            padding: 0.4rem 0.8rem; 
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 0.5rem !important;
+            padding: 0.4rem 0.8rem;
             margin-left: 0.25rem;
             border: 1px solid transparent !important;
             font-weight: 500;
@@ -242,9 +258,9 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
             border-color: #e2e8f0 !important;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { 
-            background: #3b82f6 !important; 
-            color: white !important; 
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #3b82f6 !important;
+            color: white !important;
             border-color: #3b82f6 !important;
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
         }
@@ -256,10 +272,10 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
 
         /* Dark mode overrides for DataTables */
         .dark .dataTables_wrapper .dataTables_length select,
-        .dark .dataTables_wrapper .dataTables_filter input { 
-            border-color: #334155; 
-            background-color: #1e293b; 
-            color: #f1f5f9; 
+        .dark .dataTables_wrapper .dataTables_filter input {
+            border-color: #334155;
+            background-color: #1e293b;
+            color: #f1f5f9;
         }
         .dark .dataTables_wrapper .dataTables_length select:focus,
         .dark .dataTables_wrapper .dataTables_filter input:focus {
@@ -270,10 +286,10 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
         .dark table.dataTable tbody th, .dark table.dataTable tbody td { border-bottom-color: #1e293b; }
         .dark table.dataTable tbody tr:hover { background-color: #0f172a; }
         .dark .dataTables_wrapper .dataTables_paginate .paginate_button { color: #cbd5e1 !important; }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover { 
-            background: #334155 !important; 
-            border-color: #475569 !important; 
-            color: white !important; 
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: white !important;
         }
         .dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #475569 !important; }
         .dark .dataTables_wrapper .dataTables_info { color: #94a3b8 !important; }
@@ -317,7 +333,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
         $.extend(true, $.fn.dataTable.defaults, {
             dom: '<"top"f>rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
             language: {
-                <?= \App\Core\Lang::locale() === 'th' ? '
+                <?php echo \App\Core\Lang::locale() === 'th' ? '
                 "emptyTable": "ไม่มีข้อมูลในตาราง",
                 "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
                 "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
@@ -348,76 +364,76 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 <?= $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-transform duration-300 shadow-xl flex">
-        <div class="h-16 flex items-center px-6 border-b <?= $theme['border'] ?> font-bold text-lg tracking-wider">
-            <?php $logo = Settings::get('site_logo'); if ($logo): ?>
-                <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
+    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-transform duration-300 shadow-xl flex">
+        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider">
+            <?php $logo = Settings::get('site_logo');if ($logo): ?>
+                <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
             <?php else: ?>
                 <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2"></i>
             <?php endif; ?>
-            <span class="truncate"><?= htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
+            <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
         </div>
-        
+
         <div class="flex-1 overflow-y-auto py-6">
             <nav class="space-y-1 px-3">
                 <!-- Group: System Management -->
-                <?php 
-                $systemRoutes = ['/dashboard', '/users', '/roles', '/logs/activity', '/logs/audit', '/settings'];
-                $isSystemActive = false;
-                $currentUri = $_SERVER['REQUEST_URI'] ?? '';
-                foreach ($systemRoutes as $route) {
-                    if (strpos($currentUri, $route) === 0) {
-                        $isSystemActive = true;
-                        break;
+                <?php
+                    $systemRoutes   = ['/dashboard', '/users', '/roles', '/logs/activity', '/logs/audit', '/settings'];
+                    $isSystemActive = false;
+                    $currentUri     = $_SERVER['REQUEST_URI'] ?? '';
+                    foreach ($systemRoutes as $route) {
+                        if (strpos($currentUri, $route) === 0) {
+                            $isSystemActive = true;
+                            break;
+                        }
                     }
-                }
                 ?>
                 <div class="sidebar-group">
-                    <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?= $isSystemActive ? 'text-white bg-white/10' : 'text-slate-300' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
+                    <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isSystemActive ? 'text-primary-300 bg-primary-900/40' : 'text-slate-300 hover:text-primary-300 hover:bg-primary-900/20' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
                         <div class="flex items-center">
-                            <i class="ph ph-desktop text-lg mr-3"></i> 
-                            <span><?= __('common.administration') ?></span>
+                            <i class="ph ph-desktop text-lg mr-3"></i>
+                            <span><?php echo __('common.administration') ?></span>
                         </div>
-                        <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 <?= $isSystemActive ? 'rotate-90' : '' ?>"></i>
+                        <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 <?php echo $isSystemActive ? 'rotate-90' : '' ?>"></i>
                     </button>
-                    <div class="submenu overflow-hidden <?= $isSystemActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-slate-700/50 ml-5">
-                        <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/dashboard') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-squares-four text-lg mr-3 opacity-70"></i> <?= __('common.dashboard') ?>
+                    <div class="submenu overflow-hidden <?php echo $isSystemActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
+                        <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/dashboard') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-squares-four text-lg mr-3 opacity-70"></i> <?php echo __('common.dashboard') ?>
                         </a>
-                        <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/users') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-users text-lg mr-3 opacity-70"></i> <?= __('common.user_management') ?>
+                        <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/users') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-users text-lg mr-3 opacity-70"></i> <?php echo __('common.user_management') ?>
                         </a>
-                        <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/roles') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-shield-check text-lg mr-3 opacity-70"></i> <?= __('common.roles_permissions') ?>
+                        <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/roles') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-shield-check text-lg mr-3 opacity-70"></i> <?php echo __('common.roles_permissions') ?>
                         </a>
-                        <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/logs/activity') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-activity text-lg mr-3 opacity-70"></i> <?= __('common.activity_logs') ?>
+                        <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-activity text-lg mr-3 opacity-70"></i> <?php echo __('common.activity_logs') ?>
                         </a>
-                        <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/logs/audit') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-file-search text-lg mr-3 opacity-70"></i> <?= __('common.audit_logs') ?>
+                        <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-file-search text-lg mr-3 opacity-70"></i> <?php echo __('common.audit_logs') ?>
                         </a>
-                        <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?= strpos($currentUri, '/settings') === 0 ? 'text-white border-l-[3px] border-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-gear text-lg mr-3 opacity-70"></i> <?= __('common.system_settings') ?>
+                        <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/settings') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-gear text-lg mr-3 opacity-70"></i> <?php echo __('common.system_settings') ?>
                         </a>
                     </div>
                 </div>
             </nav>
         </div>
-        
-        <div class="p-4 border-t <?= $theme['border'] ?> <?= $theme['footer'] ?> relative group cursor-pointer">
+
+        <div class="p-4 border-t <?php echo $theme['border'] ?> <?php echo $theme['footer'] ?> relative group cursor-pointer">
             <a href="/profile" class="flex items-center hover:opacity-80 transition-opacity">
-                <?php $profileImg = Session::get('profile_image'); if ($profileImg): ?>
-                    <img src="<?= htmlspecialchars($profileImg) ?>" alt="Profile" class="w-9 h-9 rounded-full object-cover shadow-inner border border-slate-700">
+                <?php $profileImg = Session::get('profile_image');if ($profileImg): ?>
+                    <img src="<?php echo htmlspecialchars($profileImg) ?>" alt="Profile" class="w-9 h-9 rounded-full object-cover shadow-inner border border-slate-700">
                 <?php else: ?>
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm shadow-inner text-white">
-                        <?= htmlspecialchars(strtoupper(substr(Session::get('username', 'U'), 0, 1))) ?>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary-500 to-primary-700 flex items-center justify-center font-bold text-sm shadow-inner text-white">
+                        <?php echo htmlspecialchars(strtoupper(substr(Session::get('username', 'U'), 0, 1))) ?>
                     </div>
                 <?php endif; ?>
-                <div class="ml-3 overflow-hidden flex-1 text-white">
-                    <p class="text-sm font-medium truncate"><?= htmlspecialchars(Session::get('username', 'Guest')) ?></p>
-                    <p class="text-xs text-slate-400 truncate"><?= __('common.view_profile') ?></p>
+                <div class="ml-3 overflow-hidden flex-1 text-white group-hover:text-primary-100 transition-colors">
+                    <p class="text-sm font-medium truncate"><?php echo htmlspecialchars(Session::get('username', 'Guest')) ?></p>
+                    <p class="text-xs text-primary-300/70 group-hover:text-primary-300 transition-colors truncate"><?php echo __('common.view_profile') ?></p>
                 </div>
-                <i class="ph ph-caret-right text-slate-500 text-sm"></i>
+                <i class="ph ph-caret-right text-primary-400/50 group-hover:text-primary-400 transition-colors text-sm"></i>
             </a>
         </div>
     </aside>
@@ -430,54 +446,54 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                 <button id="sidebarToggle" class="md:hidden text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors mr-1">
                     <i class="ph ph-list text-2xl"></i>
                 </button>
-                
+
                 <!-- Desktop Global Search Trigger -->
                 <div class="hidden md:flex items-center bg-slate-100/80 hover:bg-slate-200/50 dark:bg-slate-800/80 dark:hover:bg-slate-700/50 border border-transparent dark:border-slate-800 rounded-full px-4 py-1.5 w-64 text-slate-400 dark:text-slate-500 cursor-pointer transition-all duration-200" onclick="openSearchPalette()">
                     <i class="ph ph-magnifying-glass text-base mr-2.5"></i>
-                    <span class="text-xs font-medium"><?= __('common.search') ?>...</span>
+                    <span class="text-xs font-medium"><?php echo __('common.search') ?>...</span>
                     <kbd class="ml-auto bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded text-[9px] text-slate-400 dark:text-slate-500 shadow-sm font-sans font-medium uppercase">Ctrl K</kbd>
                 </div>
 
                 <!-- Mobile Global Search Trigger -->
-                <button class="md:hidden text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors p-2" onclick="openSearchPalette()" title="<?= __('common.search') ?>">
+                <button class="md:hidden text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors p-2" onclick="openSearchPalette()" title="<?php echo __('common.search') ?>">
                     <i class="ph ph-magnifying-glass text-xl"></i>
                 </button>
             </div>
             <div class="flex items-center space-x-4">
                 <!-- Theme Toggle -->
-                <button id="themeToggle" class="text-gray-400 hover:text-primary dark:text-slate-400 dark:hover:text-yellow-400 transition-colors relative" title="<?= __('common.toggle_theme') ?>">
+                <button id="themeToggle" class="text-gray-400 hover:text-primary dark:text-slate-400 dark:hover:text-yellow-400 transition-colors relative" title="<?php echo __('common.toggle_theme') ?>">
                     <i id="themeToggleIcon" class="ph ph-moon text-xl"></i>
                 </button>
-                
+
                 <!-- Notifications Dropdown -->
                 <div class="relative">
-                    <button id="notificationToggle" class="text-gray-400 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors relative" title="<?= __('common.notifications') ?>">
+                    <button id="notificationToggle" class="text-gray-400 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors relative" title="<?php echo __('common.notifications') ?>">
                         <i class="ph ph-bell text-xl"></i>
                         <span id="notificationBadge" class="hidden absolute top-0 right-0 -mt-1 -mr-1 h-3 w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                         </span>
                     </button>
-                    
+
                     <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 z-50 overflow-hidden transition-all transform origin-top-right">
                         <div class="px-4 py-3 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
-                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white"><?= __('common.notifications') ?></h3>
-                            <button id="markAllReadBtn" class="text-xs text-blue-600 dark:text-blue-400 hover:underline"><?= __('common.mark_all_read') ?></button>
+                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white"><?php echo __('common.notifications') ?></h3>
+                            <button id="markAllReadBtn" class="text-xs text-blue-600 dark:text-blue-400 hover:underline"><?php echo __('common.mark_all_read') ?></button>
                         </div>
                         <div id="notificationList" class="max-h-96 overflow-y-auto">
                             <!-- Injected by JS -->
-                            <div class="p-4 text-center text-sm text-gray-500 dark:text-slate-400"><?= __('common.loading') ?></div>
+                            <div class="p-4 text-center text-sm text-gray-500 dark:text-slate-400"><?php echo __('common.loading') ?></div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
 
                 <form action="/logout" method="POST" id="logoutForm" class="inline m-0 p-0">
-                    <input type="hidden" name="csrf_token" value="<?= Session::getCsrfToken() ?>">
+                    <input type="hidden" name="csrf_token" value="<?php echo Session::getCsrfToken() ?>">
                     <button type="button" onclick="confirmLogout()" class="text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium flex items-center transition-colors">
-                        <i class="ph ph-sign-out text-lg md:mr-1.5"></i> 
-                        <span class="hidden md:inline"><?= __('common.logout') ?></span>
+                        <i class="ph ph-sign-out text-lg md:mr-1.5"></i>
+                        <span class="hidden md:inline"><?php echo __('common.logout') ?></span>
                     </button>
                 </form>
             </div>
@@ -514,12 +530,12 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                             });
                             Toast.fire({
                                 icon: 'success',
-                                title: <?= json_encode(htmlspecialchars($flashSuccess)) ?>
+                                title: <?php echo json_encode(htmlspecialchars($flashSuccess)) ?>
                             });
                         });
                     </script>
                 <?php endif; ?>
-                
+
                 <?php if ($flashError = Session::getFlash('error')): ?>
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
@@ -547,18 +563,18 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                             });
                             Toast.fire({
                                 icon: 'error',
-                                title: <?= json_encode(htmlspecialchars($flashError)) ?>
+                                title: <?php echo json_encode(htmlspecialchars($flashError)) ?>
                             });
                         });
                     </script>
                 <?php endif; ?>
 
                 <!-- View Content Injected Here -->
-                <?= $content ?? '' ?>
-                
+                <?php echo $content ?? '' ?>
+
                 <!-- Footer -->
                 <footer class="mt-8 pt-4 border-t border-gray-200 dark:border-slate-800 text-center text-sm text-gray-500 dark:text-slate-400 pb-4 transition-colors">
-                    <?= Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>
+                    <?php echo Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>
                 </footer>
             </div>
         </main>
@@ -590,7 +606,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
             const notifBadge = document.getElementById('notificationBadge');
             const notifList = document.getElementById('notificationList');
             const markAllBtn = document.getElementById('markAllReadBtn');
-            
+
             let notificationsOpen = false;
 
             function fetchNotifications() {
@@ -605,7 +621,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                                 notifBadge.classList.add('hidden');
                                 notifBadge.classList.remove('flex');
                             }
-                            
+
                             renderNotifications(data.notifications);
                         }
                     });
@@ -613,17 +629,17 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
 
             function renderNotifications(notifications) {
                 if (!notifications || notifications.length === 0) {
-                    notifList.innerHTML = '<div class="p-4 text-center text-sm text-gray-500 dark:text-slate-400"><?= __('common.no_notifications') ?></div>';
+                    notifList.innerHTML = '<div class="p-4 text-center text-sm text-gray-500 dark:text-slate-400"><?php echo __('common.no_notifications') ?></div>';
                     return;
                 }
-                
+
                 notifList.innerHTML = '';
                 notifications.forEach(n => {
                     const isReadClass = n.is_read == 1 ? 'opacity-60' : 'bg-blue-50/50 dark:bg-blue-900/10';
                     const icon = n.type === 'alert' ? 'ph-warning text-yellow-500' : 'ph-info text-blue-500';
-                    
+
                     const item = document.createElement('div');
-                    item.className = `p-3 border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer flex items-start gap-3 ${isReadClass}`;
+                    item.className = `p-3 border-b border-gray-100 dark:border-primary-800/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer flex items-start gap-3 ${isReadClass}`;
                     item.innerHTML = `
                         <div class="mt-0.5"><i class="ph-fill ${icon} text-lg"></i></div>
                         <div class="flex-1 min-w-0">
@@ -632,7 +648,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                             <p class="text-[10px] text-gray-400 mt-1">${formatDate(n.created_at, true)}</p>
                         </div>
                     `;
-                    
+
                     item.addEventListener('click', () => {
                         if (n.is_read == 0) {
                             axios.post('/api/notifications/read', { id: n.id }).then(() => {
@@ -641,7 +657,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                         }
                         if (n.link) window.location.href = n.link;
                     });
-                    
+
                     notifList.appendChild(item);
                 });
             }
@@ -713,14 +729,14 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
         // Logout Confirmation
         function confirmLogout() {
             Swal.fire({
-                title: '<?= __('common.logout_confirm_title') ?>',
-                text: '<?= __('common.logout_confirm_text') ?>',
+                title: '<?php echo __('common.logout_confirm_title') ?>',
+                text: '<?php echo __('common.logout_confirm_text') ?>',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: '<?= __('common.yes_logout') ?>',
-                cancelButtonText: '<?= __('common.cancel') ?>'
+                confirmButtonText: '<?php echo __('common.yes_logout') ?>',
+                cancelButtonText: '<?php echo __('common.cancel') ?>'
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('logoutForm').submit();
@@ -800,7 +816,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
 
                 const categories = {
                     users: {
-                        title: '<?= __('common.user_management') ?>',
+                        title: '<?php echo __('common.user_management') ?>',
                         icon: 'ph-users-three',
                         color: 'bg-blue-50 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400',
                         getUrl: item => `/users?search=${encodeURIComponent(item.username)}`,
@@ -808,7 +824,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                         formatSub: item => `<span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${item.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400'}">${item.status}</span>`
                     },
                     roles: {
-                        title: '<?= __('common.roles_permissions') ?>',
+                        title: '<?php echo __('common.roles_permissions') ?>',
                         icon: 'ph-shield-check',
                         color: 'bg-purple-50 text-purple-500 dark:bg-purple-900/20 dark:text-purple-400',
                         getUrl: item => `/roles`,
@@ -816,7 +832,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                         formatSub: item => highlight(item.description || '', query)
                     },
                     logs: {
-                        title: '<?= __('common.activity_logs') ?>',
+                        title: '<?php echo __('common.activity_logs') ?>',
                         icon: 'ph-activity',
                         color: 'bg-emerald-50 text-emerald-500 dark:bg-emerald-900/20 dark:text-emerald-400',
                         getUrl: item => `/logs/activity`,
@@ -824,7 +840,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                         formatSub: item => `<span class="text-slate-400">by</span> ${highlight(item.username || 'System', query)} <span class="text-[10px] text-slate-400 ml-2">${formatDate(item.created_at, true)}</span>`
                     },
                     translations: {
-                        title: '<?= __('settings.trans_title') ?? 'Translations' ?>',
+                        title: '<?php echo __('settings.trans_title') ?? 'Translations' ?>',
                         icon: 'ph-translate',
                         color: 'bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400',
                         getUrl: item => `/settings/translations`,
@@ -851,7 +867,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
 
                     const section = document.createElement('div');
                     section.className = 'space-y-2';
-                    
+
                     const title = document.createElement('div');
                     title.className = 'text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2';
                     title.textContent = category.title;
@@ -905,7 +921,7 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                 <!-- Search Input Wrapper -->
                 <div class="relative flex items-center border-b border-gray-100 dark:border-slate-800 px-4">
                     <i class="ph ph-magnifying-glass text-slate-400 dark:text-slate-500 text-xl mr-3"></i>
-                    <input type="text" id="globalSearchInput" placeholder="<?= __('common.search') ?>..." class="w-full bg-transparent border-0 py-4 text-gray-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-0 text-base" autocomplete="off">
+                    <input type="text" id="globalSearchInput" placeholder="<?php echo __('common.search') ?>..." class="w-full bg-transparent border-0 py-4 text-gray-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-0 text-base" autocomplete="off">
                     <button onclick="closeSearchPalette()" class="text-slate-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs font-medium px-2 py-1 rounded-md border border-gray-200 dark:border-slate-800">ESC</button>
                 </div>
 
@@ -913,23 +929,23 @@ $theme = $themes[$sidebarTheme] ?? $themes['slate'];
                 <div id="globalSearchResults" class="flex-1 overflow-y-auto p-4 space-y-4">
                     <!-- Quick Links / Default State -->
                     <div id="searchDefaultState" class="space-y-4">
-                        <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2"><?= __('common.main_menu') ?></div>
+                        <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2"><?php echo __('common.main_menu') ?></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <a href="/users" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center"><i class="ph ph-users text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('common.user_management') ?></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.user_management') ?></div>
                             </a>
                             <a href="/roles" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-500 flex items-center justify-center"><i class="ph ph-shield-check text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('common.roles_permissions') ?></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.roles_permissions') ?></div>
                             </a>
                             <a href="/logs/activity" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center"><i class="ph ph-activity text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('common.activity_logs') ?></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.activity_logs') ?></div>
                             </a>
                             <a href="/settings" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center"><i class="ph ph-gear text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('common.system_settings') ?></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.system_settings') ?></div>
                             </a>
                         </div>
                     </div>

@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 md:p-8 max-w-3xl transition-colors">
+<div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 md:p-8 max-w-3xl transition-colors">
     <form action="/users/create" method="POST">
         <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
@@ -63,10 +63,10 @@
         </div>
 
         <div class="flex items-center justify-end border-t border-gray-100 dark:border-slate-800 pt-6 mt-6 space-x-3">
-            <a href="/users" class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <a href="/users" class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors">
                 <?= __('common.cancel') ?>
             </a>
-            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center">
+            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
                 <i class="ph ph-floppy-disk mr-2 text-lg"></i> <?= __('users.save_user') ?>
             </button>
         </div>

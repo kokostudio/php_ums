@@ -46,7 +46,7 @@
         <div class="flex justify-center">
             <form action="/logout" method="POST" class="inline m-0 p-0">
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
-                <button type="submit" class="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center">
+                <button type="submit" class="px-6 py-3 bg-white dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center">
                     <i class="ph ph-sign-out text-lg mr-2"></i> <?= __('common.logout') ?>
                 </button>
             </form>

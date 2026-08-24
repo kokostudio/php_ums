@@ -6,13 +6,13 @@
         <p class="text-sm text-gray-500 dark:text-slate-400 mt-1"><?= __('profile.manage_sessions_desc') ?></p>
     </div>
     <div>
-        <a href="/profile" class="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center">
+        <a href="/profile" class="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors inline-flex items-center">
             <i class="ph ph-arrow-left mr-2"></i> <?= __('profile.back_to_profile') ?>
         </a>
     </div>
 </div>
 
-<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
+<div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
     <div class="overflow-x-auto w-full">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -44,7 +44,7 @@
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
                         <td class="py-4 px-6">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-4 shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4 shrink-0">
                                     <i class="ph <?= $icon ?> text-xl"></i>
                                 </div>
                                 <div>

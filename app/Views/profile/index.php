@@ -8,11 +8,11 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Left Column: User Card -->
     <div class="lg:col-span-1">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 text-center relative transition-colors">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 text-center relative transition-colors">
             <?php if (!empty($user['profile_image'])): ?>
-                <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Picture" class="w-24 h-24 mx-auto rounded-full object-cover shadow-inner mb-4 border-2 border-white dark:border-slate-900 outline outline-2 outline-blue-100 dark:outline-blue-900/30">
+                <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Picture" class="w-24 h-24 mx-auto rounded-full object-cover shadow-inner mb-4 border-2 border-white dark:border-slate-900 outline outline-2 outline-primary-100 dark:outline-primary-900/30">
             <?php else: ?>
-                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-3xl text-white shadow-inner mb-4">
+                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-primary-500 to-purple-500 flex items-center justify-center font-bold text-3xl text-white shadow-inner mb-4">
                     <?= htmlspecialchars(strtoupper(substr($user['username'], 0, 1))) ?>
                 </div>
             <?php endif; ?>
@@ -34,7 +34,7 @@
     <div class="lg:col-span-2 space-y-6">
         
         <!-- General Info Form -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2"><?= __('profile.general_info') ?></h3>
             <form action="/profile" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
@@ -49,7 +49,7 @@
                                 <i class="ph ph-image text-gray-400 dark:text-slate-500 text-2xl"></i>
                             <?php endif; ?>
                         </div>
-                        <input type="file" id="profile_image_input" accept="image/png, image/jpeg, image/webp" class="text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-slate-800 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-slate-700">
+                        <input type="file" id="profile_image_input" accept="image/png, image/jpeg, image/webp" class="text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
                         <input type="hidden" name="cropped_image" id="cropped_image_input">
                     </div>
                 </div>
@@ -63,12 +63,12 @@
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.email_address') ?> <span class="text-red-500">*</span></label>
                         <input type="email" id="email" name="email" required value="<?= htmlspecialchars($user['email']) ?>"
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                     </div>
                 </div>
                 
                 <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center">
+                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
                         <i class="ph ph-floppy-disk mr-2"></i> <?= __('profile.update_profile') ?>
                     </button>
                 </div>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Change Password Form -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2"><?= __('profile.change_password') ?></h3>
             <form action="/profile/password" method="POST">
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
@@ -85,22 +85,22 @@
                     <div>
                         <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.current_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="current_password" name="current_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                     </div>
                     <div>
                         <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.new_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="new_password" name="new_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                     </div>
                     <div>
                         <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.confirm_new_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="confirm_password" name="confirm_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                     </div>
                 </div>
                 
                 <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition-colors shadow-sm flex items-center">
+                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
                         <i class="ph ph-lock-key mr-2"></i> <?= __('profile.update_password') ?>
                     </button>
                 </div>
@@ -108,9 +108,9 @@
         </div>
 
         <!-- 2FA Setup -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2 flex items-center">
-                <i class="ph ph-shield-check mr-2 text-blue-500"></i> <?= __('profile.two_factor') ?>
+                <i class="ph ph-shield-check mr-2 text-primary-500"></i> <?= __('profile.two_factor') ?>
             </h3>
 
             <?php if ($user['two_factor_enabled']): ?>
@@ -150,8 +150,8 @@
                             <label for="totp_code" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.enter_verification_code') ?></label>
                             <div class="flex gap-2">
                                 <input type="text" id="totp_code" name="totp_code" required maxlength="6" pattern="[0-9]{6}" placeholder="123456"
-                                    class="w-full px-4 py-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors tracking-widest text-center">
-                                <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
+                                    class="w-full px-4 py-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors tracking-widest text-center">
+                                <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm whitespace-nowrap">
                                     <?= __('profile.verify_and_enable') ?>
                                 </button>
                             </div>
@@ -162,14 +162,14 @@
         </div>
 
         <!-- Active Sessions -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6 flex items-center justify-between">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6 flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1 flex items-center">
                     <i class="ph ph-devices mr-2 text-purple-500"></i> <?= __('profile.active_sessions') ?>
                 </h3>
                 <p class="text-sm text-gray-500 dark:text-slate-400"><?= __('profile.active_sessions_desc') ?></p>
             </div>
-            <a href="/profile/sessions" class="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm whitespace-nowrap border border-slate-200 dark:border-slate-700">
+            <a href="/profile/sessions" class="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors shadow-sm whitespace-nowrap border border-slate-200 dark:border-slate-700">
                 <?= __('profile.manage_sessions') ?>
             </a>
         </div>
@@ -179,7 +179,7 @@
 
 <!-- Cropper Modal -->
 <div id="cropperModal" class="fixed inset-0 z-[100] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-300">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden border border-gray-200 dark:border-slate-800 scale-95 transition-transform duration-300 transform" id="cropperModalContent">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden border border-gray-200 dark:border-slate-800 scale-95 transition-transform duration-300 transform" id="cropperModalContent">
         <div class="p-4 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('profile.crop_profile_picture') ?></h3>
             <button type="button" id="closeCropperBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -191,9 +191,9 @@
                 <img id="cropperImage" src="" class="max-w-full hidden">
             </div>
         </div>
-        <div class="p-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 bg-white dark:bg-slate-900">
-            <button type="button" id="cancelCropBtn" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"><?= __('common.cancel') ?></button>
-            <button type="button" id="applyCropBtn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"><?= __('profile.apply_crop') ?></button>
+        <div class="p-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 bg-white dark:bg-black/20 dark:backdrop-blur-md">
+            <button type="button" id="cancelCropBtn" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors"><?= __('common.cancel') ?></button>
+            <button type="button" id="applyCropBtn" class="px-4 py-2 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm"><?= __('profile.apply_crop') ?></button>
         </div>
     </div>
 </div>

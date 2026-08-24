@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
+<div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
     <div class="p-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2"><?= __('auth.reset_password_title') ?></h2>
         <p class="text-gray-600 dark:text-slate-400 text-sm mb-6"><?= __('auth.reset_password_subtitle') ?></p>
@@ -32,7 +32,7 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                <button type="submit" class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-sidebar hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                     <?= __('auth.reset_password_btn') ?> <i class="ph ph-check-circle ml-2"></i>
                 </button>
             </div>

@@ -91,4 +91,10 @@
   - ห้ามใส่ property `language:` แยกต่างหากใน DataTables initialization ของแต่ละหน้า
   - ระบบมีการตั้งค่า Global Configuration ไว้แล้วใน `app/Views/layouts/app.php` ซึ่งครอบคลุมการแปลภาษา (Th/En) ของ DataTables แบบอัตโนมัติ
 
-
+## 12. Dynamic Theme & Tailwind Conventions (UI/UX)
+- **Dynamic Palette:** ระบบรองรับการเปลี่ยนธีมแบบ Dynamic โดย `layouts/app.php` จะดึงค่าสีธีมปัจจุบันส่งเข้าไปทับ `primary` ของ Tailwind เสมอ ดังนั้นให้ใช้ class กลุ่ม `primary-*` สำหรับลูกเล่นหรือจุดที่ต้องการเปลี่ยนสีตามธีม
+- **Primary Buttons:** ปุ่มกดหลักในแบบฟอร์ม (เช่น Save, Update, Create) **ต้องใช้ class `bg-sidebar` เสมอ** เพื่อให้ปุ่มมีสีตรงกับธีม Sidebar ปัจจุบันอย่างสมบูรณ์แบบ
+- **Destructive Buttons:** ปุ่มที่เป็นอันตราย เช่น ลบข้อมูล หรือปิดการใช้งาน (Disable) ให้ใช้สีแดง (เช่น `bg-red-500`) ตามมาตรฐานสากลเสมอ
+- **Active & Hover States (Accents):** สถานะ Active ของแท็บเมนู (Tabs), แถวในตาราง, เมนูย่อย, หรือปุ่มรองต่างๆ ต้องใช้ `text-primary-*` และ `bg-primary-*` (เช่น `hover:bg-primary-50 dark:hover:bg-primary-900/20`) แทนการใช้สีเทา (`slate`) หรือสีฟ้า (`blue`) แบบเจาะจง เพื่อให้ความรู้สึกที่ตอบสนองกับธีมได้อย่างกลมกลืน (Premium Tint)
+- **Global Color Scope:** ห้าม Override สีหลักของ Tailwind (เช่น `blue`, `gray`, `slate`) ทั่วทั้งระบบ เพื่อหลีกเลี่ยงผลกระทบต่อ UI ส่วนที่ไม่เกี่ยวข้อง จะมีการแมปแบบ Dynamic เฉพาะสี `primary` และ `sidebar` เท่านั้น
+- **Ultra Dark Mode:** สำหรับโหมดกลางคืน (Dark Mode) ในส่วนของ Card หรือ Modal ให้ใช้ Background แบบโปร่งแสงที่ดูลึกและพรีเมียม เช่น `dark:bg-black/20 dark:backdrop-blur-md` หรือ `dark:bg-slate-950`

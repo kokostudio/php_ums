@@ -16,7 +16,7 @@
         
         <!-- Left Column: Role Details -->
         <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
+            <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2"><?= __('roles.role_info') ?></h3>
                 
                 <div class="mb-4">
@@ -44,7 +44,7 @@
 
         <!-- Right Column: Permission Matrix -->
         <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
+            <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
                 <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-slate-800 pb-2">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('roles.permission_matrix') ?></h3>
                     <button type="button" id="selectAll" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
@@ -62,7 +62,7 @@
                                     <span class="ml-2 text-xs font-medium text-gray-500 dark:text-slate-400"><?= __('roles.all_in_module') ?></span>
                                 </label>
                             </div>
-                            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-slate-900">
+                            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-black/20 dark:backdrop-blur-md">
                                 <?php foreach ($perms as $perm): ?>
                                     <label class="inline-flex items-center cursor-pointer group">
                                         <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>" class="perm-checkbox w-4 h-4 text-blue-600 border-gray-300 dark:border-slate-600 rounded focus:ring-blue-500 transition-colors" data-module="<?= $module ?>">
@@ -82,10 +82,10 @@
 
     <!-- Footer Actions -->
     <div class="mt-6 flex items-center justify-end border-t border-gray-200 dark:border-slate-800 pt-6 space-x-3">
-        <a href="/roles" class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+        <a href="/roles" class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors">
             <?= __('common.cancel') ?>
         </a>
-        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center">
+        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
             <i class="ph ph-floppy-disk mr-2 text-lg"></i> <?= __('roles.save_role') ?>
         </button>
     </div>

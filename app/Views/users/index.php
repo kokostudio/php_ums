@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-gray-800 dark:text-white"><?= __('users.title') ?></h1>
         <p class="text-sm text-gray-500 dark:text-slate-400 mt-1"><?= __('users.subtitle') ?></p>
     </div>
-    <a href="/users/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
+    <a href="/users/create" class="bg-sidebar hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
         <i class="ph ph-plus mr-2"></i> <?= __('users.add_user') ?>
     </a>
 </div>
@@ -70,7 +70,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
+<div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
     <div class="p-6 border-b border-gray-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
         <div class="flex flex-col sm:flex-row gap-4">
             <div class="w-full sm:w-64">

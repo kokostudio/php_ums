@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     
     <!-- Card 1 -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
         <div class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
             <i class="ph-fill ph-users text-2xl"></i>
         </div>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Card 2 -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
         <div class="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
             <i class="ph-fill ph-user-check text-2xl"></i>
         </div>
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Card 3 -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex items-center hover:shadow-md transition-shadow">
         <div class="w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
             <i class="ph-fill ph-shield-star text-2xl"></i>
         </div>
@@ -59,7 +59,7 @@
 <!-- Charts Section -->
 <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Registrations Chart -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('dashboard.user_registrations') ?></h3>
         <div class="w-full h-64 relative">
             <canvas id="registrationsChart"></canvas>

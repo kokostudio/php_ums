@@ -28,6 +28,7 @@ use App\Core\Session;
             theme: {
                 extend: {
                     colors: {
+                        sidebar: '#0f172a', /* Default slate-900 for auth */
                         primary: '#3b82f6',
                         secondary: '#64748b',
                     },
@@ -71,10 +72,10 @@ $bgStyle = $bgImage ? "background-image: url('" . htmlspecialchars($bgImage) . "
     <?php $currentLocale = \App\Core\Lang::locale(); ?>
     <div class="absolute top-4 right-4 z-20 flex items-center space-x-2">
         <div class="flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-lg p-1 text-xs font-medium border border-gray-200 dark:border-slate-800 shadow-sm">
-            <a href="/lang/th" class="px-2 py-1 rounded-md <?= $currentLocale === 'th' ? 'bg-blue-600 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white' ?> transition-all flex items-center">
+            <a href="/lang/th" class="px-2 py-1 rounded-md <?= $currentLocale === 'th' ? 'bg-slate-900 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white' ?> transition-all flex items-center">
                 TH
             </a>
-            <a href="/lang/en" class="px-2 py-1 rounded-md <?= $currentLocale === 'en' ? 'bg-blue-600 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white' ?> transition-all flex items-center">
+            <a href="/lang/en" class="px-2 py-1 rounded-md <?= $currentLocale === 'en' ? 'bg-slate-900 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white' ?> transition-all flex items-center">
                 EN
             </a>
         </div>
@@ -91,7 +92,7 @@ $bgStyle = $bgImage ? "background-image: url('" . htmlspecialchars($bgImage) . "
             <?php $logo = Settings::get('site_logo'); if ($logo): ?>
                 <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="h-20 w-auto mx-auto mb-4 drop-shadow-md">
             <?php else: ?>
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 dark:bg-blue-500 text-white shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 mb-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 dark:bg-blue-500 text-white shadow-lg shadow-slate-900/30 dark:shadow-slate-900/20 mb-4">
                     <i class="ph-fill ph-cube text-4xl"></i>
                 </div>
             <?php endif; ?>
