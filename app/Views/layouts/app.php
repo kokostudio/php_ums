@@ -64,6 +64,10 @@
         } else {
             document.documentElement.classList.remove('dark')
         }
+        // Sidebar Init
+        if (localStorage.sidebarCollapsed === 'true') {
+            document.documentElement.classList.add('sidebar-collapsed');
+        }
     </script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -130,6 +134,36 @@
         .sidebar-item:hover { background-color: rgba(255, 255, 255, 0.1); }
         .sidebar-item.active { background-color: rgba(255, 255, 255, 0.2); border-left: 4px solid white; }
 
+        /* ── Sidebar Collapse Transitions ── */
+        .sidebar-collapsed #sidebar { width: 5rem !important; }
+        .sidebar-collapsed #sidebar .sidebar-text,
+        .sidebar-collapsed #sidebar .submenu,
+        .sidebar-collapsed #sidebar .caret-icon { display: none !important; }
+        .sidebar-collapsed #sidebar .sidebar-logo-container { justify-content: center; width: 100%; }
+        .sidebar-collapsed #sidebar .sidebar-logo-container img { margin-right: 0; }
+        .sidebar-collapsed #sidebar .sidebar-logo-container i { margin-right: 0; }
+        .sidebar-collapsed #pinSidebarBtn i { transform: rotate(-45deg); transition: transform 0.3s; }
+        .sidebar-collapsed #sidebar .sidebar-group > button { justify-content: center; padding-left: 0; padding-right: 0; }
+        .sidebar-collapsed #sidebar .sidebar-group > button span { display: none; }
+        .sidebar-collapsed #sidebar .sidebar-group > button i.ph { margin-right: 0; font-size: 1.5rem; }
+        .sidebar-collapsed #sidebar .profile-details { display: none !important; }
+        .sidebar-collapsed #sidebar .profile-caret { display: none !important; }
+        .sidebar-collapsed #sidebar .profile-section { justify-content: center; padding-left: 0; padding-right: 0; }
+
+        /* Hover expansion when pinned */
+        .sidebar-collapsed #sidebar:hover { width: 16rem !important; }
+        .sidebar-collapsed #sidebar:hover .sidebar-text,
+        .sidebar-collapsed #sidebar:hover .caret-icon { display: inline-block !important; }
+        .sidebar-collapsed #sidebar:hover .sidebar-logo-container { justify-content: flex-start; width: auto; }
+        .sidebar-collapsed #sidebar:hover .sidebar-logo-container img { margin-right: 0.75rem; }
+        .sidebar-collapsed #sidebar:hover .sidebar-logo-container i { margin-right: 0.5rem; }
+        .sidebar-collapsed #sidebar:hover .sidebar-group > button { justify-content: space-between; padding-left: 0.75rem; padding-right: 0.75rem; }
+        .sidebar-collapsed #sidebar:hover .sidebar-group > button span { display: inline; }
+        .sidebar-collapsed #sidebar:hover .sidebar-group > button i.ph { margin-right: 0.75rem; font-size: 1.125rem; }
+        .sidebar-collapsed #sidebar:hover .profile-details { display: block !important; }
+        .sidebar-collapsed #sidebar:hover .profile-caret { display: block !important; }
+        .sidebar-collapsed #sidebar:hover .profile-section { justify-content: space-between; padding-left: 1rem; padding-right: 1rem; }
+
         /* ── Custom Scrollbar ── */
         ::-webkit-scrollbar {
             width: 6px;
@@ -192,15 +226,137 @@
         .dark .swal2-icon.swal2-success { border-color: #22c55e !important; color: #22c55e !important; }
         .dark .swal2-icon.swal2-info { border-color: #3b82f6 !important; color: #3b82f6 !important; }
 
-        /* ── Premium DataTables Styling (Replaced by Official Tailwind CSS) ── */
+        /* ── Premium DataTables Styling ── */
+        .dataTables_wrapper {
+            padding: 0.5rem 0;
+        }
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.4rem 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            background-color: white;
+            color: #1e293b;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            margin-left: 0.5rem;
+            min-width: 200px;
+        }
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        table.dataTable.no-footer { border-bottom: none; }
+        table.dataTable thead th {
+            border-bottom: 2px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem;
+        }
+        table.dataTable tbody th, table.dataTable tbody td {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        table.dataTable tbody tr {
+            transition: all 0.2s ease;
+        }
+        table.dataTable tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Pagination */
+        .dataTables_wrapper .dataTables_paginate {
+            padding-top: 1rem;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 0.5rem !important;
+            padding: 0.4rem 0.8rem;
+            margin-left: 0.25rem;
+            border: 1px solid transparent !important;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+            border-color: #e2e8f0 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #3b82f6 !important;
+            color: white !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+        }
+        .dataTables_wrapper .dataTables_info {
+            padding-top: 1.2rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Dark mode overrides for DataTables */
+        .dark .dataTables_wrapper .dataTables_length select,
+        .dark .dataTables_wrapper .dataTables_filter input {
+            border-color: #334155;
+            background-color: #1e293b;
+            color: #f1f5f9;
+        }
+        .dark .dataTables_wrapper .dataTables_length select:focus,
+        .dark .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .dark table.dataTable thead th { border-bottom-color: #334155; color: #94a3b8; }
+        .dark table.dataTable tbody th, .dark table.dataTable tbody td { border-bottom-color: #1e293b; }
+        .dark table.dataTable tbody tr:hover { background-color: #0f172a; }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button { color: #cbd5e1 !important; }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: white !important;
+        }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #475569 !important; }
+        .dark .dataTables_wrapper .dataTables_info { color: #94a3b8 !important; }
+        .dark .dataTables_wrapper .dataTables_length, .dark .dataTables_wrapper .dataTables_filter { color: #cbd5e1 !important; }
+
+        /* Custom Skeleton Loading for DataTables */
+        div.dataTables_wrapper div.dataTables_processing {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            margin-left: -50%;
+            margin-top: -50px;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            border: none;
+            box-shadow: none;
+        }
+        .dark div.dataTables_wrapper div.dataTables_processing {
+            background: rgba(15, 23, 42, 0.8);
+        }
     </style>
 
     <!-- jQuery & DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
@@ -210,7 +366,7 @@
     <script>
         // Global DataTables Defaults (Premium UI + i18n + Skeleton Loader)
         $.extend(true, $.fn.dataTable.defaults, {
-            dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"<"flex items-center gap-2"l><"flex items-center gap-2"f>>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip><"clear">',
+            dom: '<"top"f>rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
             language: {
                 <?php echo \App\Core\Lang::locale() === 'th' ? '
                 "emptyTable": "ไม่มีข้อมูลในตาราง",
@@ -243,14 +399,19 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-transform duration-300 shadow-xl flex">
-        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider">
-            <?php $logo = Settings::get('site_logo');if ($logo): ?>
-                <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
-            <?php else: ?>
-                <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2"></i>
-            <?php endif; ?>
-            <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
+    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-all duration-300 shadow-xl flex">
+        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider justify-between">
+            <div class="flex items-center sidebar-logo-container overflow-hidden">
+                <?php $logo = Settings::get('site_logo');if ($logo): ?>
+                    <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3 transition-all">
+                <?php else: ?>
+                    <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2 transition-all"></i>
+                <?php endif; ?>
+                <span class="truncate sidebar-text"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
+            </div>
+            <button id="pinSidebarBtn" class="hidden md:block text-slate-400 hover:text-white transition-colors" title="<?= __('common.pin_sidebar') ?? 'Pin Sidebar' ?>">
+                <i class="ph ph-push-pin text-lg transition-transform"></i>
+            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto py-6">
@@ -299,20 +460,22 @@
             </nav>
         </div>
 
-        <div class="p-4 border-t <?php echo $theme['border'] ?> <?php echo $theme['footer'] ?> relative group cursor-pointer">
-            <a href="/profile" class="flex items-center hover:opacity-80 transition-opacity">
-                <?php $profileImg = Session::get('profile_image');if ($profileImg): ?>
-                    <img src="<?php echo htmlspecialchars($profileImg) ?>" alt="Profile" class="w-9 h-9 rounded-full object-cover shadow-inner border border-slate-700">
-                <?php else: ?>
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary-500 to-primary-700 flex items-center justify-center font-bold text-sm shadow-inner text-white">
-                        <?php echo htmlspecialchars(strtoupper(substr(Session::get('username', 'U'), 0, 1))) ?>
+        <div class="p-4 border-t <?php echo $theme['border'] ?> <?php echo $theme['footer'] ?> relative group cursor-pointer profile-section flex transition-all">
+            <a href="/profile" class="flex items-center w-full hover:opacity-80 transition-opacity justify-between">
+                <div class="flex items-center min-w-0">
+                    <?php $profileImg = Session::get('profile_image');if ($profileImg): ?>
+                        <img src="<?php echo htmlspecialchars($profileImg) ?>" alt="Profile" class="w-9 h-9 rounded-full object-cover shadow-inner border border-slate-700">
+                    <?php else: ?>
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary-500 to-primary-700 flex items-center justify-center font-bold text-sm shadow-inner text-white">
+                            <?php echo htmlspecialchars(strtoupper(substr(Session::get('username', 'U'), 0, 1))) ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="ml-3 overflow-hidden flex-1 text-white group-hover:text-primary-100 transition-colors profile-details">
+                        <p class="text-sm font-medium truncate"><?php echo htmlspecialchars(Session::get('username', 'Guest')) ?></p>
+                        <p class="text-xs text-primary-300/70 group-hover:text-primary-300 transition-colors truncate"><?php echo __('common.view_profile') ?></p>
                     </div>
-                <?php endif; ?>
-                <div class="ml-3 overflow-hidden flex-1 text-white group-hover:text-primary-100 transition-colors">
-                    <p class="text-sm font-medium truncate"><?php echo htmlspecialchars(Session::get('username', 'Guest')) ?></p>
-                    <p class="text-xs text-primary-300/70 group-hover:text-primary-300 transition-colors truncate"><?php echo __('common.view_profile') ?></p>
                 </div>
-                <i class="ph ph-caret-right text-primary-400/50 group-hover:text-primary-400 transition-colors text-sm"></i>
+                <i class="ph ph-caret-right text-primary-400/50 group-hover:text-primary-400 transition-colors text-sm profile-caret"></i>
             </a>
         </div>
     </aside>
@@ -592,18 +755,33 @@
         function openSidebar() {
             $sidebar.removeClass('-translate-x-full');
             $overlay.removeClass('hidden');
-            // small delay for transition
             setTimeout(() => $overlay.removeClass('opacity-0'), 10);
         }
 
         function closeSidebar() {
             $sidebar.addClass('-translate-x-full');
             $overlay.addClass('opacity-0');
-            setTimeout(() => $overlay.addClass('hidden'), 300); // match duration
+            setTimeout(() => $overlay.addClass('hidden'), 300);
         }
 
         $toggleBtn.on('click', openSidebar);
         $overlay.on('click', closeSidebar);
+
+        // Desktop Sidebar Pin Toggle
+        const pinBtn = document.getElementById('pinSidebarBtn');
+        pinBtn.addEventListener('click', function() {
+            const html = document.documentElement;
+            if (html.classList.contains('sidebar-collapsed')) {
+                html.classList.remove('sidebar-collapsed');
+                localStorage.sidebarCollapsed = 'false';
+            } else {
+                html.classList.add('sidebar-collapsed');
+                localStorage.sidebarCollapsed = 'true';
+                // Close any open submenus
+                $('.submenu').slideUp(200);
+                $('.caret-icon').removeClass('rotate-90');
+            }
+        });
 
         // Logout Confirmation
         function confirmLogout() {
