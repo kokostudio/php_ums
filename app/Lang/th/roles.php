@@ -18,7 +18,9 @@ return [
     'deleted'         => 'ลบบทบาทสำเร็จ',
     'created'         => 'เพิ่มบทบาทสำเร็จ',
     'updated'         => 'อัปเดตบทบาทสำเร็จ',
-    'cannot_delete_super' => 'ไม่สามารถลบบทบาท Super Admin ได้',
+    'cannot_delete_super' => 'ไม่สามารถลบบบทบาท Super Admin ได้',
     'total_roles'     => 'บทบาททั้งหมด',
     'users_in_role'   => 'ผู้ใช้ในบทบาท',
+    'subtitle'        => 'จัดการบทบาทของระบบและสิทธิ์ที่ได้รับมอบหมาย',
+    'ph_role_name'    => 'เช่น บรรณาธิการ',
 ];

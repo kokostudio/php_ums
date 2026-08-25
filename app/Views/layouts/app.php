@@ -192,136 +192,15 @@
         .dark .swal2-icon.swal2-success { border-color: #22c55e !important; color: #22c55e !important; }
         .dark .swal2-icon.swal2-info { border-color: #3b82f6 !important; color: #3b82f6 !important; }
 
-        /* ── Premium DataTables Styling ── */
-        .dataTables_wrapper {
-            padding: 0.5rem 0;
-        }
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter input {
-            border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
-            padding: 0.4rem 1rem;
-            outline: none;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            background-color: white;
-            color: #1e293b;
-        }
-        .dataTables_wrapper .dataTables_filter input {
-            margin-left: 0.5rem;
-            min-width: 200px;
-        }
-        .dataTables_wrapper .dataTables_length select:focus,
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        table.dataTable.no-footer { border-bottom: none; }
-        table.dataTable thead th {
-            border-bottom: 2px solid #e2e8f0;
-            color: #64748b;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 1rem;
-        }
-        table.dataTable tbody th, table.dataTable tbody td {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 1rem;
-            vertical-align: middle;
-        }
-        table.dataTable tbody tr {
-            transition: all 0.2s ease;
-        }
-        table.dataTable tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        /* Pagination */
-        .dataTables_wrapper .dataTables_paginate {
-            padding-top: 1rem;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            border-radius: 0.5rem !important;
-            padding: 0.4rem 0.8rem;
-            margin-left: 0.25rem;
-            border: 1px solid transparent !important;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: #f1f5f9 !important;
-            color: #0f172a !important;
-            border-color: #e2e8f0 !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-            background: #3b82f6 !important;
-            color: white !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
-        }
-        .dataTables_wrapper .dataTables_info {
-            padding-top: 1.2rem;
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        /* Dark mode overrides for DataTables */
-        .dark .dataTables_wrapper .dataTables_length select,
-        .dark .dataTables_wrapper .dataTables_filter input {
-            border-color: #334155;
-            background-color: #1e293b;
-            color: #f1f5f9;
-        }
-        .dark .dataTables_wrapper .dataTables_length select:focus,
-        .dark .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        .dark table.dataTable thead th { border-bottom-color: #334155; color: #94a3b8; }
-        .dark table.dataTable tbody th, .dark table.dataTable tbody td { border-bottom-color: #1e293b; }
-        .dark table.dataTable tbody tr:hover { background-color: #0f172a; }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button { color: #cbd5e1 !important; }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: white !important;
-        }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #475569 !important; }
-        .dark .dataTables_wrapper .dataTables_info { color: #94a3b8 !important; }
-        .dark .dataTables_wrapper .dataTables_length, .dark .dataTables_wrapper .dataTables_filter { color: #cbd5e1 !important; }
-
-        /* Custom Skeleton Loading for DataTables */
-        div.dataTables_wrapper div.dataTables_processing {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            height: 100%;
-            margin-left: -50%;
-            margin-top: -50px;
-            text-align: center;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(4px);
-            z-index: 10;
-            border: none;
-            box-shadow: none;
-        }
-        .dark div.dataTables_wrapper div.dataTables_processing {
-            background: rgba(15, 23, 42, 0.8);
-        }
+        /* ── Premium DataTables Styling (Replaced by Official Tailwind CSS) ── */
     </style>
 
     <!-- jQuery & DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
@@ -331,7 +210,7 @@
     <script>
         // Global DataTables Defaults (Premium UI + i18n + Skeleton Loader)
         $.extend(true, $.fn.dataTable.defaults, {
-            dom: '<"top"f>rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
+            dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"<"flex items-center gap-2"l><"flex items-center gap-2"f>>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip><"clear">',
             language: {
                 <?php echo \App\Core\Lang::locale() === 'th' ? '
                 "emptyTable": "ไม่มีข้อมูลในตาราง",

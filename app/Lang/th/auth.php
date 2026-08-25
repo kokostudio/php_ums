@@ -14,7 +14,7 @@ return [
     'forgot_password_title'    => 'ลืมรหัสผ่าน',
     'forgot_password_subtitle' => 'กรอกอีเมลเพื่อรับลิงก์รีเซ็ตรหัสผ่าน',
     'email_address'     => 'อีเมล',
-    'email_placeholder' => 'your@email.com',
+    'email_placeholder' => 'อีเมลของคุณ',
     'send_reset_link'   => 'ส่งลิงก์รีเซ็ต',
     'back_to_login'     => 'กลับไปหน้าเข้าสู่ระบบ',
 

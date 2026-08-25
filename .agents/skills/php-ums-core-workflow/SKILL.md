@@ -200,3 +200,14 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 6. **Writing Business Logic in Controllers** — move complex logic to Services/Repositories.
 7. **Skipping whitelist on URL segments** — always validate `$tab`, `$id` segments before use.
 
+### 10. Dynamic Theme & Tailwind Conventions (UI/UX)
+- **Dynamic Palette:** `layouts/app.php` injects the current theme color into Tailwind's `primary` color scale. Use `primary-*` classes for accents, active states, and hover effects (e.g. `text-primary-400`, `bg-primary-900/20`).
+- **Global Color Scope:** Do not override base Tailwind colors (blue, gray, slate) globally.
+- **Buttons:** Main action buttons should use `bg-sidebar` to match the current sidebar theme. Destructive buttons should use standard red (`bg-red-500`).
+- **Ultra Dark Mode:** Use translucent backgrounds for cards/modals in dark mode (e.g., `dark:bg-black/20 dark:backdrop-blur-md`).
+
+### 11. Pinned Sidebar Menus (Favorites)
+- **Feature:** The sidebar supports a "Pinned Menus" feature where users can pin frequently used submenus to the top.
+- **UI:** A pin icon appears when hovering over a submenu item.
+- **Storage:** Pinned menu states (href arrays) are stored entirely client-side in `localStorage` under `pinned_menus`.
+- **Behavior:** The DOM is manipulated dynamically via JS in `layouts/app.php` to clone pinned menus into the top `#pinnedMenusContainer` on load and on click. No backend changes are required for this UI feature.

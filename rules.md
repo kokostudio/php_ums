@@ -98,3 +98,8 @@
 - **Active & Hover States (Accents):** สถานะ Active ของแท็บเมนู (Tabs), แถวในตาราง, เมนูย่อย, หรือปุ่มรองต่างๆ ต้องใช้ `text-primary-*` และ `bg-primary-*` (เช่น `hover:bg-primary-50 dark:hover:bg-primary-900/20`) แทนการใช้สีเทา (`slate`) หรือสีฟ้า (`blue`) แบบเจาะจง เพื่อให้ความรู้สึกที่ตอบสนองกับธีมได้อย่างกลมกลืน (Premium Tint)
 - **Global Color Scope:** ห้าม Override สีหลักของ Tailwind (เช่น `blue`, `gray`, `slate`) ทั่วทั้งระบบ เพื่อหลีกเลี่ยงผลกระทบต่อ UI ส่วนที่ไม่เกี่ยวข้อง จะมีการแมปแบบ Dynamic เฉพาะสี `primary` และ `sidebar` เท่านั้น
 - **Ultra Dark Mode:** สำหรับโหมดกลางคืน (Dark Mode) ในส่วนของ Card หรือ Modal ให้ใช้ Background แบบโปร่งแสงที่ดูลึกและพรีเมียม เช่น `dark:bg-black/20 dark:backdrop-blur-md` หรือ `dark:bg-slate-950`
+
+## 13. Pinned Sidebar Menus (Favorites)
+- **UI/UX:** แถบเมนูด้านซ้าย (Sidebar) รองรับฟีเจอร์ "เมนูโปรด (Pinned Menus)" โดยจะมีไอคอนหมุดปรากฏขึ้นเมื่อ Hover ที่เมนูย่อย
+- **Storage:** รายการเมนูที่ถูกปักหมุดจะถูกจัดเก็บไว้ใน `localStorage` ของเบราว์เซอร์ผู้ใช้ ในตัวแปร `pinned_menus` (Array of hrefs)
+- **Behavior:** เมนูที่ปักหมุดจะถูก Clone ไปแสดงผลในหมวดหมู่พิเศษด้านบนสุดของ Sidebar แบบ Dynamic ผ่าน JavaScript (`layouts/app.php`) เพื่อความรวดเร็วและไม่ต้องแก้ไขโครงสร้าง PHP เดิม

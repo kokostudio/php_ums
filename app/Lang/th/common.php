@@ -14,6 +14,7 @@ return [
     'back'          => 'กลับ',
     'all'           => 'ทั้งหมด',
     'view'          => 'ดู',
+    'view_all'      => 'ดูทั้งหมด',
     'confirm'       => 'ยืนยัน',
     'yes'           => 'ใช่',
     'no'            => 'ไม่',
@@ -37,6 +38,7 @@ return [
     'main_menu'     => 'เมนูหลัก',
     'administration'=> 'จัดการระบบ',
     'view_profile'  => 'ดูโปรไฟล์',
+    'system'        => 'ระบบ',
 
     // Sidebar
     'user_management'    => 'จัดการผู้ใช้',

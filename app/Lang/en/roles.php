@@ -22,4 +22,5 @@ return [
     'cannot_delete_super' => 'Cannot delete Super Admin role.',
     'total_roles'     => 'Total Roles',
     'users_in_role'   => 'users',
+    'ph_role_name'    => 'e.g. Editor',
 ];

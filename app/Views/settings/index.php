@@ -50,7 +50,7 @@
                         <input type="text" id="site_name" name="site_name" required 
                             value="<?= htmlspecialchars($settings['site_name'] ?? 'Standard Core System') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                            placeholder="e.g. My Awesome App">
+                            placeholder="<?= __('settings.ph_app_name') ?? 'e.g. My Awesome App' ?>">
                     </div>
 
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
@@ -59,7 +59,7 @@
                         <input type="text" id="site_footer" name="site_footer" 
                             value="<?= htmlspecialchars($settings['site_footer'] ?? '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                            placeholder="e.g. &copy; 2026 My Company">
+                            placeholder="<?= __('settings.ph_footer') ?? 'e.g. &copy; 2026 My Company' ?>">
                     </div>
 
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
@@ -230,7 +230,7 @@
                         <input type="text" id="login_title" name="login_title" 
                             value="<?= htmlspecialchars($settings['login_title'] ?? 'Standard Core System') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                            placeholder="e.g. Welcome Back!">
+                            placeholder="<?= __('settings.ph_welcome') ?? 'e.g. Welcome Back!' ?>">
                     </div>
 
                     <div>
@@ -239,7 +239,7 @@
                         <input type="text" id="login_subtitle" name="login_subtitle" 
                             value="<?= htmlspecialchars($settings['login_subtitle'] ?? 'Sign in to your account') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                            placeholder="e.g. Please enter your details.">
+                            placeholder="<?= __('settings.ph_login_sub') ?? 'e.g. Please enter your details.' ?>">
                     </div>
 
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
