@@ -148,7 +148,34 @@
                                 <div class="w-8 h-8 rounded-full bg-rose-950 border border-rose-900/50 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'rose'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Crimson</span>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Rose Crimson</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Base Font Size Settings -->
+                    <div class="pt-6 border-t border-gray-50 dark:border-slate-800">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.base_font_size') ?? 'ขนาดตัวอักษรของระบบ (System Font Size)' ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3"><?= __('settings.base_font_size_desc') ?? 'ปรับขนาดตัวอักษรพื้นฐานสำหรับทุกหน้าจอ' ?></p>
+                        
+                        <?php $currentFontSize = $settings['base_font_size'] ?? 'text-[16px]'; ?>
+                        <div class="grid grid-cols-3 gap-3 max-w-lg">
+                            <!-- Small -->
+                            <label class="relative flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 <?= $currentFontSize === 'text-[14px]' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="base_font_size" value="text-[14px]" class="sr-only" <?= $currentFontSize === 'text-[14px]' ? 'checked' : '' ?>>
+                                <span class="text-sm font-semibold text-gray-800 dark:text-slate-200">เล็ก (Small)</span>
+                            </label>
+
+                            <!-- Medium -->
+                            <label class="relative flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 <?= $currentFontSize === 'text-[16px]' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="base_font_size" value="text-[16px]" class="sr-only" <?= $currentFontSize === 'text-[16px]' ? 'checked' : '' ?>>
+                                <span class="text-base font-semibold text-gray-800 dark:text-slate-200">ปกติ (Medium)</span>
+                            </label>
+
+                            <!-- Large -->
+                            <label class="relative flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 <?= $currentFontSize === 'text-[18px]' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="base_font_size" value="text-[18px]" class="sr-only" <?= $currentFontSize === 'text-[18px]' ? 'checked' : '' ?>>
+                                <span class="text-lg font-semibold text-gray-800 dark:text-slate-200">ใหญ่ (Large)</span>
                             </label>
                         </div>
                     </div>
@@ -453,3 +480,30 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        // Toggle active visual state for setting cards
+        $('input[type="radio"]').on('change', function() {
+            var groupName = $(this).attr('name');
+            var activeClasses = 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10';
+            var inactiveClasses = 'border-gray-200 dark:border-slate-800';
+
+            // Remove active classes from all labels in this group
+            $('input[name="' + groupName + '"]').closest('label').removeClass(activeClasses).addClass(inactiveClasses);
+            
+            // Add active classes to the checked one
+            $(this).closest('label').removeClass(inactiveClasses).addClass(activeClasses);
+
+            // Special case for check icon in sidebar theme
+            if(groupName === 'sidebar_theme') {
+                $('input[name="sidebar_theme"]').siblings('div').find('i.ph-check').remove();
+                $(this).siblings('div').append('<i class="ph ph-check text-white text-xs"></i>');
+            }
+            
+            // Special case for instant font size preview
+            if(groupName === 'base_font_size') {
+                $('html').removeClass('text-[14px] text-[16px] text-[18px]').addClass($(this).val());
+            }
+        });
+    });
+</script>

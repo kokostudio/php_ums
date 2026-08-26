@@ -48,7 +48,7 @@
     ][$sidebarTheme] ?? '#0f172a';
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo \App\Core\Lang::locale() ?>">
+<html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -132,6 +132,34 @@
         
         .submenu-item-link .pin-menu-btn { opacity: 0; transition: opacity 0.2s; }
         .submenu-item-link:hover .pin-menu-btn { opacity: 1; }
+
+        /* ── Sidebar Collapsed State ── */
+        html.sidebar-collapsed #sidebar { width: 5rem; }
+        html.sidebar-collapsed #sidebar .truncate, 
+        html.sidebar-collapsed #sidebar .sidebar-item span,
+        html.sidebar-collapsed #sidebar .caret-icon,
+        html.sidebar-collapsed #sidebar a span:not(.pin-menu-btn):not(.unpin-menu-btn),
+        html.sidebar-collapsed #sidebar .pin-menu-btn,
+        html.sidebar-collapsed #sidebar .unpin-menu-btn,
+        html.sidebar-collapsed #pinned-menus-container .uppercase { display: none !important; }
+        
+        html.sidebar-collapsed #sidebar .sidebar-item { justify-content: center; padding-left: 0; padding-right: 0; }
+        html.sidebar-collapsed #sidebar .sidebar-item i { margin-right: 0; font-size: 1.5rem; }
+        
+        html.sidebar-collapsed #sidebar .submenu { margin-left: 0 !important; padding-left: 0 !important; border-left: none !important; }
+        html.sidebar-collapsed #sidebar .submenu a { justify-content: center; padding-left: 0; padding-right: 0; }
+        html.sidebar-collapsed #sidebar .submenu a i { margin-right: 0; font-size: 1.5rem; }
+        html.sidebar-collapsed #sidebar #pinned-menus a { justify-content: center; padding-left: 0; padding-right: 0; }
+        html.sidebar-collapsed #sidebar #pinned-menus a i { margin-right: 0; font-size: 1.5rem; }
+        
+        html.sidebar-collapsed #sidebar .h-16 { padding: 0; justify-content: center; }
+        html.sidebar-collapsed #sidebar .h-16 .truncate { display: none; }
+        html.sidebar-collapsed #sidebar .h-16 .flex.items-center.overflow-hidden { display: none; }
+        html.sidebar-collapsed #pinSidebarBtn { margin-left: 0; display: flex !important; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        
+        html.sidebar-collapsed #sidebar .p-4 { padding: 1rem 0; display: flex; justify-content: center; }
+        html.sidebar-collapsed #sidebar .p-4 img, html.sidebar-collapsed #sidebar .p-4 .bg-gradient-to-tr { margin: 0 auto; }
+        html.sidebar-collapsed #sidebar .p-4 .ml-3, html.sidebar-collapsed #sidebar .p-4 > i { display: none; }
 
         /* ── Custom Scrollbar ── */
         ::-webkit-scrollbar {
@@ -246,14 +274,19 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-transform duration-300 shadow-xl flex">
-        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider">
-            <?php $logo = Settings::get('site_logo');if ($logo): ?>
-                <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
-            <?php else: ?>
-                <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2"></i>
-            <?php endif; ?>
-            <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
+    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-all duration-300 shadow-xl flex">
+        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider justify-between">
+            <div class="flex items-center overflow-hidden">
+                <?php $logo = Settings::get('site_logo');if ($logo): ?>
+                    <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
+                <?php else: ?>
+                    <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2"></i>
+                <?php endif; ?>
+                <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
+            </div>
+            <button id="pinSidebarBtn" class="hidden md:block text-slate-400 hover:text-white transition-colors focus:outline-none flex-shrink-0 ml-2" title="Toggle Sidebar">
+                <i class="ph ph-list text-xl"></i>
+            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto py-6">
@@ -284,22 +317,22 @@
                     </button>
                     <div class="submenu overflow-hidden <?php echo $isSystemActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
                         <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/dashboard') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-squares-four text-lg mr-3 opacity-70"></i> <?php echo __('common.dashboard') ?>
+                            <i class="ph ph-squares-four text-lg mr-3 opacity-70"></i> <span><?php echo __('common.dashboard') ?></span>
                         </a>
                         <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/users') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-users text-lg mr-3 opacity-70"></i> <?php echo __('common.user_management') ?>
+                            <i class="ph ph-users text-lg mr-3 opacity-70"></i> <span><?php echo __('common.user_management') ?></span>
                         </a>
                         <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/roles') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-shield-check text-lg mr-3 opacity-70"></i> <?php echo __('common.roles_permissions') ?>
+                            <i class="ph ph-shield-check text-lg mr-3 opacity-70"></i> <span><?php echo __('common.roles_permissions') ?></span>
                         </a>
                         <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-activity text-lg mr-3 opacity-70"></i> <?php echo __('common.activity_logs') ?>
+                            <i class="ph ph-activity text-lg mr-3 opacity-70"></i> <span><?php echo __('common.activity_logs') ?></span>
                         </a>
                         <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-file-search text-lg mr-3 opacity-70"></i> <?php echo __('common.audit_logs') ?>
+                            <i class="ph ph-file-search text-lg mr-3 opacity-70"></i> <span><?php echo __('common.audit_logs') ?></span>
                         </a>
                         <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/settings') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-gear text-lg mr-3 opacity-70"></i> <?php echo __('common.system_settings') ?>
+                            <i class="ph ph-gear text-lg mr-3 opacity-70"></i> <span><?php echo __('common.system_settings') ?></span>
                         </a>
                     </div>
                 </div>

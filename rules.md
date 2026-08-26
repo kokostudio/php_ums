@@ -101,5 +101,17 @@
 
 ## 13. Pinned Sidebar Menus (Favorites)
 - **UI/UX:** แถบเมนูด้านซ้าย (Sidebar) รองรับฟีเจอร์ "เมนูโปรด (Pinned Menus)" โดยจะมีไอคอนหมุดปรากฏขึ้นเมื่อ Hover ที่เมนูย่อย
-- **Storage:** รายการเมนูที่ถูกปักหมุดจะถูกจัดเก็บไว้ใน `localStorage` ของเบราว์เซอร์ผู้ใช้ ในตัวแปร `pinned_menus` (Array of hrefs)
-- **Behavior:** เมนูที่ปักหมุดจะถูก Clone ไปแสดงผลในหมวดหมู่พิเศษด้านบนสุดของ Sidebar แบบ Dynamic ผ่าน JavaScript (`layouts/app.php`) เพื่อความรวดเร็วและไม่ต้องแก้ไขโครงสร้าง PHP เดิม
+- **Storage:** รายการเมนูที่ถูกปักหมุดจะถูกจัดเก็บไว้ใน `localStorage` ของเบราว์เซอร์ผู้ใช้ ในตัวแปร `pinnedMenus` (Array of hrefs)
+- **Behavior:** เมนูที่ปักหมุดจะถูก Clone ไปแสดงผลในหมวดหมู่พิเศษด้านบนสุดของ Sidebar แบบ Dynamic ผ่าน JavaScript (`layouts/app.php`)
+- **Event Bubbling:** ทุกครั้งที่เขียนโค้ดปุ่มซ้อนในลิงก์ (เช่น ปุ่มปักหมุดที่อยู่ใน <a>) ต้องใช้ `event.stopPropagation()` เสมอ เพื่อป้องกันการเด้งเปลี่ยนหน้าเว็บ
+- **Tailwind CDN Limits:** ห้ามใช้ Class ที่พึ่งพากลไกกลุ่มที่ซับซ้อน (เช่น `group-hover/menu`) กับ Element ที่ถูกสร้างด้วย JavaScript ภายหลัง (DOM Injection) ให้หันไปเขียน Custom CSS ในบล็อก `<style>` แทน
+
+## 14. Sidebar Behavior (Collapse / Expand)
+- **Feature:** Sidebar สามารถย่อ/ขยายได้เพื่อประหยัดพื้นที่ โดยบันทึกสถานะไว้ใน `localStorage.sidebarCollapsed`
+- **Structure Rule:** ข้อความที่อยู่ในเมนู Sidebar (เช่น `<a>...</a>`) **ต้องถูกครอบด้วยแท็ก `<span>` เสมอ** (เช่น `<a><i class="..."></i> <span>Dashboard</span></a>`)
+- **Reasoning:** เพื่อให้ระบบสามารถใช้ CSS (`html.sidebar-collapsed span { display: none; }`) ซ่อนเฉพาะข้อความและเหลือแต่ไอคอนได้อย่างสวยงาม
+
+## 15. System Font Size Scaling & Real-Time UI
+- **Tailwind Rem Scaling:** ระบบรองรับการขยายขนาดตัวหนังสือ 3 ระดับ (14px, 16px, 18px) โดยอาศัยหลักการตั้งค่า `font-size` พื้นฐานที่แท็ก `<html>` (เช่น `<html class="text-[16px]">`)
+- **Global Effect:** ด้วยหลักการนี้ ทำให้ค่า `rem` ทั้งหมดใน Tailwind (เช่น p-4, m-2, text-sm) ถูกยืด/หดตามขนาดที่ผู้ใช้เลือกโดยอัตโนมัติอย่างสมบูรณ์แบบ
+- **Real-time Active State:** หน้าจอตั้งค่า (Settings UI) ควรใช้ JavaScript (jQuery) ในการปรับปรุง Active Class (`border-primary-xxx`, `bg-primary-xxx`) ทันทีที่ผู้ใช้คลิกเลือก และต้องมีการจำลอง (Preview) ข้อมูลทันทีโดยไม่ต้องรอให้โหลดหน้าใหม่ (เช่นเปลี่ยน Class บน <html> ทันที)

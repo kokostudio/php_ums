@@ -208,6 +208,18 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 
 ### 11. Pinned Sidebar Menus (Favorites)
 - **Feature:** The sidebar supports a "Pinned Menus" feature where users can pin frequently used submenus to the top.
-- **UI:** A pin icon appears when hovering over a submenu item.
-- **Storage:** Pinned menu states (href arrays) are stored entirely client-side in `localStorage` under `pinned_menus`.
-- **Behavior:** The DOM is manipulated dynamically via JS in `layouts/app.php` to clone pinned menus into the top `#pinnedMenusContainer` on load and on click. No backend changes are required for this UI feature.
+- **UI:** A pin icon appears when hovering over a submenu item. Do NOT rely on Tailwind dynamic arbitrary classes (like `group-hover/menu`) for elements appended via JS, as Tailwind CDN may fail to parse them. Use standard CSS in `<style>` instead (e.g., `.submenu-item-link:hover .pin-menu-btn { opacity: 1; }`).
+- **Event Bubbling:** Always use `event.stopPropagation()` on the pin button's `onclick` handler to prevent the browser from navigating to the parent link.
+- **Storage:** Pinned menu states (href arrays) are stored entirely client-side in `localStorage` under `pinnedMenus`.
+- **Behavior:** The DOM is manipulated dynamically via JS in `layouts/app.php` to clone pinned menus into the top `#pinned-menus-container` on load and on click. No backend changes are required for this UI feature.
+
+### 12. Sidebar Behavior (Collapse / Expand)
+- **Feature:** The sidebar can be collapsed to save screen space, displaying only icons.
+- **State:** Toggled via `html.sidebar-collapsed` and persisted in `localStorage.sidebarCollapsed`.
+- **HTML Structure:** All text inside sidebar links (`<a>` tags) MUST be wrapped in a `<span>` tag (e.g., `<i class="..."></i> <span>Dashboard</span>`). This is mandatory so the CSS can target and hide the text (`display: none`) when the sidebar is collapsed, leaving only the icon visible.
+- **Pin Icons:** When the sidebar is collapsed, pin icons are hidden automatically via CSS to prevent UI clutter.
+
+### 13. System Font Size Scaling & Real-Time UI
+- **Tailwind Rem Scaling:** The system supports a 3-level font size scaling (14px, 16px, 18px). This is achieved by dynamically injecting a Tailwind class (like `text-[16px]`) onto the `<html>` tag.
+- **Global Effect:** Because Tailwind utilizes `rem` for spacing, padding, and fonts, changing the root font size scales the entire UI proportionally and flawlessly.
+- **Real-time Active State:** For Settings pages with radio/card selectors (e.g., Font Size, Theme), use JavaScript (jQuery) to instantly toggle the active Tailwind classes (`border-primary-*`, `bg-primary-*`) upon click. Always provide a real-time preview (e.g., swapping the class on `<html>`) before the user submits the form.
