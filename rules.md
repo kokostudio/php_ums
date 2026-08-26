@@ -54,6 +54,7 @@
 - **ห้ามใช้ Query String** สำหรับ Navigation หลักของระบบ เช่น `/settings?tab=general` ถือเป็น pattern ที่ไม่ดี
 - **ใช้ Clean URL เสมอ:** ทุก section/tab/state ที่ผู้ใช้งานสามารถ navigate ไปได้ ต้องมี URL ของตัวเอง เช่น `/settings/general`, `/settings/login`
 - **Route Parameter Pattern:** ใช้ `{param}` ใน Router สำหรับ dynamic segment เช่น `/settings/{tab}`, `/users/{id}/edit`
+- **Controller Parameter Matching (PHP 8+):** ตัวแปรรับค่าในเมธอดของ Controller ต้องมีชื่อตรงกับตัวแปรใน Route เสมอ (เช่น Route `{id}` -> `public function edit($id)`) เพื่อป้องกัน Named Parameter Error จาก `call_user_func_array` ใน PHP 8+
 - **POST Action URL:** Form ที่ POST ข้อมูลต้องส่งไปที่ URL ที่ตรงกับ resource เช่น `POST /settings/general` แทน `POST /settings?tab=general`
 - **Controller Whitelisting:** Controller ที่รับ segment จาก URL ต้อง whitelist ค่าที่ยอมรับได้ก่อนเสมอ เช่น `$tab = in_array($tab, ['general', 'login']) ? $tab : 'general';` เพื่อป้องกันการ manipulate URL
 
@@ -87,14 +88,16 @@
   - ห้าม Hardcode ข้อความ UI (Labels, Buttons, Breadcrumbs, Flash Messages, Descriptions) ใน Views
   - ต้องเรียกใช้ผ่านฟังก์ชันสากล `__('module.key')` หรือ `__('common.key')` เสมอ
   - รองรับ Parameter แทนที่ placeholder ด้วยเครื่องหมายโคลอน (:) เช่น `__('common.welcome', ['name' => 'Admin'])` จะแทนที่ `:name` ด้วย 'Admin'
-- **DataTables Global i18n:**
+- **DataTables Global i18n & DOM:**
   - ห้ามใส่ property `language:` แยกต่างหากใน DataTables initialization ของแต่ละหน้า
   - ระบบมีการตั้งค่า Global Configuration ไว้แล้วใน `app/Views/layouts/app.php` ซึ่งครอบคลุมการแปลภาษา (Th/En) ของ DataTables แบบอัตโนมัติ
+  - หากหน้าไหนมีการตั้งค่า DataTables ของตัวเอง (เช่น Custom Search) **ต้องใส่ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ** เพื่อดัน Length Menu (`l`), Info (`i`), และ Pagination (`p`) ไปอยู่ด้านล่างสุดของตารางให้เป็นมาตรฐานเดียวกันทั้งระบบ
 
 ## 12. Dynamic Theme & Tailwind Conventions (UI/UX)
 - **Dynamic Palette:** ระบบรองรับการเปลี่ยนธีมแบบ Dynamic โดย `layouts/app.php` จะดึงค่าสีธีมปัจจุบันส่งเข้าไปทับ `primary` ของ Tailwind เสมอ ดังนั้นให้ใช้ class กลุ่ม `primary-*` สำหรับลูกเล่นหรือจุดที่ต้องการเปลี่ยนสีตามธีม
 - **Primary Buttons:** ปุ่มกดหลักในแบบฟอร์ม (เช่น Save, Update, Create) **ต้องใช้ class `bg-sidebar` เสมอ** เพื่อให้ปุ่มมีสีตรงกับธีม Sidebar ปัจจุบันอย่างสมบูรณ์แบบ
 - **Destructive Buttons:** ปุ่มที่เป็นอันตราย เช่น ลบข้อมูล หรือปิดการใช้งาน (Disable) ให้ใช้สีแดง (เช่น `bg-red-500`) ตามมาตรฐานสากลเสมอ
+- **Confirmation Dialogs:** การยืนยันใน Actions ที่อันตราย (เช่น Revoke, Delete) **ห้ามใช้ Native `confirm()` ของเบราว์เซอร์** ให้เรียกใช้ **SweetAlert2 (`Swal.fire`)** เสมอ เพื่อความสวยงามและเป็นมาตรฐาน
 - **Active & Hover States (Accents):** สถานะ Active ของแท็บเมนู (Tabs), แถวในตาราง, เมนูย่อย, หรือปุ่มรองต่างๆ ต้องใช้ `text-primary-*` และ `bg-primary-*` (เช่น `hover:bg-primary-50 dark:hover:bg-primary-900/20`) แทนการใช้สีเทา (`slate`) หรือสีฟ้า (`blue`) แบบเจาะจง เพื่อให้ความรู้สึกที่ตอบสนองกับธีมได้อย่างกลมกลืน (Premium Tint)
 - **Global Color Scope:** ห้าม Override สีหลักของ Tailwind (เช่น `blue`, `gray`, `slate`) ทั่วทั้งระบบ เพื่อหลีกเลี่ยงผลกระทบต่อ UI ส่วนที่ไม่เกี่ยวข้อง จะมีการแมปแบบ Dynamic เฉพาะสี `primary` และ `sidebar` เท่านั้น
 - **Ultra Dark Mode:** สำหรับโหมดกลางคืน (Dark Mode) ในส่วนของ Card หรือ Modal ให้ใช้ Background แบบโปร่งแสงที่ดูลึกและพรีเมียม เช่น `dark:bg-black/20 dark:backdrop-blur-md` หรือ `dark:bg-slate-950`
@@ -115,3 +118,33 @@
 - **Tailwind Rem Scaling:** ระบบรองรับการขยายขนาดตัวหนังสือ 3 ระดับ (14px, 16px, 18px) โดยอาศัยหลักการตั้งค่า `font-size` พื้นฐานที่แท็ก `<html>` (เช่น `<html class="text-[16px]">`)
 - **Global Effect:** ด้วยหลักการนี้ ทำให้ค่า `rem` ทั้งหมดใน Tailwind (เช่น p-4, m-2, text-sm) ถูกยืด/หดตามขนาดที่ผู้ใช้เลือกโดยอัตโนมัติอย่างสมบูรณ์แบบ
 - **Real-time Active State:** หน้าจอตั้งค่า (Settings UI) ควรใช้ JavaScript (jQuery) ในการปรับปรุง Active Class (`border-primary-xxx`, `bg-primary-xxx`) ทันทีที่ผู้ใช้คลิกเลือก และต้องมีการจำลอง (Preview) ข้อมูลทันทีโดยไม่ต้องรอให้โหลดหน้าใหม่ (เช่นเปลี่ยน Class บน <html> ทันที)
+
+## 16. PHP 8.1+ Null Safety (Strict Types)
+- **String Functions Compatibility:** ใน PHP 8.1+ ฟังก์ชันที่รับพารามิเตอร์เป็นข้อความ (เช่น `htmlspecialchars()`, `preg_match()`) จะโยนข้อผิดพลาด Fatal Error / TypeError หากมีการส่งค่า `NULL` เข้าไป
+- **Null Coalescing Operator:** ต้องใช้การเช็คและใส่ค่าเริ่มต้นด้วยโอเปอเรเตอร์ `?? ''` เสมอเวลาแสดงผลหรือใช้งานตัวแปรที่มาจาก Database ซึ่งอาจจะเป็น `NULL` ได้ (เช่น `$session['ip_address'] ?? ''`) เพื่อความสเถียรของระบบ
+
+---
+
+## 🎯 Quick Checklist สำหรับสร้างฟีเจอร์/โมดูลใหม่ (System Standards Checklist)
+เพื่อป้องกันการหลุดมาตรฐานของระบบ ทุกครั้งที่สร้างหน้าใหม่ ตารางใหม่ หรือปุ่มใหม่ ให้ตรวจสอบตามรายการต่อไปนี้อย่างเคร่งครัด:
+
+### 1. Routing & Controller (หลังบ้าน)
+- [ ] ใช้ **Clean URL** เสมอ (เช่น `/users/create`) ห้ามใช้ Query String เพื่อเปลี่ยนหน้า (เช่น `?page=create`)
+- [ ] ชื่อ Parameter ใน Route ต้อง **ตรงกับตัวแปรใน Controller** เสมอ (ป้องกัน PHP 8 Named Argument Error)
+- [ ] ป้องกัน CSRF เสมอเมื่อรับ POST (ใช้ `\App\Core\Security::checkCsrf()`)
+- [ ] ถอดรหัส ID (`decodeId`) ทันทีเมื่อรับค่าจากหน้าเว็บ และเข้ารหัส ID (`encodeId`) ก่อนส่งออกไปที่หน้าเว็บ
+
+### 2. View & UI (หน้าบ้าน)
+- [ ] **ห้าม Hardcode ข้อความภาษา** ให้ใช้ `<?= __('module.key') ?>` ตลอดทั้งหน้า
+- [ ] แสดงวันที่ต้องใช้ `formatDate($date)` (ฝั่งเซิร์ฟเวอร์) หรือ `formatDate(data)` (ฝั่ง JS) เท่านั้น (รูปแบบมาตรฐาน `d/m/Y`)
+- [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้)
+- [ ] **ปุ่มอันตราย** (ลบ, ระงับ) ต้องใช้ `bg-red-500` และต้องแสดงหน้าต่างยืนยันด้วย **SweetAlert2 (`Swal.fire`)** เท่านั้น ห้ามใช้ `confirm()` ปกติ
+- [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
+
+### 3. DataTables (ตารางข้อมูล)
+- [ ] ต้องทำเป็น **Server-Side Processing** เสมอ หากมีข้อมูลจำนวนมาก
+- [ ] ห้ามใส่การตั้งค่าภาษา (`language`) ยิบย่อยลงไปเอง เพราะระบบจัดการให้ที่ไฟล์ Layout แล้ว
+- [ ] **DOM Layout มาตรฐาน:** หากต้องตั้งค่าหน้าตาของ DataTable เอง ต้องใช้ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ เพื่อจัดระเบียบ Length, Info, Pagination ให้อยู่ด้านล่างตารางอย่างสวยงาม
+
+### 4. Null Safety (PHP 8.1+)
+- [ ] ตัวแปรใดที่ดึงจากฐานข้อมูลและอาจมีโอกาสเป็น `null` ต้องครอบด้วย `?? ''` ก่อนนำไปใช้ร่วมกับฟังก์ชันจัดการ String เสมอ

@@ -8,24 +8,45 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Left Column: User Card -->
     <div class="lg:col-span-1">
-        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 text-center relative transition-colors">
-            <?php if (!empty($user['profile_image'])): ?>
-                <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Picture" class="w-24 h-24 mx-auto rounded-full object-cover shadow-inner mb-4 border-2 border-white dark:border-slate-900 outline outline-2 outline-primary-100 dark:outline-primary-900/30">
-            <?php else: ?>
-                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-primary-500 to-purple-500 flex items-center justify-center font-bold text-3xl text-white shadow-inner mb-4">
-                    <?= htmlspecialchars(strtoupper(substr($user['username'], 0, 1))) ?>
-                </div>
-            <?php endif; ?>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white"><?= htmlspecialchars($user['username']) ?></h2>
-            <p class="text-sm text-gray-500 dark:text-slate-400 mb-4"><?= htmlspecialchars($roleName) ?></p>
-            
-            <div class="pt-4 border-t border-gray-100 dark:border-slate-800 flex justify-between text-sm text-gray-600 dark:text-slate-300">
-                <span class="font-medium"><?= __('profile.joined') ?></span>
-                <span><?= formatDate($user['created_at']) ?></span>
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden relative transition-colors">
+            <!-- Cover Banner -->
+            <div class="h-28 bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-900/80 dark:to-indigo-900/80 relative">
+                <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMSI+PC9wYXRoPgo8L3N2Zz4=')]"></div>
             </div>
-            <div class="pt-2 flex justify-between text-sm text-gray-600 dark:text-slate-300">
-                <span class="font-medium"><?= __('profile.last_login') ?></span>
-                <span><?= $user['last_login'] ? formatDate($user['last_login'], true) : __('profile.never') ?></span>
+
+            <div class="px-6 pb-6 text-center relative -mt-12">
+                <?php if (!empty($user['profile_image'])): ?>
+                    <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Picture" class="w-24 h-24 mx-auto rounded-full object-cover shadow-lg border-4 border-white dark:border-slate-900 relative z-10 bg-white dark:bg-slate-900">
+                <?php else: ?>
+                    <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-primary-500 to-purple-500 flex items-center justify-center font-bold text-3xl text-white shadow-lg border-4 border-white dark:border-slate-900 relative z-10">
+                        <?= htmlspecialchars(strtoupper(substr($user['username'], 0, 1))) ?>
+                    </div>
+                <?php endif; ?>
+                
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mt-3"><?= htmlspecialchars($user['username']) ?></h2>
+                
+                <div class="mt-2 mb-5">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50">
+                        <i class="ph-fill ph-shield-star mr-1.5"></i> <?= htmlspecialchars($roleName) ?>
+                    </span>
+                </div>
+                
+                <div class="pt-4 border-t border-gray-100 dark:border-slate-800/60 flex flex-col space-y-3 text-sm text-left">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-gray-500 dark:text-slate-400">
+                            <i class="ph ph-calendar-blank mr-2 text-lg"></i>
+                            <span><?= __('profile.joined') ?></span>
+                        </div>
+                        <span class="font-medium text-gray-800 dark:text-slate-200"><?= formatDate($user['created_at']) ?></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-gray-500 dark:text-slate-400">
+                            <i class="ph ph-clock-counter-clockwise mr-2 text-lg"></i>
+                            <span><?= __('profile.last_login') ?></span>
+                        </div>
+                        <span class="font-medium text-gray-800 dark:text-slate-200"><?= $user['last_login'] ? formatDate($user['last_login'], true) : __('profile.never') ?></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -58,17 +79,17 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.username_no_change') ?></label>
                         <input type="text" value="<?= htmlspecialchars($user['username']) ?>" readonly
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 outline-none">
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700/50 bg-gray-100 dark:bg-slate-800/80 text-gray-500 dark:text-slate-400 outline-none cursor-not-allowed">
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.email_address') ?> <span class="text-red-500">*</span></label>
                         <input type="email" id="email" name="email" required value="<?= htmlspecialchars($user['email']) ?>"
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all shadow-sm">
                     </div>
                 </div>
                 
                 <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
+                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 flex items-center">
                         <i class="ph ph-floppy-disk mr-2"></i> <?= __('profile.update_profile') ?>
                     </button>
                 </div>
@@ -85,23 +106,23 @@
                     <div>
                         <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.current_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="current_password" name="current_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all shadow-sm">
                     </div>
                     <div>
                         <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.new_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="new_password" name="new_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all shadow-sm">
                     </div>
                     <div>
                         <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.confirm_new_password') ?> <span class="text-red-500">*</span></label>
                         <input type="password" id="confirm_password" name="confirm_password" required
-                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all shadow-sm">
                     </div>
                 </div>
                 
                 <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
-                        <i class="ph ph-lock-key mr-2"></i> <?= __('profile.update_password') ?>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 flex items-center">
+                        <i class="ph ph-key mr-2"></i> <?= __('profile.update_password') ?>
                     </button>
                 </div>
             </form>
@@ -169,8 +190,8 @@
                 </h3>
                 <p class="text-sm text-gray-500 dark:text-slate-400"><?= __('profile.active_sessions_desc') ?></p>
             </div>
-            <a href="/profile/sessions" class="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-300 hover:border-primary-200 dark:hover:border-primary-800 transition-colors shadow-sm whitespace-nowrap border border-slate-200 dark:border-slate-700">
-                <?= __('profile.manage_sessions') ?>
+            <a href="/profile/sessions" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 whitespace-nowrap flex items-center">
+                <?= __('profile.manage_sessions') ?> <i class="ph ph-arrow-right ml-2"></i>
             </a>
         </div>
 

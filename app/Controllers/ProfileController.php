@@ -265,22 +265,22 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function revokeSession($sessionId)
+    public function revokeSession($id)
     {
         Security::checkCsrf();
         $db = Database::getInstance();
         $userId = Session::get('user_id');
 
         // Prevent revoking the current session from here (use logout instead)
-        if ($sessionId === session_id()) {
+        if ($id === session_id()) {
             Session::setFlash('error', 'Cannot revoke current session. Please use logout instead.');
             $this->redirect('/profile/sessions');
         }
 
         $stmt = $db->prepare("DELETE FROM user_sessions WHERE id = :id AND user_id = :user_id");
-        $stmt->execute(['id' => $sessionId, 'user_id' => $userId]);
+        $stmt->execute(['id' => $id, 'user_id' => $userId]);
 
-        Logger::activity("Revoked active session: {$sessionId}");
+        Logger::activity("Revoked active session: {$id}");
         Session::setFlash('success', __('messages.session_revoked'));
         $this->redirect('/profile/sessions');
     }

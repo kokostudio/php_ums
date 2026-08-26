@@ -19,7 +19,7 @@ class Router
     private function addRoute(string $method, string $path, array|callable $handler, array $middlewares = []): void
     {
         // Simple regex conversion for dynamic parameters (e.g. {id})
-        $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<\1>[a-zA-Z0-9_-]+)', $path);
+        $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<\1>[a-zA-Z0-9_,-]+)', $path);
         $pattern = "#^{$pattern}$#";
         
         $this->routes[$method][$pattern] = [

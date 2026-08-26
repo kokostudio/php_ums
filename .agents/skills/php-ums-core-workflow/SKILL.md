@@ -50,6 +50,13 @@ $router->post('/settings/{tab}', [SettingController::class, 'update'], [AuthMidd
 $router->get('/settings', ...); // then read $_GET['tab'] inside controller
 ```
 
+**Controller Parameter Matching (PHP 8+):**
+The parameter name in your controller method MUST exactly match the dynamic segment in the route to avoid PHP 8 named parameter errors.
+```php
+// Route: /users/{id}/edit
+public function edit($id) { ... }
+```
+
 Route parameter must be **whitelisted** in the controller:
 ```php
 public function index($tab = 'general') {
@@ -100,6 +107,7 @@ When a Settings-like page needs multiple sections:
 - The `/data` endpoint returns JSON with `draw`, `recordsTotal`, `recordsFiltered`, `data`
 - Encode `hash_id` in the data endpoint, never expose raw `id`
 - Use `$_GET['search']['value']`, `$_GET['start']`, `$_GET['length']` for filtering/pagination
+- **DOM Layout Standard:** If defining a custom DataTable layout (e.g. hiding default search), always append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to maintain the standard positioning of length, info, and pagination at the bottom.
 
 ### 6. Form Conventions
 
@@ -204,6 +212,7 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 - **Dynamic Palette:** `layouts/app.php` injects the current theme color into Tailwind's `primary` color scale. Use `primary-*` classes for accents, active states, and hover effects (e.g. `text-primary-400`, `bg-primary-900/20`).
 - **Global Color Scope:** Do not override base Tailwind colors (blue, gray, slate) globally.
 - **Buttons:** Main action buttons should use `bg-sidebar` to match the current sidebar theme. Destructive buttons should use standard red (`bg-red-500`).
+- **Confirmation Dialogs:** Destructive actions MUST trigger **SweetAlert2 (`Swal.fire`)** confirmation dialogs instead of the browser's native `confirm()`.
 - **Ultra Dark Mode:** Use translucent backgrounds for cards/modals in dark mode (e.g., `dark:bg-black/20 dark:backdrop-blur-md`).
 
 ### 11. Pinned Sidebar Menus (Favorites)
@@ -223,3 +232,33 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 - **Tailwind Rem Scaling:** The system supports a 3-level font size scaling (14px, 16px, 18px). This is achieved by dynamically injecting a Tailwind class (like `text-[16px]`) onto the `<html>` tag.
 - **Global Effect:** Because Tailwind utilizes `rem` for spacing, padding, and fonts, changing the root font size scales the entire UI proportionally and flawlessly.
 - **Real-time Active State:** For Settings pages with radio/card selectors (e.g., Font Size, Theme), use JavaScript (jQuery) to instantly toggle the active Tailwind classes (`border-primary-*`, `bg-primary-*`) upon click. Always provide a real-time preview (e.g., swapping the class on `<html>`) before the user submits the form.
+
+### 14. PHP 8.1+ Null Safety (Strict Types)
+- **String Functions Compatibility:** In PHP 8.1+, passing `null` to string-expecting functions like `htmlspecialchars()` or `preg_match()` throws a Fatal Error / TypeError.
+- **Null Coalescing Operator:** ALWAYS use the null coalescing operator `?? ''` when working with potentially null values from the database (e.g., `$session['ip_address'] ?? ''`) before rendering them or using them in string operations.
+
+---
+
+## 🎯 Quick Checklist for New Features / Modules
+To ensure absolute compliance with the system architecture, always verify the following when creating anything new:
+
+### 1. Routing & Controllers (Backend)
+- [ ] Use **Clean URLs** exclusively (e.g., `/users/create`), NEVER query strings (`?page=create`).
+- [ ] Controller method parameter names MUST match the Route named parameters exactly (e.g., `{id}` -> `function edit($id)`).
+- [ ] Enforce **CSRF Protection** on all POST handlers (`Security::checkCsrf()`).
+- [ ] Decode IDs (`decodeId`) instantly when received, and Encode IDs (`encodeId`) before returning them to the UI.
+
+### 2. Views & UI (Frontend)
+- [ ] **NO Hardcoded Text:** Always use the `<?= __('module.key') ?>` helper for translations.
+- [ ] **Date Standard:** Always use `formatDate()` (PHP) or `formatDate()` (JS) to ensure the `d/m/Y` global standard.
+- [ ] **Primary Buttons:** Must use `bg-sidebar` so the color matches the dynamic theme.
+- [ ] **Destructive Buttons:** Must use `bg-red-500` and MUST trigger a **SweetAlert2 (`Swal.fire`)** confirmation dialog, not native `confirm()`.
+- [ ] **Active/Hover States:** Must use `primary-*` classes (e.g. `bg-primary-50`) instead of hardcoding slate/blue.
+
+### 3. DataTables
+- [ ] Use **Server-Side Processing** for everything.
+- [ ] DO NOT define `language:` blocks inline; it's handled globally in the layout.
+- [ ] **DOM Standard:** If a custom DOM is needed, you MUST append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to place Length (`l`), Info (`i`), and Pagination (`p`) firmly at the bottom.
+
+### 4. PHP 8.1+ Null Safety
+- [ ] Any nullable string variable fetched from the DB MUST use the `?? ''` null coalescing operator before being passed to string functions.

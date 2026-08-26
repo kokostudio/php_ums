@@ -1,4 +1,4 @@
-<?php require dirname(__DIR__) . '/layouts/app.php'; ?>
+
 
 <div class="mb-6 flex items-center justify-between">
     <div>
@@ -28,7 +28,7 @@
                     <?php 
                         $isCurrent = ($session['id'] === $currentSessionId);
                         // Simple parser for user agent to make it readable
-                        $ua = $session['user_agent'];
+                        $ua = $session['user_agent'] ?? '';
                         $device = __('profile.unknown_device');
                         $browser = __('profile.unknown_browser');
                         $icon = 'ph-desktop';
@@ -61,17 +61,17 @@
                             </div>
                         </td>
                         <td class="py-4 px-6 text-sm text-gray-600 dark:text-slate-300">
-                            <?= htmlspecialchars($session['ip_address']) ?>
+                            <?= htmlspecialchars($session['ip_address'] ?? '') ?>
                         </td>
                         <td class="py-4 px-6 text-sm text-gray-600 dark:text-slate-300">
-                            <?= date('M d, Y H:i', $session['last_activity']) ?>
+                            <?= date('d/m/Y H:i', $session['last_activity']) ?>
                         </td>
                         <td class="py-4 px-6 text-right">
                             <?php if (!$isCurrent): ?>
                                 <form action="/profile/sessions/<?= htmlspecialchars($session['id']) ?>/revoke" method="POST" class="inline m-0">
                                     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
-                                    <button type="submit" onclick="return confirm('<?= __('profile.revoke_confirm') ?>')" class="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded transition-colors">
-                                        <?= __('profile.revoke') ?>
+                                    <button type="button" onclick="confirmRevoke(this)" class="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors shadow-sm">
+                                        <i class="ph ph-trash mr-1"></i> <?= __('profile.revoke') ?>
                                     </button>
                                 </form>
                             <?php else: ?>
@@ -92,3 +92,22 @@
         </table>
     </div>
 </div>
+
+<script>
+function confirmRevoke(button) {
+    Swal.fire({
+        title: '<?= __('common.confirm') ?>',
+        text: '<?= __('profile.revoke_confirm') ?>',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: '<?= __('common.yes') ?>',
+        cancelButtonText: '<?= __('common.cancel') ?>'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            button.closest('form').submit();
+        }
+    });
+}
+</script>
