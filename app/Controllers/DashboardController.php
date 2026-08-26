@@ -104,12 +104,12 @@ class DashboardController extends Controller
             ],
             [
                 'id' => 'rolesDistributionChart',
-                'title' => __('dashboard.roles_distribution') ?? 'Roles Distribution',
+                'title' => __('dashboard.roles_distribution'),
                 'type' => 'doughnut',
                 'labels' => $roleLabels,
                 'datasets' => [
                     [
-                        'label' => __('dashboard.users') ?? 'Users',
+                        'label' => __('dashboard.users'),
                         'data' => $roleValues,
                         'color' => 'multi', // special handling in JS
                     ]
@@ -132,12 +132,12 @@ class DashboardController extends Controller
             'os' => php_uname('s') . ' ' . php_uname('r'),
             'db_version' => $db->getAttribute(\PDO::ATTR_SERVER_VERSION),
             'server' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown Server',
-            'time' => date('Y-m-d H:i:s')
+            'time' => date('d/m/Y H:i:s')
         ];
 
         // Ensure we pass the page title to the layout
         $this->view('dashboard/index', [
-            'pageTitle' => __('common.dashboard') ?? 'Overview Dashboard',
+            'pageTitle' => __('common.dashboard'),
             'cards' => $cards,
             'charts' => $charts,
             'recentActivities' => $recentActivities,

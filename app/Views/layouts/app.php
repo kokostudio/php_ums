@@ -129,6 +129,9 @@
         .sidebar-item { transition: all 0.2s ease-in-out; }
         .sidebar-item:hover { background-color: rgba(255, 255, 255, 0.1); }
         .sidebar-item.active { background-color: rgba(255, 255, 255, 0.2); border-left: 4px solid white; }
+        
+        .submenu-item-link .pin-menu-btn { opacity: 0; transition: opacity 0.2s; }
+        .submenu-item-link:hover .pin-menu-btn { opacity: 1; }
 
         /* ── Custom Scrollbar ── */
         ::-webkit-scrollbar {
@@ -578,29 +581,31 @@
 
         // Desktop Sidebar Pin Toggle
         const pinBtn = document.getElementById('pinSidebarBtn');
-        pinBtn.addEventListener('click', function() {
-            const html = document.documentElement;
-            if (html.classList.contains('sidebar-collapsed')) {
-                html.classList.remove('sidebar-collapsed');
-                localStorage.sidebarCollapsed = 'false';
-            } else {
-                html.classList.add('sidebar-collapsed');
-                localStorage.sidebarCollapsed = 'true';
-                // Close any open submenus
-                $('.submenu').slideUp(200);
-                $('.caret-icon').removeClass('rotate-90');
-            }
-        });
+        if (pinBtn) {
+            pinBtn.addEventListener('click', function() {
+                const html = document.documentElement;
+                if (html.classList.contains('sidebar-collapsed')) {
+                    html.classList.remove('sidebar-collapsed');
+                    localStorage.sidebarCollapsed = 'false';
+                } else {
+                    html.classList.add('sidebar-collapsed');
+                    localStorage.sidebarCollapsed = 'true';
+                    // Close any open submenus
+                    $('.submenu').slideUp(200);
+                    $('.caret-icon').removeClass('rotate-90');
+                }
+            });
+        }
 
         // Individual Menu Pinning Logic (Favorites)
         $(document).ready(function() {
             $('#main-sidebar-nav .submenu a').each(function() {
-                $(this).addClass('relative group/menu pr-8');
+                $(this).addClass('relative pr-8 submenu-item-link');
                 let url = $(this).attr('href');
                 $(this).append(`
-                    <button class="pin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover/menu:opacity-100 transition-opacity text-slate-400 hover:text-white focus:opacity-100" data-url="${url}" title="Pin Menu" onclick="event.preventDefault(); togglePinMenu('${url}')">
+                    <span class="pin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer" data-url="${url}" title="Pin Menu" onclick="event.preventDefault(); event.stopPropagation(); togglePinMenu('${url}')">
                         <i class="ph ph-push-pin text-sm"></i>
-                    </button>
+                    </span>
                 `);
             });
             renderPinnedMenus();
@@ -632,16 +637,16 @@
                     if ($original.length) {
                         let $clone = $original.clone(true);
                         $clone.find('.pin-menu-btn').remove(); 
-                        $clone.removeClass('group/menu');
+                        $clone.removeClass('submenu-item-link');
                         $clone.append(`
-                            <button class="unpin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-400 hover:text-red-400 transition-colors" data-url="${url}" title="Unpin Menu" onclick="event.preventDefault(); togglePinMenu('${url}')">
+                            <span class="unpin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-400 hover:text-red-400 transition-colors cursor-pointer" data-url="${url}" title="Unpin Menu" onclick="event.preventDefault(); event.stopPropagation(); togglePinMenu('${url}')">
                                 <i class="ph-fill ph-push-pin text-sm"></i>
-                            </button>
+                            </span>
                         `);
                         $nav.append($clone);
                         
                         $original.find('.pin-menu-btn i').removeClass('ph').addClass('ph-fill text-primary-400');
-                        $original.find('.pin-menu-btn').removeClass('opacity-0 text-slate-400 hover:text-white').addClass('opacity-100 hover:text-red-400');
+                        $original.find('.pin-menu-btn').removeClass('text-slate-400 hover:text-white').addClass('hover:text-red-400').css('opacity', '1');
                     }
                 });
 
@@ -649,7 +654,7 @@
                     let u = $(this).attr('href');
                     if (!pinned.includes(u)) {
                         $(this).find('.pin-menu-btn i').removeClass('ph-fill text-primary-400').addClass('ph');
-                        $(this).find('.pin-menu-btn').addClass('opacity-0 text-slate-400 hover:text-white').removeClass('opacity-100 hover:text-red-400');
+                        $(this).find('.pin-menu-btn').addClass('text-slate-400 hover:text-white').removeClass('hover:text-red-400').css('opacity', '');
                     }
                 });
             }
