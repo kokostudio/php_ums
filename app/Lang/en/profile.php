@@ -7,6 +7,8 @@ return [
     'last_login'        => 'Last Login:',
     'never'             => 'Never',
     'general_info'      => 'General Information',
+    'first_name'        => 'First Name',
+    'last_name'         => 'Last Name',
     'profile_picture'   => 'Profile Picture',
     'username_no_change'=> 'Username (Cannot be changed)',
     'email_address'     => 'Email Address',

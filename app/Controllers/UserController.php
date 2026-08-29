@@ -83,7 +83,7 @@ class UserController extends Controller
 
         // Fetch paginated data
         $query = "
-            SELECT u.id, u.username, u.email, u.status, u.created_at, r.name as role_name
+            SELECT u.id, u.username, u.email, u.status, u.created_at, u.avatar, r.name as role_name
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             {$whereClause}
@@ -134,6 +134,19 @@ class UserController extends Controller
 
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
+        $avatarName = null;
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $avatarName = md5(uniqid()) . '.' . $ext;
+                move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $avatarName);
+            }
+        }
+
         // Basic Validation
         if (empty($username) || empty($email) || empty($password)) {
             Session::setFlash('error', __('messages.all_fields_required'));
@@ -151,13 +164,14 @@ class UserController extends Controller
         $hashedPassword = Security::hashPassword($password);
 
         try {
-            $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id, status) VALUES (:username, :email, :password, :role_id, :status)");
+            $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id, status, avatar) VALUES (:username, :email, :password, :role_id, :status, :avatar)");
             $stmt->execute([
                 'username' => $username,
                 'email' => $email,
                 'password' => $hashedPassword,
                 'role_id' => $roleId,
-                'status' => $status
+                'status' => $status,
+                'avatar' => $avatarName
             ]);
             
             $newId = $db->lastInsertId();
@@ -221,6 +235,25 @@ class UserController extends Controller
 
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
+        $avatarName = $oldUser['avatar'];
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $newAvatarName = md5(uniqid()) . '.' . $ext;
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $newAvatarName)) {
+                    // Delete old avatar if exists
+                    if (!empty($oldUser['avatar']) && file_exists($uploadDir . $oldUser['avatar'])) {
+                        unlink($uploadDir . $oldUser['avatar']);
+                    }
+                    $avatarName = $newAvatarName;
+                }
+            }
+        }
+
         // Check unique (excluding current user)
         $checkStmt = $db->prepare("SELECT id FROM users WHERE (username = :username OR email = :email) AND id != :id");
         $checkStmt->execute(['username' => $username, 'email' => $email, 'id' => $realId]);
@@ -229,12 +262,13 @@ class UserController extends Controller
             $this->redirect("/users/{$id}/edit");
         }
 
-        $query = "UPDATE users SET username = :username, email = :email, role_id = :role_id, status = :status";
+        $query = "UPDATE users SET username = :username, email = :email, role_id = :role_id, status = :status, avatar = :avatar";
         $params = [
             'username' => $username,
             'email' => $email,
             'role_id' => $roleId,
             'status' => $status,
+            'avatar' => $avatarName,
             'id' => $realId
         ];
 
@@ -284,6 +318,10 @@ class UserController extends Controller
         $oldUser = $stmt->fetch();
 
         if ($oldUser) {
+            if (strtolower($oldUser['username']) === 'admin') {
+                $this->json(['success' => false, 'message' => 'The admin user cannot be deleted.'], 403);
+            }
+
             unset($oldUser['password']);
             $db->prepare("DELETE FROM users WHERE id = :id")->execute(['id' => $realId]);
             

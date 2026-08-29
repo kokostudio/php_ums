@@ -46,9 +46,16 @@
     'emerald' => '#022c22',
     'rose'    => '#4c0519',
     ][$sidebarTheme] ?? '#0f172a';
+    $primaryHex = [
+    'slate'   => '#64748b',
+    'black'   => '#737373',
+    'indigo'  => '#6366f1',
+    'emerald' => '#10b981',
+    'rose'    => '#f43f5e',
+    ][$sidebarTheme] ?? '#64748b';
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>">
+<html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?> bg-slate-50 dark:bg-slate-900">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -170,12 +177,12 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;        /* slate-300 – light mode */
+            background: <?= $primaryHex ?>80;
             border-radius: 9999px;
             transition: background 0.2s;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #3b82f6;        /* blue-500 – brand accent */
+            background: <?= $primaryHex ?>;
         }
         ::-webkit-scrollbar-corner {
             background: transparent;
@@ -183,10 +190,10 @@
 
         /* Dark mode scrollbar */
         .dark ::-webkit-scrollbar-thumb {
-            background: #334155;        /* slate-700 */
+            background: <?= $primaryHex ?>66;
         }
         .dark ::-webkit-scrollbar-thumb:hover {
-            background: #3b82f6;        /* blue-500 – same accent */
+            background: <?= $primaryHex ?>;
         }
 
         /* Firefox scrollbar */
@@ -636,7 +643,7 @@
                 $(this).addClass('relative pr-8 submenu-item-link');
                 let url = $(this).attr('href');
                 $(this).append(`
-                    <span class="pin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer" data-url="${url}" title="Pin Menu" onclick="event.preventDefault(); event.stopPropagation(); togglePinMenu('${url}')">
+                    <span class="pin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer z-10" data-url="${url}" title="Pin Menu" onclick="togglePinMenu(event, '${url}')">
                         <i class="ph ph-push-pin text-sm"></i>
                     </span>
                 `);
@@ -644,7 +651,11 @@
             renderPinnedMenus();
         });
 
-        window.togglePinMenu = function(url) {
+        window.togglePinMenu = function(e, url) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             let pinned = JSON.parse(localStorage.getItem('pinnedMenus') || '[]');
             if (pinned.includes(url)) {
                 pinned = pinned.filter(p => p !== url);
@@ -672,7 +683,7 @@
                         $clone.find('.pin-menu-btn').remove(); 
                         $clone.removeClass('submenu-item-link');
                         $clone.append(`
-                            <span class="unpin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-400 hover:text-red-400 transition-colors cursor-pointer" data-url="${url}" title="Unpin Menu" onclick="event.preventDefault(); event.stopPropagation(); togglePinMenu('${url}')">
+                            <span class="unpin-menu-btn absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-400 hover:text-red-400 transition-colors cursor-pointer z-10" data-url="${url}" title="Unpin Menu" onclick="togglePinMenu(event, '${url}')">
                                 <i class="ph-fill ph-push-pin text-sm"></i>
                             </span>
                         `);
@@ -906,6 +917,35 @@
                         </div>
                     `;
                 }
+            }
+        });
+
+        // Global Form Submit Loading State
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.hasAttribute('data-no-loading')) return;
+            
+            const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitBtn) {
+                if (submitBtn.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                
+                // Keep original text
+                if (!submitBtn.dataset.originalContent) {
+                    submitBtn.dataset.originalContent = submitBtn.innerHTML;
+                }
+                
+                // Avoid messing with layout if it's not flex
+                if (!submitBtn.classList.contains('flex')) {
+                    submitBtn.classList.add('inline-flex', 'items-center', 'justify-center');
+                }
+                
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> ${submitBtn.dataset.originalContent.replace(/(<([^>]+)>)/gi, '').trim()}`;
             }
         });
     </script>

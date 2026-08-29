@@ -36,6 +36,12 @@ $router->get('/login/2fa', [\App\Controllers\AuthController::class, 'show2faForm
 $router->post('/login/2fa', [\App\Controllers\AuthController::class, 'verify2faLogin']);
 $router->post('/logout', [\App\Controllers\AuthController::class, 'logout']);
 
+// Social Auth Routes
+$router->get('/auth/google', [\App\Controllers\SocialAuthController::class, 'redirectToGoogle']);
+$router->get('/auth/google/callback', [\App\Controllers\SocialAuthController::class, 'handleGoogleCallback']);
+$router->get('/auth/line', [\App\Controllers\SocialAuthController::class, 'redirectToLine']);
+$router->get('/auth/line/callback', [\App\Controllers\SocialAuthController::class, 'handleLineCallback']);
+
 // Forgot/Reset Password
 $router->get('/forgot-password', [\App\Controllers\AuthController::class, 'forgotPassword']);
 $router->post('/forgot-password', [\App\Controllers\AuthController::class, 'sendResetLink']);

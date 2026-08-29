@@ -33,6 +33,7 @@ class AuthController extends Controller
 
         if (empty($username) || empty($password)) {
             Session::setFlash('error', __('messages.enter_user_pass'));
+            Session::setFlash('old_username', $username);
             $this->redirect('/login');
         }
 
@@ -45,6 +46,7 @@ class AuthController extends Controller
             if ($user['status'] !== 'active') {
                 Logger::activity("Failed login attempt (Account {$user['status']}) for user: {$username}");
                 Session::setFlash('error', __('messages.account_disabled'));
+                Session::setFlash('old_username', $username);
                 $this->redirect('/login');
             }
 
@@ -75,6 +77,7 @@ class AuthController extends Controller
         } else {
             Logger::activity("Failed login attempt (Invalid credentials) for user: {$username}");
             Session::setFlash('error', __('messages.invalid_credentials'));
+            Session::setFlash('old_username', $username);
             $this->redirect('/login');
         }
     }

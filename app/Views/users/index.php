@@ -154,7 +154,15 @@ $(document).ready(function() {
             { 
                 data: 'username',
                 render: function(data, type, row) {
-                    return `<div class="font-medium text-gray-900 dark:text-white">${data}</div>`;
+                    let avatarUrl = row.avatar ? '/uploads/avatars/' + row.avatar : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data) + '&background=random';
+                    return `
+                        <div class="flex items-center space-x-3">
+                            <div class="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                                <img src="${avatarUrl}" alt="${data}" class="h-full w-full object-cover">
+                            </div>
+                            <div class="font-medium text-gray-900 dark:text-white">${data}</div>
+                        </div>
+                    `;
                 }
             },
             { data: 'email' },
@@ -182,14 +190,27 @@ $(document).ready(function() {
                 orderable: false,
                 className: 'text-right',
                 render: function(data, type, row) {
+                    let deleteBtn = '';
+                    if (row.username && row.username.toLowerCase() === 'admin') {
+                        deleteBtn = `
+                            <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1" title="Cannot delete admin user">
+                                <i class="ph ph-trash text-lg"></i>
+                            </button>
+                        `;
+                    } else {
+                        deleteBtn = `
+                            <button onclick="deleteUser('${data}')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1" title="<?= __('common.delete') ?>">
+                                <i class="ph ph-trash text-lg"></i>
+                            </button>
+                        `;
+                    }
+                    
                     return `
                         <div class="flex justify-end gap-2">
                             <a href="/users/${data}/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1" title="<?= __('common.edit') ?>">
                                 <i class="ph ph-pencil-simple text-lg"></i>
                             </a>
-                            <button onclick="deleteUser('${data}')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1" title="<?= __('common.delete') ?>">
-                                <i class="ph ph-trash text-lg"></i>
-                            </button>
+                            ${deleteBtn}
                         </div>
                     `;
                 }

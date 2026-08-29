@@ -45,7 +45,13 @@ class SettingController extends Controller
         // Keys allowed per tab
         $textKeysByTab = [
             'general' => ['site_name', 'site_footer', 'sidebar_theme', 'base_font_size'],
-            'login'   => ['login_title', 'login_subtitle'],
+            'login'   => [
+                'login_title', 'login_subtitle', 'login_edition', 'login_features_enabled',
+                'login_feature1_icon', 'login_feature1_text',
+                'login_feature2_icon', 'login_feature2_text',
+                'login_feature3_icon', 'login_feature3_text',
+                'login_pattern'
+            ],
         ];
         $fileKeysByTab = [
             'general' => ['site_logo', 'site_favicon'],

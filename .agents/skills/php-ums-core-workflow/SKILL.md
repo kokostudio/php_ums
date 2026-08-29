@@ -115,6 +115,7 @@ When a Settings-like page needs multiple sections:
 - Backend always calls `Security::checkCsrf()` as the first line of POST handlers
 - Use `Security::sanitize()` on all text inputs before storing
 - File uploads: validate MIME type with `mime_content_type()`, store in `public/uploads/`
+- **Global Loading State:** All form submissions automatically trigger a loading spinner (`ph-circle-notch`) and disable the submit button via a global JS listener. If a form should NOT trigger this (e.g., live search forms), you MUST add the `data-no-loading` attribute to the `<form>` tag.
 
 ### 7. UI & Typography Standards
 
@@ -130,26 +131,22 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Prompt', 'sans-seri
 body { font-family: 'Prompt', sans-serif; }
 ```
 
-**Dark Mode:**
-- Dark mode is class-based (`darkMode: 'class'` in Tailwind config)
-- Preference stored in `localStorage.theme` (`'dark'` or `'light'`)
-- All views must include `dark:` variants for **all** color classes
-- Init script in layout prevents FOUC (Flash of Unstyled Content)
+**Dark Mode & Scrollbar:**
+- Dark mode is class-based (`darkMode: 'class'` in Tailwind config). Preference stored in `localStorage.theme`.
+- **Scrollbar MUST match the theme dynamically:** Use custom thin 6px scrollbars. The track background must hide white flashes (e.g., adding `bg-slate-50 dark:bg-slate-900` to the `<html>` element). Thumb colors must adapt to dark/light modes.
+- Firefox & WebKit must adhere to the dynamic theme color via PHP-injected CSS variables in the `<style>` block if necessary.
 
-**Scrollbar:**
-- Custom thin 6px scrollbar in both layouts
-- Light: `slate-300` track thumb → hover `blue-500`
-- Dark: `slate-700` track thumb → hover `blue-500`
-- Firefox: `scrollbar-width: thin`
-
-**Icons:** Phosphor Icons
-- Outline: `<i class="ph ph-{name}"></i>`
-- Filled: `<i class="ph-fill ph-{name}"></i>`
+**Icons & Shapes:**
+- Icons: Phosphor Icons (Outline: `<i class="ph ph-{name}"></i>`, Filled: `<i class="ph-fill ph-{name}"></i>`)
+- **Shapes (CRITICAL):** UI themes (cards, inputs, buttons) must use square-like slight rounding (`rounded-md`). Do NOT use heavily rounded (`rounded-xl` or `rounded-2xl`) unless specifically requested.
 
 **Color System:**
 - Primary: `#3b82f6` (blue-500)
 - Secondary: `#64748b` (slate-500)
 - ห้ามใช้สีนอก palette โดยไม่มีเหตุผล
+
+**Form Validation:**
+- **Validation Messages:** Validation error messages MUST appear immediately below their respective inputs (e.g., `<p id="field-error" class="text-xs text-red-500 mt-1"></p>`). Do not rely solely on top-level alerts for field-specific errors.
 
 ### 8. Date & Time Formatting Standards
 
@@ -218,7 +215,8 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 ### 11. Pinned Sidebar Menus (Favorites)
 - **Feature:** The sidebar supports a "Pinned Menus" feature where users can pin frequently used submenus to the top.
 - **UI:** A pin icon appears when hovering over a submenu item. Do NOT rely on Tailwind dynamic arbitrary classes (like `group-hover/menu`) for elements appended via JS, as Tailwind CDN may fail to parse them. Use standard CSS in `<style>` instead (e.g., `.submenu-item-link:hover .pin-menu-btn { opacity: 1; }`).
-- **Event Bubbling:** Always use `event.stopPropagation()` on the pin button's `onclick` handler to prevent the browser from navigating to the parent link.
+- **Event Bubbling (CRITICAL BUG FIX):** Do NOT use `onclick="event.preventDefault(); event.stopPropagation();"` directly in inline HTML, as it breaks in some browsers (e.g. Firefox) or propagates unintentionally, causing the pinned menu to fail. ALWAYS pass the event explicitly: `onclick="togglePinMenu(event, '${url}')"` and handle `e.preventDefault(); e.stopPropagation();` inside the JavaScript function.
+- **Z-Index (CRITICAL BUG FIX):** ALWAYS add `z-10` to dynamically appended buttons (like `.pin-menu-btn` and `.unpin-menu-btn`) so they sit above parent flex containers and remain clickable.
 - **Storage:** Pinned menu states (href arrays) are stored entirely client-side in `localStorage` under `pinnedMenus`.
 - **Behavior:** The DOM is manipulated dynamically via JS in `layouts/app.php` to clone pinned menus into the top `#pinned-menus-container` on load and on click. No backend changes are required for this UI feature.
 
@@ -236,6 +234,17 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 ### 14. PHP 8.1+ Null Safety (Strict Types)
 - **String Functions Compatibility:** In PHP 8.1+, passing `null` to string-expecting functions like `htmlspecialchars()` or `preg_match()` throws a Fatal Error / TypeError.
 - **Null Coalescing Operator:** ALWAYS use the null coalescing operator `?? ''` when working with potentially null values from the database (e.g., `$session['ip_address'] ?? ''`) before rendering them or using them in string operations.
+
+### 15. Auth Layout & Premium Background Patterns
+- **Layout:** Authentication pages (login, register) use `layouts/auth.php`.
+- **Background Setting:** The background pattern is customizable via Settings (`login_pattern`).
+- **Premium Aesthetics:** Available patterns include `dots` (Dots & Orbs), `grid` (Minimal Grid), `mesh` (Soft Mesh), `lines` (Diagonal Lines), `glass` (Glassmorphism), and `none`.
+- **Implementation:** These patterns rely on absolute positioning, `pointer-events-none`, and Tailwind utility classes (no custom CSS animations that require compilation) to ensure they work perfectly via Tailwind CDN. Never place these patterns inside the login form card itself; they belong in the layout's right-side background panel.
+
+### 16. Profile & Authentication Features
+- **Social Login:** The system supports OAuth 2.0 Social Logins (Google and LINE). Flow is handled natively via cURL in `SocialAuthController.php` to minimize dependencies.
+- **Auto Registration:** Social logins automatically create a new user and assign the default system role if the email or provider ID doesn't exist.
+- **Extended Profile:** User profiles include First Name (`first_name`) and Last Name (`last_name`). Always include these fields in user creation/editing forms and profile settings.
 
 ---
 

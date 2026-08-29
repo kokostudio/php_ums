@@ -7,6 +7,8 @@ return [
     'last_login'        => 'เข้าสู่ระบบล่าสุด:',
     'never'             => 'ไม่เคย',
     'general_info'      => 'ข้อมูลทั่วไป',
+    'first_name'        => 'ชื่อ',
+    'last_name'         => 'นามสกุล',
     'profile_picture'   => 'รูปโปรไฟล์',
     'username_no_change'=> 'ชื่อผู้ใช้ (ไม่สามารถเปลี่ยนได้)',
     'email_address'     => 'ที่อยู่อีเมล',

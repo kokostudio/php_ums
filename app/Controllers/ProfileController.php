@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $db = Database::getInstance();
         $userId = Session::get('user_id');
         
-        $stmt = $db->prepare("SELECT username, email, role_id, created_at, last_login, profile_image, two_factor_enabled FROM users WHERE id = :id");
+        $stmt = $db->prepare("SELECT username, email, first_name, last_name, role_id, created_at, last_login, profile_image, two_factor_enabled FROM users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch();
 
@@ -66,6 +66,8 @@ class ProfileController extends Controller
         $userId = Session::get('user_id');
 
         $email = Security::sanitize($_POST['email'] ?? '');
+        $firstName = Security::sanitize($_POST['first_name'] ?? '');
+        $lastName = Security::sanitize($_POST['last_name'] ?? '');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Session::setFlash('error', 'Invalid email format.');
@@ -81,8 +83,8 @@ class ProfileController extends Controller
         }
 
         try {
-            $updateSql = "UPDATE users SET email = :email WHERE id = :id";
-            $params = ['email' => $email, 'id' => $userId];
+            $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name WHERE id = :id";
+            $params = ['email' => $email, 'first_name' => $firstName, 'last_name' => $lastName, 'id' => $userId];
 
             // Handle Cropped Profile Image Upload (Base64)
             if (!empty($_POST['cropped_image'])) {
@@ -105,7 +107,7 @@ class ProfileController extends Controller
                 $targetPath = $uploadDir . $filename;
 
                 if (file_put_contents($targetPath, $data)) {
-                    $updateSql = "UPDATE users SET email = :email, profile_image = :profile_image WHERE id = :id";
+                    $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name, profile_image = :profile_image WHERE id = :id";
                     $params['profile_image'] = '/uploads/profiles/' . $filename;
                     Session::set('profile_image', '/uploads/profiles/' . $filename);
                 }
@@ -129,7 +131,7 @@ class ProfileController extends Controller
                     $targetPath = $uploadDir . $filename;
 
                     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                        $updateSql = "UPDATE users SET email = :email, profile_image = :profile_image WHERE id = :id";
+                        $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name, profile_image = :profile_image WHERE id = :id";
                         $params['profile_image'] = '/uploads/profiles/' . $filename;
                         
                         // Update session with new image

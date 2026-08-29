@@ -90,21 +90,7 @@
 <script>
 $(document).ready(function() {
     const table = $('#rolesTable').DataTable({
-        dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"<"flex items-center gap-2"B>f>rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '<i class="ph-fill ph-file-xls mr-1"></i> Excel',
-                className: 'bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-3 rounded shadow-sm text-sm transition-colors border-0',
-                exportOptions: { columns: [0, 1, 2, 3] }
-            },
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="ph-fill ph-file-pdf mr-1"></i> PDF',
-                className: 'bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded shadow-sm text-sm transition-colors border-0 ml-2',
-                exportOptions: { columns: [0, 1, 2, 3] }
-            }
-        ],
+        dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
         pageLength: 10,
         order: [[0, 'asc']],
         columnDefs: [

@@ -109,7 +109,7 @@
                             <!-- Slate Dark -->
                             <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'slate' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
                                 <input type="radio" name="sidebar_theme" value="slate" class="sr-only" <?= $currentTheme === 'slate' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 shadow-inner mb-2.5 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-md bg-slate-900 border border-slate-700 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'slate'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
                                 <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Slate Dark</span>
@@ -118,7 +118,7 @@
                             <!-- Midnight Black -->
                             <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'black' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
                                 <input type="radio" name="sidebar_theme" value="black" class="sr-only" <?= $currentTheme === 'black' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-full bg-zinc-950 border border-zinc-800 shadow-inner mb-2.5 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-md bg-zinc-950 border border-zinc-800 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'black'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
                                 <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Midnight</span>
@@ -127,7 +127,7 @@
                             <!-- Deep Indigo -->
                             <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'indigo' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
                                 <input type="radio" name="sidebar_theme" value="indigo" class="sr-only" <?= $currentTheme === 'indigo' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-full bg-indigo-950 border border-indigo-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-md bg-indigo-950 border border-indigo-900/50 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'indigo'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
                                 <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Deep Indigo</span>
@@ -136,7 +136,7 @@
                             <!-- Emerald Forest -->
                             <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'emerald' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
                                 <input type="radio" name="sidebar_theme" value="emerald" class="sr-only" <?= $currentTheme === 'emerald' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-full bg-emerald-950 border border-emerald-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-md bg-emerald-950 border border-emerald-900/50 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'emerald'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
                                 <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Emerald</span>
@@ -145,7 +145,7 @@
                             <!-- Rose Crimson -->
                             <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'rose' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
                                 <input type="radio" name="sidebar_theme" value="rose" class="sr-only" <?= $currentTheme === 'rose' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-full bg-rose-950 border border-rose-900/50 shadow-inner mb-2.5 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-md bg-rose-950 border border-rose-900/50 shadow-inner mb-2.5 flex items-center justify-center">
                                     <?php if ($currentTheme === 'rose'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
                                 </div>
                                 <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Rose Crimson</span>
@@ -267,6 +267,78 @@
                             value="<?= htmlspecialchars($settings['login_subtitle'] ?? 'Sign in to your account') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                             placeholder="<?= __('settings.ph_login_sub') ?? 'e.g. Please enter your details.' ?>">
+                    </div>
+
+                    <div>
+                        <label for="login_edition" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Edition Text</label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">ข้อความใต้โลโก้ เช่น ERP EDITION</p>
+                        <input type="text" id="login_edition" name="login_edition" 
+                            value="<?= htmlspecialchars($settings['login_edition'] ?? 'ERP EDITION') ?>"
+                            class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                            placeholder="ERP EDITION">
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-100 dark:border-slate-800">
+                        <label for="login_pattern" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ลายพื้นหลัง (Background Pattern)</label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">เลือกลายตกแต่งพื้นหลังสำหรับหน้าจอล็อกอิน</p>
+                        <select id="login_pattern" name="login_pattern" class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            <option value="dots" <?= ($settings['login_pattern'] ?? 'dots') === 'dots' ? 'selected' : '' ?>>จุดและแสงฟุ้ง (Dots & Orbs)</option>
+                            <option value="grid" <?= ($settings['login_pattern'] ?? 'dots') === 'grid' ? 'selected' : '' ?>>ตารางมินิมอล (Minimal Grid)</option>
+                            <option value="mesh" <?= ($settings['login_pattern'] ?? 'dots') === 'mesh' ? 'selected' : '' ?>>สีไล่ระดับนุ่มนวล (Soft Mesh)</option>
+                            <option value="lines" <?= ($settings['login_pattern'] ?? 'dots') === 'lines' ? 'selected' : '' ?>>เส้นทแยงมุม (Diagonal Lines)</option>
+                            <option value="glass" <?= ($settings['login_pattern'] ?? 'dots') === 'glass' ? 'selected' : '' ?>>กระจกหรูหรา (Glassmorphism)</option>
+                            <option value="none" <?= ($settings['login_pattern'] ?? 'dots') === 'none' ? 'selected' : '' ?>>ไม่มีลาย (None)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800">
+                        <div class="flex items-center justify-between max-w-lg mb-4">
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-white">Feature Cards</h4>
+                                <p class="text-xs text-gray-500 dark:text-slate-400">แสดงการ์ดคุณสมบัติ 3 รายการในหน้า Login</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="hidden" name="login_features_enabled" value="0">
+                                <input type="checkbox" name="login_features_enabled" value="1" class="sr-only peer" <?= (!isset($settings['login_features_enabled']) || $settings['login_features_enabled'] == '1') ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="space-y-4 max-w-lg">
+                            <!-- Feature 1 -->
+                            <div class="flex gap-3">
+                                <div class="w-1/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Icon 1 (e.g. ph-shield-check)</label>
+                                    <input type="text" name="login_feature1_icon" value="<?= htmlspecialchars($settings['login_feature1_icon'] ?? 'ph-shield-check') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                                <div class="w-2/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Text 1</label>
+                                    <input type="text" name="login_feature1_text" value="<?= htmlspecialchars($settings['login_feature1_text'] ?? 'เข้าสู่ระบบปลอดภัยด้วย SSO') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <!-- Feature 2 -->
+                            <div class="flex gap-3">
+                                <div class="w-1/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Icon 2 (e.g. ph-package)</label>
+                                    <input type="text" name="login_feature2_icon" value="<?= htmlspecialchars($settings['login_feature2_icon'] ?? 'ph-package') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                                <div class="w-2/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Text 2</label>
+                                    <input type="text" name="login_feature2_text" value="<?= htmlspecialchars($settings['login_feature2_text'] ?? 'จัดการสินค้า สต็อก และลูกค้า') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <!-- Feature 3 -->
+                            <div class="flex gap-3">
+                                <div class="w-1/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Icon 3 (e.g. ph-chart-line-up)</label>
+                                    <input type="text" name="login_feature3_icon" value="<?= htmlspecialchars($settings['login_feature3_icon'] ?? 'ph-chart-line-up') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                                <div class="w-2/3">
+                                    <label class="block text-xs text-gray-500 mb-1">Text 3</label>
+                                    <input type="text" name="login_feature3_text" value="<?= htmlspecialchars($settings['login_feature3_text'] ?? 'รายงานและแดชบอร์ดแบบเรียลไทม์') ?>" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
