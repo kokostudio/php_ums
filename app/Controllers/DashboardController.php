@@ -15,6 +15,7 @@ class DashboardController extends Controller
             'total_users' => $db->query("SELECT COUNT(id) FROM users")->fetchColumn(),
             'total_roles' => $db->query("SELECT COUNT(id) FROM roles")->fetchColumn(),
             'active_users' => $db->query("SELECT COUNT(id) FROM users WHERE status = 'active'")->fetchColumn(),
+            'online_users' => $db->query("SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE last_activity >= " . (time() - 900) . " AND user_id IS NOT NULL")->fetchColumn(),
         ];
 
         // Dynamic Cards Registry
@@ -32,11 +33,17 @@ class DashboardController extends Controller
                 'color' => 'emerald',
             ],
             [
-                'title' => __('dashboard.total_roles'),
+                'title' => __('dashboard.total_roles') ?? 'Total Roles',
                 'value' => number_format((float)$stats['total_roles']),
                 'icon'  => 'ph-shield-star',
                 'color' => 'purple',
             ],
+            [
+                'title' => __('dashboard.online_users') ?? 'Online Now',
+                'value' => number_format((float)$stats['online_users']),
+                'icon'  => 'ph-plugs-connected',
+                'color' => 'pink',
+            ]
         ];
 
         // Fetch User Registrations over the last 6 months for Chart.js
@@ -132,12 +139,15 @@ class DashboardController extends Controller
             'os' => php_uname('s') . ' ' . php_uname('r'),
             'db_version' => $db->getAttribute(\PDO::ATTR_SERVER_VERSION),
             'server' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown Server',
-            'time' => date('d/m/Y H:i:s')
+            'time' => date('d/m/Y H:i:s'),
+            'disk_free' => function_exists('disk_free_space') ? round(disk_free_space("/") / (1024 * 1024 * 1024), 2) . ' GB' : 'N/A',
+            'memory_limit' => ini_get('memory_limit')
         ];
 
         // Ensure we pass the page title to the layout
         $this->view('dashboard/index', [
             'pageTitle' => __('common.dashboard'),
+            'stats' => $stats,
             'cards' => $cards,
             'charts' => $charts,
             'recentActivities' => $recentActivities,

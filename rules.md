@@ -102,6 +102,9 @@
 - **Active & Hover States (Accents):** สถานะ Active ของแท็บเมนู (Tabs), แถวในตาราง, เมนูย่อย, หรือปุ่มรองต่างๆ ต้องใช้ `text-primary-*` และ `bg-primary-*` (เช่น `hover:bg-primary-50 dark:hover:bg-primary-900/20`) แทนการใช้สีเทา (`slate`) หรือสีฟ้า (`blue`) แบบเจาะจง เพื่อให้ความรู้สึกที่ตอบสนองกับธีมได้อย่างกลมกลืน (Premium Tint)
 - **Global Color Scope:** ห้าม Override สีหลักของ Tailwind (เช่น `blue`, `gray`, `slate`) ทั่วทั้งระบบ เพื่อหลีกเลี่ยงผลกระทบต่อ UI ส่วนที่ไม่เกี่ยวข้อง จะมีการแมปแบบ Dynamic เฉพาะสี `primary` และ `sidebar` เท่านั้น
 - **Ultra Dark Mode:** สำหรับโหมดกลางคืน (Dark Mode) ในส่วนของ Card หรือ Modal ให้ใช้ Background แบบโปร่งแสงที่ดูลึกและพรีเมียม เช่น `dark:bg-black/20 dark:backdrop-blur-md` หรือ `dark:bg-slate-950`
+- **Sticky Top Save Button (มาตรฐานฟอร์มบันทึก):** ทุกหน้าจอที่เป็นฟอร์มบันทึกข้อมูล (เช่น Settings, Profile, Create/Edit Form) ปุ่มบันทึก (Save/Submit) ต้องถูกจัดวางไว้ในแถบ Header ด้านบนสุด และต้องใช้เทคนิค Sticky ควบคู่กับ Glassmorphism เพื่อให้แถบปุ่มติดขอบบนสุดตอนผู้ใช้เลื่อนหน้าจอลงมา
+  - ตัวอย่างคลาสบังคับใช้: `sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 px-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl`
+
 
 ## 13. Pinned Sidebar Menus (Favorites)
 - **UI/UX:** แถบเมนูด้านซ้าย (Sidebar) รองรับฟีเจอร์ "เมนูโปรด (Pinned Menus)" โดยจะมีไอคอนหมุดปรากฏขึ้นเมื่อ Hover ที่เมนูย่อย
@@ -149,3 +152,12 @@
 
 ### 4. Null Safety (PHP 8.1+)
 - [ ] ตัวแปรใดที่ดึงจากฐานข้อมูลและอาจมีโอกาสเป็น `null` ต้องครอบด้วย `?? ''` ก่อนนำไปใช้ร่วมกับฟังก์ชันจัดการ String เสมอ
+
+## 17. Premium Dashboard & UI Design Standards
+- **No Welcome Banners:** เพื่อให้หน้า Dashboard ดูสะอาดและเน้นไปที่ข้อมูล (Data-driven) ให้ตัดส่วน Welcome Banner ขนาดใหญ่ออก และเริ่มต้นด้วยการ์ดสถิติ (Stat Cards) ทันที
+- **Stat Cards (4 Columns):** จัดเรียงกล่องสถิติเป็น 4 คอลัมน์ (`grid-cols-1 md:grid-cols-2 xl:grid-cols-4`) เพื่อความสมดุล โดยให้มีหนึ่งกล่องแสดงยอด **"ผู้ใช้ออนไลน์ขณะนี้" (Online Users)** ซึ่งดึงข้อมูลจริงจากความเคลื่อนไหวในตาราง `user_sessions` (เช่น 15 นาทีล่าสุด)
+- **Premium Aesthetics:** 
+  - ใช้ลูกเล่น Glassmorphism (`backdrop-blur-xl`, `bg-white/50`) 
+  - เพิ่มมิติด้วยเอฟเฟกต์ Hover (เช่น `hover:-translate-y-1`, `hover:scale-105`)
+  - ใช้เงาสะท้อนแบบเรืองแสง (Glow shadows) แทนเงาดำปกติ เพื่อความหรูหรา
+- **Modern Charts:** การตั้งค่ากราฟ (Chart.js) ให้ใช้เส้นโค้งมนสมูท (`tension: 0.4`), เพิ่มการถมสีแบบไล่ระดับ (Linear Gradients) สำหรับกราฟเส้น, และใช้ชุดสีโทน Premium Palette สำหรับกราฟวงกลม พร้อมปรับ Tooltip ให้เข้ากับธีม

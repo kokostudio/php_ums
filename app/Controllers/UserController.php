@@ -7,6 +7,9 @@ use App\Core\Database;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\Logger;
+use App\Core\UploadManager;
+use App\Core\Validator;
+use App\Core\DataTableHelper;
 
 class UserController extends Controller
 {
@@ -27,38 +30,10 @@ class UserController extends Controller
     {
         $db = Database::getInstance();
         
-        $draw = $_GET['draw'] ?? 1;
-        $start = $_GET['start'] ?? 0;
-        $length = $_GET['length'] ?? 10;
-        $searchValue = $_GET['search']['value'] ?? '';
-
-        $params = [];
-        $whereConditions = [];
-
-        if (!empty($searchValue)) {
-            $whereConditions[] = "(u.username LIKE :search1 OR u.email LIKE :search2 OR r.name LIKE :search3)";
-            $params['search1'] = "%{$searchValue}%";
-            $params['search2'] = "%{$searchValue}%";
-            $params['search3'] = "%{$searchValue}%";
-        }
-
-        // Custom Filters
-        if (!empty($_GET['role_filter'])) {
-            $whereConditions[] = "u.role_id = :role_filter";
-            $params['role_filter'] = $_GET['role_filter'];
-        }
-        if (!empty($_GET['status_filter'])) {
-            $whereConditions[] = "u.status = :status_filter";
-            $params['status_filter'] = $_GET['status_filter'];
-        }
-
-        $whereClause = "";
-        if (!empty($whereConditions)) {
-            $whereClause = "WHERE " . implode(" AND ", $whereConditions);
-        }
-
-        // Sorting
-        $columns = [
+        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.avatar, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id";
+        
+        $searchableColumns = ['u.username', 'u.email', 'r.name'];
+        $orderableColumns = [
             0 => 'u.id',
             1 => 'u.username',
             2 => 'u.email',
@@ -66,52 +41,37 @@ class UserController extends Controller
             4 => 'u.status',
             5 => 'u.created_at'
         ];
-        
-        $orderColumnIndex = $_GET['order'][0]['column'] ?? 0;
-        $orderDir = $_GET['order'][0]['dir'] ?? 'desc';
-        $orderColumn = $columns[$orderColumnIndex] ?? 'u.id';
-        $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
 
-        // Total count without filtering
-        $totalRecords = $db->query("SELECT COUNT(id) FROM users")->fetchColumn();
+        $extraWhere = [];
+        $extraParams = [];
 
-        // Total count with filtering
-        $totalFilteredQuery = "SELECT COUNT(u.id) FROM users u LEFT JOIN roles r ON u.role_id = r.id {$whereClause}";
-        $stmtFiltered = $db->prepare($totalFilteredQuery);
-        $stmtFiltered->execute($params);
-        $totalFiltered = $stmtFiltered->fetchColumn();
-
-        // Fetch paginated data
-        $query = "
-            SELECT u.id, u.username, u.email, u.status, u.created_at, u.avatar, r.name as role_name
-            FROM users u
-            LEFT JOIN roles r ON u.role_id = r.id
-            {$whereClause}
-            ORDER BY {$orderColumn} {$orderDir}
-            LIMIT :start, :length
-        ";
-        
-        $stmt = $db->prepare($query);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(":$key", $value);
+        if (!empty($_GET['role_filter'])) {
+            $extraWhere[] = "u.role_id = :role_filter";
+            $extraParams['role_filter'] = $_GET['role_filter'];
         }
-        $stmt->bindValue(':start', (int)$start, \PDO::PARAM_INT);
-        $stmt->bindValue(':length', (int)$length, \PDO::PARAM_INT);
-        $stmt->execute();
-        
-        $data = $stmt->fetchAll();
+        if (!empty($_GET['status_filter'])) {
+            $extraWhere[] = "u.status = :status_filter";
+            $extraParams['status_filter'] = $_GET['status_filter'];
+        }
+
+        $result = DataTableHelper::process(
+            $db,
+            $_GET,
+            $baseQuery,
+            $searchableColumns,
+            $orderableColumns,
+            'u.id',
+            $extraWhere,
+            $extraParams,
+            "SELECT COUNT(id) FROM users"
+        );
 
         // Encode IDs for the frontend
-        foreach ($data as &$row) {
+        foreach ($result['data'] as &$row) {
             $row['hash_id'] = Security::encodeId((int)$row['id']);
         }
 
-        $this->json([
-            "draw" => intval($draw),
-            "recordsTotal" => intval($totalRecords),
-            "recordsFiltered" => intval($totalFiltered),
-            "data" => $data
-        ]);
+        $this->json($result);
     }
 
     public function create()
@@ -126,30 +86,31 @@ class UserController extends Controller
         Security::checkCsrf();
         $db = Database::getInstance();
 
-        $username = Security::sanitize($_POST['username'] ?? '');
-        $email = Security::sanitize($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $errors = Validator::validate($_POST, [
+            'username' => 'required|alpha_dash',
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
+
+        if (!empty($errors)) {
+            $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
+            Session::setFlash('error', $errorMsg);
+            $this->redirect('/users/create');
+        }
+
+        $username = Security::sanitize($_POST['username']);
+        $email = Security::sanitize($_POST['email']);
+        $password = $_POST['password'];
         $roleIdHash = $_POST['role_id'] ?? null;
         $status = Security::sanitize($_POST['status'] ?? 'active');
 
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
         $avatarName = null;
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $avatarName = md5(uniqid()) . '.' . $ext;
-                move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $avatarName);
-            }
-        }
-
-        // Basic Validation
-        if (empty($username) || empty($email) || empty($password)) {
-            Session::setFlash('error', __('messages.all_fields_required'));
+        try {
+            $avatarName = UploadManager::handle($_FILES['avatar'] ?? [], __DIR__ . '/../../public/uploads/avatars/');
+        } catch (\Exception $e) {
+            Session::setFlash('error', $e->getMessage());
             $this->redirect('/users/create');
         }
 
@@ -227,8 +188,19 @@ class UserController extends Controller
             $this->redirect('/users');
         }
 
-        $username = Security::sanitize($_POST['username'] ?? '');
-        $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $errors = Validator::validate($_POST, [
+            'username' => 'required|alpha_dash',
+            'email' => 'required|email',
+        ]);
+
+        if (!empty($errors)) {
+            $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
+            Session::setFlash('error', $errorMsg);
+            $this->redirect("/users/{$id}/edit");
+        }
+
+        $username = Security::sanitize($_POST['username']);
+        $email = Security::sanitize($_POST['email']);
         $password = $_POST['password'] ?? '';
         $roleIdHash = $_POST['role_id'] ?? null;
         $status = Security::sanitize($_POST['status'] ?? 'active');
@@ -236,22 +208,18 @@ class UserController extends Controller
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
         $avatarName = $oldUser['avatar'];
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $newAvatarName = md5(uniqid()) . '.' . $ext;
-                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $newAvatarName)) {
-                    // Delete old avatar if exists
-                    if (!empty($oldUser['avatar']) && file_exists($uploadDir . $oldUser['avatar'])) {
-                        unlink($uploadDir . $oldUser['avatar']);
-                    }
-                    $avatarName = $newAvatarName;
+        try {
+            $newAvatarName = UploadManager::handle($_FILES['avatar'] ?? [], __DIR__ . '/../../public/uploads/avatars/');
+            if ($newAvatarName) {
+                // Delete old avatar if exists
+                if (!empty($oldUser['avatar']) && file_exists(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['avatar'])) {
+                    unlink(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['avatar']);
                 }
+                $avatarName = $newAvatarName;
             }
+        } catch (\Exception $e) {
+            Session::setFlash('error', $e->getMessage());
+            $this->redirect("/users/{$id}/edit");
         }
 
         // Check unique (excluding current user)

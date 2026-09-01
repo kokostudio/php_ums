@@ -35,12 +35,15 @@
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 md:p-8 transition-colors">
 
             <?php if ($tab === 'general'): ?>
-            <!-- ===== GENERAL INFO TAB ===== -->
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-slate-800 pb-3">
-                <i class="ph ph-sliders mr-2"></i><?= __('settings.general_info') ?>
-            </h3>
-            
-            <form action="/settings/general" method="POST" enctype="multipart/form-data">
+            <form action="/settings/general" method="POST" enctype="multipart/form-data" id="generalSettingsForm">
+                <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        <i class="ph ph-sliders mr-2"></i><?= __('settings.general_info') ?>
+                    </h3>
+                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm flex items-center">
+                        <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
+                    </button>
+                </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
                 <div class="space-y-6">
@@ -201,11 +204,6 @@
                     input:checked ~ .dot { transform: translateX(100%); }
                 </style>
 
-                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800">
-                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
-                        <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
-                    </button>
-                </div>
             </form>
 
             <script>
@@ -243,11 +241,15 @@
 
             <?php elseif ($tab === 'login'): ?>
             <!-- ===== LOGIN PAGE TAB ===== -->
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-slate-800 pb-3">
-                <i class="ph ph-sign-in mr-2"></i><?= __('settings.login_page') ?>
-            </h3>
-
-            <form action="/settings/login" method="POST" enctype="multipart/form-data">
+            <form action="/settings/login" method="POST" enctype="multipart/form-data" id="loginSettingsForm">
+                <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        <i class="ph ph-sign-in mr-2"></i><?= __('settings.login_page') ?>
+                    </h3>
+                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm flex items-center">
+                        <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
+                    </button>
+                </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
                 <div class="space-y-6">
@@ -367,11 +369,6 @@
                     </div>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800">
-                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center">
-                        <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
-                    </button>
-                </div>
             </form>
 
             <?php elseif ($tab === 'translations'): ?>

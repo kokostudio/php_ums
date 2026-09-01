@@ -161,8 +161,9 @@
         
         html.sidebar-collapsed #sidebar .h-16 { padding: 0; justify-content: center; }
         html.sidebar-collapsed #sidebar .h-16 .truncate { display: none; }
-        html.sidebar-collapsed #sidebar .h-16 .flex.items-center.overflow-hidden { display: none; }
-        html.sidebar-collapsed #pinSidebarBtn { margin-left: 0; display: flex !important; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        html.sidebar-collapsed #sidebar .h-16 img { margin-right: 0 !important; margin-left: auto; margin-right: auto; }
+        html.sidebar-collapsed #sidebar .h-16 i.ph-cube { margin-right: 0 !important; font-size: 1.75rem !important; }
+        html.sidebar-collapsed #pinSidebarBtn { display: none !important; }
         
         html.sidebar-collapsed #sidebar .p-4 { padding: 1rem 0; display: flex; justify-content: center; }
         html.sidebar-collapsed #sidebar .p-4 img, html.sidebar-collapsed #sidebar .p-4 .bg-gradient-to-tr { margin: 0 auto; }
@@ -291,9 +292,6 @@
                 <?php endif; ?>
                 <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
             </div>
-            <button id="pinSidebarBtn" class="hidden md:block text-slate-400 hover:text-white transition-colors focus:outline-none flex-shrink-0 ml-2" title="Toggle Sidebar">
-                <i class="ph ph-list text-xl"></i>
-            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto py-6">
@@ -315,7 +313,7 @@
                     }
                 ?>
                 <div class="sidebar-group">
-                    <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isSystemActive ? 'text-primary-300 bg-primary-900/40' : 'text-slate-300 hover:text-primary-300 hover:bg-primary-900/20' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
+                    <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isSystemActive ? 'text-white bg-primary-900/50' : 'text-slate-200 hover:text-white hover:bg-primary-900/30' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
                         <div class="flex items-center">
                             <i class="ph ph-desktop text-lg mr-3"></i>
                             <span><?php echo __('common.administration') ?></span>
@@ -323,23 +321,23 @@
                         <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 <?php echo $isSystemActive ? 'rotate-90' : '' ?>"></i>
                     </button>
                     <div class="submenu overflow-hidden <?php echo $isSystemActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
-                        <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/dashboard') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-squares-four text-lg mr-3 opacity-70"></i> <span><?php echo __('common.dashboard') ?></span>
+                        <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/dashboard') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-squares-four text-lg mr-3 <?php echo strpos($currentUri, '/dashboard') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.dashboard') ?></span>
                         </a>
-                        <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/users') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-users text-lg mr-3 opacity-70"></i> <span><?php echo __('common.user_management') ?></span>
+                        <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/users') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-users text-lg mr-3 <?php echo strpos($currentUri, '/users') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.user_management') ?></span>
                         </a>
-                        <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/roles') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-shield-check text-lg mr-3 opacity-70"></i> <span><?php echo __('common.roles_permissions') ?></span>
+                        <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/roles') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-shield-check text-lg mr-3 <?php echo strpos($currentUri, '/roles') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.roles_permissions') ?></span>
                         </a>
-                        <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-activity text-lg mr-3 opacity-70"></i> <span><?php echo __('common.activity_logs') ?></span>
+                        <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-activity text-lg mr-3 <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.activity_logs') ?></span>
                         </a>
-                        <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-file-search text-lg mr-3 opacity-70"></i> <span><?php echo __('common.audit_logs') ?></span>
+                        <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-file-search text-lg mr-3 <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.audit_logs') ?></span>
                         </a>
-                        <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/settings') === 0 ? 'text-primary-400 bg-primary-900/20 border-l-[3px] border-primary-500' : 'text-primary-300/70 hover:text-primary-200 hover:bg-primary-900/20 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-gear text-lg mr-3 opacity-70"></i> <span><?php echo __('common.system_settings') ?></span>
+                        <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/settings') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-gear text-lg mr-3 <?php echo strpos($currentUri, '/settings') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.system_settings') ?></span>
                         </a>
                     </div>
                 </div>
@@ -369,7 +367,12 @@
         <!-- Topbar -->
         <header class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 z-10 sticky top-0 transition-colors duration-300">
             <div class="flex items-center space-x-3">
+                <!-- Mobile Menu Toggle (Drawer) -->
                 <button id="sidebarToggle" class="md:hidden text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors mr-1">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <!-- Desktop Sidebar Collapse Toggle -->
+                <button id="desktopSidebarToggle" class="hidden md:block text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors mr-1" title="Toggle Sidebar">
                     <i class="ph ph-list text-2xl"></i>
                 </button>
 
@@ -499,8 +502,21 @@
                 <?php echo $content ?? '' ?>
 
                 <!-- Footer -->
-                <footer class="mt-8 pt-4 border-t border-gray-200 dark:border-slate-800 text-center text-sm text-gray-500 dark:text-slate-400 pb-4 transition-colors">
-                    <?php echo Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>
+                <footer class="mt-10 py-6 border-t border-gray-200/60 dark:border-slate-800/60">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="text-sm font-medium text-gray-500 dark:text-slate-400">
+                            <?php echo Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>
+                        </div>
+                        <div class="flex items-center space-x-4 text-xs font-semibold text-gray-400 dark:text-slate-500">
+                            <span class="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer" title="Secure System">
+                                <i class="ph-fill ph-shield-check text-sm text-emerald-500"></i> Secure Core
+                            </span>
+                            <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-700"></span>
+                            <span class="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer">
+                                <i class="ph-fill ph-code text-sm text-blue-500"></i> v1.0.0
+                            </span>
+                        </div>
+                    </div>
                 </footer>
             </div>
         </main>
@@ -619,10 +635,10 @@
             setInterval(fetchNotifications, 60000);
         });
 
-        // Desktop Sidebar Pin Toggle
-        const pinBtn = document.getElementById('pinSidebarBtn');
-        if (pinBtn) {
-            pinBtn.addEventListener('click', function() {
+        // Desktop Sidebar Collapse Toggle (from Navbar)
+        const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+        if (desktopSidebarToggle) {
+            desktopSidebarToggle.addEventListener('click', function() {
                 const html = document.documentElement;
                 if (html.classList.contains('sidebar-collapsed')) {
                     html.classList.remove('sidebar-collapsed');

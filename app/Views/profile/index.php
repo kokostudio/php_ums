@@ -54,10 +54,17 @@
     <!-- Right Column: Settings Forms -->
     <div class="lg:col-span-2 space-y-6">
         
-        <!-- General Info Form -->
+        <!-- Profile Info Form -->
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2"><?= __('profile.general_info') ?></h3>
-            <form action="/profile" method="POST" enctype="multipart/form-data">
+            <form action="/profile" method="POST" enctype="multipart/form-data" id="profileInfoForm">
+                <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 px-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        <?= __('profile.profile_info') ?>
+                    </h3>
+                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-sidebar hover:opacity-90 rounded-lg transition-colors shadow-sm flex items-center">
+                        <i class="ph ph-floppy-disk mr-2 text-lg"></i> <?= __('profile.update_profile') ?>
+                    </button>
+                </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                 
                 <div class="mb-4">
@@ -101,18 +108,20 @@
                     </div>
                 </div>
                 
-                <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 flex items-center">
-                        <i class="ph ph-floppy-disk mr-2"></i> <?= __('profile.update_profile') ?>
-                    </button>
-                </div>
             </form>
         </div>
 
         <!-- Change Password Form -->
-        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2"><?= __('profile.change_password') ?></h3>
-            <form action="/profile/password" method="POST">
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
+            <form action="/profile/password" method="POST" id="passwordForm">
+                <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 px-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        <?= __('profile.change_password') ?>
+                    </h3>
+                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-sidebar hover:opacity-90 rounded-lg transition-colors shadow-sm flex items-center">
+                        <i class="ph ph-key mr-2 text-lg"></i> <?= __('profile.update_password') ?>
+                    </button>
+                </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                 
                 <div class="grid grid-cols-1 gap-4 mb-4">
@@ -133,11 +142,6 @@
                     </div>
                 </div>
                 
-                <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-sidebar rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 flex items-center">
-                        <i class="ph ph-key mr-2"></i> <?= __('profile.update_password') ?>
-                    </button>
-                </div>
             </form>
         </div>
 
