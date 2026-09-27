@@ -30,4 +30,12 @@ return [
     '2fa_desc'            => 'Please open your authenticator app (e.g. Google Authenticator) and enter the 6-digit code.',
     'verification_code'   => 'Verification Code',
     'verify_and_login'    => 'Verify & Login',
+    
+    // Security Policies
+    'pwd_min_length'      => 'Password must be at least :length characters long.',
+    'pwd_req_upper'       => 'Password must contain at least one uppercase letter (A-Z).',
+    'pwd_req_lower'       => 'Password must contain at least one lowercase letter (a-z).',
+    'pwd_req_number'      => 'Password must contain at least one number (0-9).',
+    'pwd_req_special'     => 'Password must contain at least one special character.',
+    'force_2fa_warning'   => 'Administrator policy requires you to enable Two-Factor Authentication.',
 ];

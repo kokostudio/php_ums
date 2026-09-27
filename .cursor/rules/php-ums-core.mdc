@@ -1,0 +1,24 @@
+---
+description: System Architecture, UI/UX Standards, and Security Workflow for PHP UMS
+globs: *
+---
+
+# PHP UMS Core Rules
+
+You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidelines:
+
+1. **Architecture Document:** For comprehensive rules, ALWAYS read `rules.md` and `.agents/skills/php-ums-core-workflow/SKILL.md` before making architectural decisions.
+2. **Security First:** 
+   - Never expose raw database IDs. Always use `\App\Core\Security::encodeId($id)` for outbound data and `decodeId($hash)` for inbound data.
+   - All POST/PUT/DELETE requests must include `csrf_token` and be validated with `\App\Core\Security::checkCsrf()`.
+   - For destructive actions (e.g. Delete, Revoke), NEVER use browser `confirm()`, use `Swal.fire`.
+3. **UI/UX & Tailwind:** 
+   - Do not override base Tailwind colors (blue, gray, slate). Use `primary-*` for dynamic theme elements and `bg-sidebar` for primary action buttons.
+   - Use **Client-Side DataTables** (instant load via `<tbody>` generation in PHP) by default. Use server-side AJAX only for massive datasets (100k+ rows).
+   - Never hardcode text in views; always use `<?= __('module.key') ?>` for translations.
+   - Date format must strictly be `d/m/Y` (or `d/m/Y H:i:s`) using `formatDate()` helpers.
+4. **Null Safety (PHP 8.1+):**
+   - Variables fetched from the database that may be null MUST use the null coalescing operator (`$var ?? ''`) before being passed to string functions to prevent Fatal Errors.
+5. **Error Handling & Rate Limiting:**
+   - Use `App\Core\ErrorHandler` for exceptions. Do not show raw errors in production.
+   - Protect sensitive endpoints against brute-force using the `rate_limits` table structure.

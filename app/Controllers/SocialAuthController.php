@@ -15,8 +15,13 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToGoogle()
     {
-        $clientId = getenv('GOOGLE_CLIENT_ID');
-        $redirectUri = getenv('GOOGLE_REDIRECT_URI');
+        if (Settings::get('enable_google_login') !== '1') {
+            Session::setFlash('error', 'Google Login is disabled.');
+            $this->redirect('/login');
+        }
+
+        $clientId = Settings::get('google_client_id') ?: getenv('GOOGLE_CLIENT_ID');
+        $redirectUri = Settings::get('google_redirect_uri') ?: getenv('GOOGLE_REDIRECT_URI');
         
         $state = bin2hex(random_bytes(16));
         Session::set('oauth_state', $state);
@@ -38,6 +43,11 @@ class SocialAuthController extends Controller
 
     public function handleGoogleCallback()
     {
+        if (Settings::get('enable_google_login') !== '1') {
+            Session::setFlash('error', 'Google Login is disabled.');
+            $this->redirect('/login');
+        }
+
         $code = $_GET['code'] ?? null;
         $state = $_GET['state'] ?? null;
         $savedState = Session::get('oauth_state');
@@ -49,9 +59,9 @@ class SocialAuthController extends Controller
 
         Session::remove('oauth_state');
 
-        $clientId = getenv('GOOGLE_CLIENT_ID');
-        $clientSecret = getenv('GOOGLE_CLIENT_SECRET');
-        $redirectUri = getenv('GOOGLE_REDIRECT_URI');
+        $clientId = Settings::get('google_client_id') ?: getenv('GOOGLE_CLIENT_ID');
+        $clientSecret = Settings::get('google_client_secret') ?: getenv('GOOGLE_CLIENT_SECRET');
+        $redirectUri = Settings::get('google_redirect_uri') ?: getenv('GOOGLE_REDIRECT_URI');
 
         // Exchange code for token
         $tokenUrl = 'https://oauth2.googleapis.com/token';
@@ -113,8 +123,13 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToLine()
     {
-        $clientId = getenv('LINE_CLIENT_ID');
-        $redirectUri = getenv('LINE_REDIRECT_URI');
+        if (Settings::get('enable_line_login') !== '1') {
+            Session::setFlash('error', 'LINE Login is disabled.');
+            $this->redirect('/login');
+        }
+
+        $clientId = Settings::get('line_client_id') ?: getenv('LINE_CLIENT_ID');
+        $redirectUri = Settings::get('line_redirect_uri') ?: getenv('LINE_REDIRECT_URI');
         
         $state = bin2hex(random_bytes(16));
         $nonce = bin2hex(random_bytes(16)); // Requires nonce for OIDC
@@ -137,6 +152,11 @@ class SocialAuthController extends Controller
 
     public function handleLineCallback()
     {
+        if (Settings::get('enable_line_login') !== '1') {
+            Session::setFlash('error', 'LINE Login is disabled.');
+            $this->redirect('/login');
+        }
+
         $code = $_GET['code'] ?? null;
         $state = $_GET['state'] ?? null;
         $error = $_GET['error'] ?? null;
@@ -149,9 +169,9 @@ class SocialAuthController extends Controller
 
         Session::remove('oauth_state');
 
-        $clientId = getenv('LINE_CLIENT_ID');
-        $clientSecret = getenv('LINE_CLIENT_SECRET');
-        $redirectUri = getenv('LINE_REDIRECT_URI');
+        $clientId = Settings::get('line_client_id') ?: getenv('LINE_CLIENT_ID');
+        $clientSecret = Settings::get('line_client_secret') ?: getenv('LINE_CLIENT_SECRET');
+        $redirectUri = Settings::get('line_redirect_uri') ?: getenv('LINE_REDIRECT_URI');
 
         // Exchange code for token
         $tokenUrl = 'https://api.line.me/oauth2/v2.1/token';
@@ -227,23 +247,61 @@ class SocialAuthController extends Controller
     private function loginOrCreateUser($provider, $providerId, $email, $firstName, $lastName, $profileImage)
     {
         $db = Database::getInstance();
+        $providerColumn = $provider . '_id';
+        $currentUserId = Session::get('user_id');
 
-        // Check if user exists by provider_id
-        $stmt = $db->prepare("SELECT * FROM users WHERE provider = :provider AND provider_id = :provider_id LIMIT 1");
-        $stmt->execute(['provider' => $provider, 'provider_id' => $providerId]);
-        $user = $stmt->fetch();
+        // Check if provider_id is already linked to any account
+        $stmt = $db->prepare("SELECT * FROM users WHERE {$providerColumn} = :provider_id LIMIT 1");
+        $stmt->execute(['provider_id' => $providerId]);
+        $existingUser = $stmt->fetch();
+
+        if ($currentUserId) {
+            // ==========================================
+            // LINKING FLOW (User is already logged in)
+            // ==========================================
+            if ($existingUser) {
+                if ($existingUser['id'] == $currentUserId) {
+                    Session::setFlash('success', 'Your account is already linked to this ' . ucfirst($provider) . ' account.');
+                } else {
+                    Session::setFlash('error', 'This ' . ucfirst($provider) . ' account is already linked to another user.');
+                }
+                $this->redirect('/profile');
+            }
+
+            // Link the account
+            $update = $db->prepare("UPDATE users SET {$providerColumn} = :provider_id WHERE id = :id");
+            $update->execute(['provider_id' => $providerId, 'id' => $currentUserId]);
+
+            // Optionally update avatar if they don't have one
+            $stmt = $db->prepare("SELECT avatar_url FROM users WHERE id = :id");
+            $stmt->execute(['id' => $currentUserId]);
+            $currentUser = $stmt->fetch();
+            if (empty($currentUser['avatar_url']) && $profileImage) {
+                $db->prepare("UPDATE users SET avatar_url = :avatar WHERE id = :id")->execute(['avatar' => $profileImage, 'id' => $currentUserId]);
+                Session::set('profile_image', $profileImage);
+            }
+
+            Logger::activity("Linked " . ucfirst($provider) . " account to profile.");
+            Session::setFlash('success', ucfirst($provider) . ' account has been successfully linked to your profile.');
+            $this->redirect('/profile');
+            return;
+        }
+
+        // ==========================================
+        // LOGIN/REGISTRATION FLOW (User is NOT logged in)
+        // ==========================================
+        $user = $existingUser;
 
         // If not found by provider_id, check by email
-        if (!$user && $email) {
+        if (!$user && $email && strpos($email, '@line.login') === false) {
             $stmt = $db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch();
 
             if ($user) {
                 // Link account to existing email
-                $update = $db->prepare("UPDATE users SET provider = :provider, provider_id = :provider_id WHERE id = :id");
+                $update = $db->prepare("UPDATE users SET {$providerColumn} = :provider_id WHERE id = :id");
                 $update->execute([
-                    'provider' => $provider,
                     'provider_id' => $providerId,
                     'id' => $user['id']
                 ]);
@@ -257,14 +315,13 @@ class SocialAuthController extends Controller
             // Assume default role is user (role_id 2 usually)
             $defaultRole = Settings::get('default_role_id', 2);
             
-            $insert = $db->prepare("INSERT INTO users (username, email, first_name, last_name, profile_image, provider, provider_id, role_id, status) VALUES (:username, :email, :first_name, :last_name, :profile_image, :provider, :provider_id, :role_id, 'active')");
+            $insert = $db->prepare("INSERT INTO users (username, email, first_name, last_name, avatar_url, {$providerColumn}, role_id) VALUES (:username, :email, :first_name, :last_name, :avatar_url, :provider_id, :role_id)");
             $insert->execute([
                 'username' => $username,
                 'email' => $email,
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'profile_image' => $profileImage,
-                'provider' => $provider,
+                'avatar_url' => $profileImage,
                 'provider_id' => $providerId,
                 'role_id' => $defaultRole
             ]);
@@ -278,9 +335,15 @@ class SocialAuthController extends Controller
         }
 
         if ($user['status'] !== 'active') {
-            Logger::activity("Failed {$provider} login attempt (Account {$user['status']}) for user: {$user['username']}");
-            Session::setFlash('error', __('messages.account_disabled'));
+            Logger::activity("Failed {$provider} login attempt (Account disabled) for user: {$user['username']}");
+            Session::setFlash('error', __('messages.account_disabled') ?? 'Your account is disabled.');
             $this->redirect('/login');
+        }
+
+        // Update avatar if changed (optional)
+        if ($profileImage && $profileImage !== $user['avatar_url']) {
+            $update = $db->prepare("UPDATE users SET avatar_url = :avatar_url WHERE id = :id");
+            $update->execute(['avatar_url' => $profileImage, 'id' => $user['id']]);
         }
 
         // Complete Login
@@ -301,8 +364,9 @@ class SocialAuthController extends Controller
         Session::set('user_id', $user['id']);
         Session::set('username', $user['username']);
         Session::set('user_email', $user['email']);
-        Session::set('user_role', $user['role_id']);
-        Session::set('profile_image', $user['profile_image']);
+        Session::set('role_id', $user['role_id']);
+        Session::set('2fa_enabled', false);
+        Session::set('profile_image', $user['avatar_url']);
 
         // Update Last Login
         $update = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");

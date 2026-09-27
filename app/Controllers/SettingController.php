@@ -13,7 +13,13 @@ class SettingController extends Controller
 {
     public function index($tab = 'general')
     {
-        $tab = in_array($tab, ['general', 'login', 'translations']) ? $tab : 'general';
+        // Valid tabs
+        $validTabs = ['general', 'login', 'translations', 'security', 'social'];
+        
+        if (!in_array($tab, $validTabs)) {
+            $tab = 'general';
+        }
+
         $db = Database::getInstance();
         $settings = $db->query("SELECT setting_key, setting_value FROM system_settings")->fetchAll(\PDO::FETCH_KEY_PAIR);
         
@@ -40,7 +46,7 @@ class SettingController extends Controller
     public function update($tab = 'general')
     {
         Security::checkCsrf();
-        $tab = in_array($tab, ['general', 'login']) ? $tab : 'general';
+        $tab = in_array($tab, ['general', 'login', 'security', 'social']) ? $tab : 'general';
 
         // Keys allowed per tab
         $textKeysByTab = [
@@ -51,6 +57,11 @@ class SettingController extends Controller
                 'login_feature2_icon', 'login_feature2_text',
                 'login_feature3_icon', 'login_feature3_text',
                 'login_pattern'
+            ],
+            'security' => ['password_min_length', 'login_max_attempts', 'login_lockout_time', 'session_lifetime', 'require_email_verification'],
+            'social'   => [
+                'google_client_id', 'google_client_secret', 'google_redirect_uri',
+                'line_client_id', 'line_client_secret', 'line_redirect_uri'
             ],
         ];
         $fileKeysByTab = [
@@ -71,6 +82,18 @@ class SettingController extends Controller
 
             if ($tab === 'general') {
                 Settings::set('maintenance_mode', isset($_POST['maintenance_mode']) ? '1' : '0');
+                Settings::set('enable_registration', isset($_POST['enable_registration']) ? '1' : '0');
+            }
+            if ($tab === 'security') {
+                Settings::set('pwd_require_upper', isset($_POST['pwd_require_upper']) ? '1' : '0');
+                Settings::set('pwd_require_lower', isset($_POST['pwd_require_lower']) ? '1' : '0');
+                Settings::set('pwd_require_number', isset($_POST['pwd_require_number']) ? '1' : '0');
+                Settings::set('pwd_require_special', isset($_POST['pwd_require_special']) ? '1' : '0');
+                Settings::set('force_2fa_admin', isset($_POST['force_2fa_admin']) ? '1' : '0');
+            }
+            if ($tab === 'social') {
+                Settings::set('enable_google_login', isset($_POST['enable_google_login']) ? '1' : '0');
+                Settings::set('enable_line_login', isset($_POST['enable_line_login']) ? '1' : '0');
             }
 
             // 2. File Uploads

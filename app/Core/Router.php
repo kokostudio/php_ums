@@ -96,9 +96,6 @@ class Router
 
     public function abort(int $code = 404): void
     {
-        http_response_code($code);
-        // Can be replaced with a proper error view later
-        echo "<h1>{$code} Not Found</h1>";
-        exit;
+        throw new \Exception("Route Not Found", $code);
     }
 }

@@ -9,7 +9,20 @@ class LogController extends Controller
 {
     public function activity()
     {
-        $this->view('logs/activity', ['pageTitle' => 'Activity Logs']);
+        $db = Database::getInstance();
+        $query = "
+            SELECT a.id, a.action, a.ip_address, a.created_at, u.username
+            FROM activity_logs a
+            LEFT JOIN users u ON a.user_id = u.id
+            ORDER BY a.id DESC
+            LIMIT 1000
+        ";
+        $logs = $db->query($query)->fetchAll();
+
+        $this->view('logs/activity', [
+            'pageTitle' => 'Activity Logs',
+            'logs' => $logs
+        ]);
     }
 
     public function activityData()
@@ -66,7 +79,20 @@ class LogController extends Controller
 
     public function audit()
     {
-        $this->view('logs/audit', ['pageTitle' => 'Audit Logs']);
+        $db = Database::getInstance();
+        $query = "
+            SELECT a.id, a.table_name, a.record_id, a.action, a.old_values, a.new_values, a.created_at, u.username
+            FROM audit_logs a
+            LEFT JOIN users u ON a.user_id = u.id
+            ORDER BY a.id DESC
+            LIMIT 1000
+        ";
+        $logs = $db->query($query)->fetchAll();
+
+        $this->view('logs/audit', [
+            'pageTitle' => 'Audit Logs',
+            'logs' => $logs
+        ]);
     }
 
     public function auditData()

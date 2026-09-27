@@ -19,9 +19,7 @@ class PermissionMiddleware implements MiddlewareInterface
     public function handle(): bool
     {
         if (!RBAC::hasPermission($this->module, $this->action)) {
-            http_response_code(403);
-            echo "<h1>403 Forbidden</h1><p>You do not have permission to access this resource.</p>";
-            exit;
+            throw new \Exception("You do not have permission to access this resource.", 403);
         }
 
         return true;

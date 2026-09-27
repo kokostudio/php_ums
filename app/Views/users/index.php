@@ -116,8 +116,70 @@
                     <th class="p-4 font-medium text-right rounded-tr-lg"><?= __('common.actions') ?></th>
                 </tr>
             </thead>
-            <tbody class="text-sm text-gray-700 dark:text-slate-300">
-                <!-- DataTables will populate this -->
+            <tbody class="text-sm text-gray-700 dark:text-slate-300 divide-y divide-gray-100 dark:divide-slate-800">
+                <?php foreach ($users ?? [] as $user): ?>
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="p-4">
+                        <span class="text-xs font-mono text-gray-500 dark:text-slate-400"><?= $user['hash_id'] ?></span>
+                    </td>
+                    <td class="p-4">
+                        <?php 
+                            $avatarUrl = $user['profile_image'] ? '/uploads/avatars/' . htmlspecialchars($user['profile_image']) : 'https://ui-avatars.com/api/?name=' . urlencode($user['username']) . '&background=random';
+                        ?>
+                        <div class="flex items-center space-x-3">
+                            <div class="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                                <img src="<?= $avatarUrl ?>" alt="<?= htmlspecialchars($user['username']) ?>" class="h-full w-full object-cover">
+                            </div>
+                            <div class="font-medium text-gray-900 dark:text-white"><?= htmlspecialchars($user['username']) ?></div>
+                        </div>
+                    </td>
+                    <td class="p-4"><?= htmlspecialchars($user['email']) ?></td>
+                    <td class="p-4 role-cell">
+                        <?php if ($user['role_name']): ?>
+                            <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-xs font-medium"><?= htmlspecialchars($user['role_name']) ?></span>
+                        <?php else: ?>
+                            <span class="text-gray-400 dark:text-slate-500">-</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="p-4 status-cell">
+                        <?php 
+                            $status = $user['status'];
+                            $color = $status === 'active' ? 'emerald' : ($status === 'banned' ? 'red' : 'gray');
+                        ?>
+                        <span class="px-2.5 py-1 bg-<?= $color ?>-100 dark:bg-<?= $color ?>-900/30 text-<?= $color ?>-700 dark:text-<?= $color ?>-400 rounded-full text-xs font-medium capitalize" data-status="<?= htmlspecialchars($status) ?>"><?= htmlspecialchars($status) ?></span>
+                    </td>
+                    <td class="p-4">
+                        <span class="text-gray-600 dark:text-slate-400 text-sm">
+                            <?php 
+                                $date = new DateTime($user['created_at']);
+                                echo $date->format('d/m/Y H:i');
+                            ?>
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <a href="/users/<?= $user['hash_id'] ?>/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1 rounded hover:bg-blue-50 dark:hover:bg-slate-800" title="<?= __('common.edit') ?>">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </a>
+                            <?php if (strtolower($user['username']) === 'admin'): ?>
+                                <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1 rounded" title="Cannot delete admin user">
+                                    <i class="ph ph-trash text-lg"></i>
+                                </button>
+                            <?php else: ?>
+                                <button onclick="deleteUser('<?= $user['hash_id'] ?>')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1 rounded hover:bg-red-50 dark:hover:bg-slate-800" title="<?= __('common.delete') ?>">
+                                    <i class="ph ph-trash text-lg"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                
+                <?php if (empty($users)): ?>
+                <tr>
+                    <td colspan="7" class="p-8 text-center text-gray-400"><?= __('common.no_data') ?? 'No data available' ?></td>
+                </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -134,87 +196,10 @@ $(document).ready(function() {
 
     const table = $('#usersTable').DataTable({
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '/users/data',
-            data: function (d) {
-                d.role_filter = $('#filter_role').val();
-                d.status_filter = $('#filter_status').val();
-            }
-        },
+        pageLength: 10,
         order: [[0, 'desc']], // Default sorting
-        columns: [
-            { 
-                data: 'hash_id',
-                render: function(data) {
-                    return `<span class="text-xs font-mono text-gray-500 dark:text-slate-400">${data}</span>`;
-                }
-            },
-            { 
-                data: 'username',
-                render: function(data, type, row) {
-                    let avatarUrl = row.avatar ? '/uploads/avatars/' + row.avatar : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data) + '&background=random';
-                    return `
-                        <div class="flex items-center space-x-3">
-                            <div class="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
-                                <img src="${avatarUrl}" alt="${data}" class="h-full w-full object-cover">
-                            </div>
-                            <div class="font-medium text-gray-900 dark:text-white">${data}</div>
-                        </div>
-                    `;
-                }
-            },
-            { data: 'email' },
-            { 
-                data: 'role_name',
-                render: function(data) {
-                    return data ? `<span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-xs font-medium">${data}</span>` : '<span class="text-gray-400 dark:text-slate-500">-</span>';
-                }
-            },
-            { 
-                data: 'status',
-                render: function(data) {
-                    let color = data === 'active' ? 'emerald' : (data === 'banned' ? 'red' : 'gray');
-                    return `<span class="px-2.5 py-1 bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-400 rounded-full text-xs font-medium capitalize">${data}</span>`;
-                }
-            },
-            { 
-                data: 'created_at',
-                render: function(data) {
-                    return `<span class="text-gray-600 dark:text-slate-400 text-sm">${formatDate(data, true)}</span>`;
-                }
-            },
-            { 
-                data: 'hash_id',
-                orderable: false,
-                className: 'text-right',
-                render: function(data, type, row) {
-                    let deleteBtn = '';
-                    if (row.username && row.username.toLowerCase() === 'admin') {
-                        deleteBtn = `
-                            <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1" title="Cannot delete admin user">
-                                <i class="ph ph-trash text-lg"></i>
-                            </button>
-                        `;
-                    } else {
-                        deleteBtn = `
-                            <button onclick="deleteUser('${data}')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1" title="<?= __('common.delete') ?>">
-                                <i class="ph ph-trash text-lg"></i>
-                            </button>
-                        `;
-                    }
-                    
-                    return `
-                        <div class="flex justify-end gap-2">
-                            <a href="/users/${data}/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1" title="<?= __('common.edit') ?>">
-                                <i class="ph ph-pencil-simple text-lg"></i>
-                            </a>
-                            ${deleteBtn}
-                        </div>
-                    `;
-                }
-            }
+        columnDefs: [
+            { orderable: false, targets: 6 } // Disable sorting on actions
         ]
     });
 
@@ -223,9 +208,38 @@ $(document).ready(function() {
         table.search(this.value).draw();
     });
 
+    // Custom Client-Side Filtering
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex, rowData, counter) {
+            if (settings.nTable.id !== 'usersTable') { return true; }
+            
+            let roleFilter = $('#filter_role option:selected').text();
+            let statusFilter = $('#filter_status').val();
+
+            // data[3] is Role string (from TD text)
+            let rowRole = data[3] ? data[3].trim() : "";
+            // We use a custom data attribute on the status span to get the exact value reliably
+            let rowStatus = $(table.cell(dataIndex, 4).node()).find('span').data('status');
+            
+            // Handle fallback if data attribute is missing
+            if (!rowStatus) {
+                rowStatus = data[4] ? data[4].trim().toLowerCase() : "";
+            }
+
+            if ($('#filter_role').val() !== "" && rowRole !== roleFilter && rowRole !== '-') {
+                return false;
+            }
+            if (statusFilter !== "" && rowStatus !== statusFilter) {
+                return false;
+            }
+            
+            return true;
+        }
+    );
+
     // Trigger reload when filters change
     $('#filter_role, #filter_status').on('change', function() {
-        table.ajax.reload();
+        table.draw();
     });
 
     window.deleteUser = function(hash) {
@@ -246,8 +260,10 @@ $(document).ready(function() {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 })
                 .then(response => {
-                    Swal.fire('<?= __('common.success') ?>!', response.data.message, 'success');
-                    table.ajax.reload();
+                    Swal.fire('<?= __('common.success') ?>!', response.data.message, 'success')
+                    .then(() => {
+                        window.location.reload();
+                    });
                 })
                 .catch(error => {
                     Swal.fire('<?= __('common.error') ?>!', error.response?.data?.message || 'Failed to delete user.', 'error');

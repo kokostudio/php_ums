@@ -17,9 +17,17 @@ class UserController extends Controller
     {
         $db = Database::getInstance();
         $roles = $db->query("SELECT id, name FROM roles ORDER BY id ASC")->fetchAll();
+        
+        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.profile_image, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id ORDER BY u.id DESC";
+        $users = $db->query($baseQuery)->fetchAll();
+        foreach ($users as &$row) {
+            $row['hash_id'] = Security::encodeId((int)$row['id']);
+        }
+
         $this->view('users/index', [
             'pageTitle' => 'User Management',
-            'roles' => $roles
+            'roles' => $roles,
+            'users' => $users
         ]);
     }
 
@@ -30,7 +38,7 @@ class UserController extends Controller
     {
         $db = Database::getInstance();
         
-        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.avatar, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id";
+        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.profile_image, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id";
         
         $searchableColumns = ['u.username', 'u.email', 'r.name'];
         $orderableColumns = [
@@ -89,8 +97,17 @@ class UserController extends Controller
         $errors = Validator::validate($_POST, [
             'username' => 'required|alpha_dash',
             'email' => 'required|email',
-            'password' => 'required|min:6'
         ]);
+
+        $password = $_POST['password'] ?? '';
+        if (empty($password)) {
+            $errors['password'][] = "The password field is required.";
+        } else {
+            $pwdErrors = Security::validatePasswordComplexity($password);
+            if (!empty($pwdErrors)) {
+                $errors['password'] = $pwdErrors;
+            }
+        }
 
         if (!empty($errors)) {
             $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
@@ -125,14 +142,14 @@ class UserController extends Controller
         $hashedPassword = Security::hashPassword($password);
 
         try {
-            $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id, status, avatar) VALUES (:username, :email, :password, :role_id, :status, :avatar)");
+            $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id, status, profile_image) VALUES (:username, :email, :password, :role_id, :status, :profile_image)");
             $stmt->execute([
                 'username' => $username,
                 'email' => $email,
                 'password' => $hashedPassword,
                 'role_id' => $roleId,
                 'status' => $status,
-                'avatar' => $avatarName
+                'profile_image' => $avatarName
             ]);
             
             $newId = $db->lastInsertId();
@@ -202,18 +219,26 @@ class UserController extends Controller
         $username = Security::sanitize($_POST['username']);
         $email = Security::sanitize($_POST['email']);
         $password = $_POST['password'] ?? '';
+        if (!empty($password)) {
+            $pwdErrors = Security::validatePasswordComplexity($password);
+            if (!empty($pwdErrors)) {
+                $errorMsg = implode('<br>', $pwdErrors);
+                Session::setFlash('error', $errorMsg);
+                $this->redirect("/users/{$id}/edit");
+            }
+        }
         $roleIdHash = $_POST['role_id'] ?? null;
         $status = Security::sanitize($_POST['status'] ?? 'active');
 
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
-        $avatarName = $oldUser['avatar'];
+        $avatarName = $oldUser['profile_image'] ?? null;
         try {
             $newAvatarName = UploadManager::handle($_FILES['avatar'] ?? [], __DIR__ . '/../../public/uploads/avatars/');
             if ($newAvatarName) {
                 // Delete old avatar if exists
-                if (!empty($oldUser['avatar']) && file_exists(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['avatar'])) {
-                    unlink(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['avatar']);
+                if (!empty($oldUser['profile_image']) && file_exists(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['profile_image'])) {
+                    unlink(__DIR__ . '/../../public/uploads/avatars/' . $oldUser['profile_image']);
                 }
                 $avatarName = $newAvatarName;
             }
@@ -230,13 +255,13 @@ class UserController extends Controller
             $this->redirect("/users/{$id}/edit");
         }
 
-        $query = "UPDATE users SET username = :username, email = :email, role_id = :role_id, status = :status, avatar = :avatar";
+        $query = "UPDATE users SET username = :username, email = :email, role_id = :role_id, status = :status, profile_image = :profile_image";
         $params = [
             'username' => $username,
             'email' => $email,
             'role_id' => $roleId,
             'status' => $status,
-            'avatar' => $avatarName,
+            'profile_image' => $avatarName,
             'id' => $realId
         ];
 

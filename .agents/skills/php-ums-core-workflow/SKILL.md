@@ -101,12 +101,12 @@ When a Settings-like page needs multiple sections:
 5. Form `action` uses clean URL: `/settings/general`
 6. After save, redirect to `/settings/{$tab}`
 
-### 5. DataTables (Server-Side Processing)
+### 5. DataTables (Instant Load / Client-Side Preferred)
 
-- Always use **server-side** processing for data tables (never client-side for large datasets)
-- The `/data` endpoint returns JSON with `draw`, `recordsTotal`, `recordsFiltered`, `data`
-- Encode `hash_id` in the data endpoint, never expose raw `id`
-- Use `$_GET['search']['value']`, `$_GET['start']`, `$_GET['length']` for filtering/pagination
+- **Preferred Architecture:** Always use **Client-Side DataTables** (fetch data in PHP and render `<tbody>` directly in the HTML view) to prevent layout jumping, FOUC, and skeleton loaders. This ensures 100% instant loading (like `/roles`, `/users`, `/logs`).
+- **Large Datasets:** For logs or large datasets, use a `LIMIT 1000` (or similar) in the SQL query instead of Server-Side AJAX pagination, to maintain the instant load experience without crashing the browser.
+- **Server-Side AJAX:** Should ONLY be used if explicitly required for massive datasets (100k+ rows) where a 1000-row limit is unacceptable. If used, encode `hash_id` in the data endpoint and never expose raw `id`.
+- **Custom Filtering:** For Client-Side tables, use `$.fn.dataTable.ext.search.push()` to implement custom dropdown filters (like Role or Status) that trigger via `table.draw()`.
 - **DOM Layout Standard:** If defining a custom DataTable layout (e.g. hiding default search), always append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to maintain the standard positioning of length, info, and pagination at the bottom.
 
 ### 6. Form Conventions
@@ -246,6 +246,13 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 - **Auto Registration:** Social logins automatically create a new user and assign the default system role if the email or provider ID doesn't exist.
 - **Extended Profile:** User profiles include First Name (`first_name`) and Last Name (`last_name`). Always include these fields in user creation/editing forms and profile settings.
 
+### 17. Advanced Security (Password Policy & 2FA)
+- **Password Complexity:** All newly created or updated passwords MUST pass the `\App\Core\Security::validatePasswordComplexity($password)` check. This helper validates against the settings defined in the database (`pwd_require_upper`, `pwd_require_lower`, `pwd_require_number`, `pwd_require_special`, `password_min_length`).
+- **Two-Factor Authentication (2FA):** 
+  - Managed via `google2fa_secret`.
+  - The `AuthMiddleware` enforces a "Force 2FA for Admins" policy if `Settings::get('force_2fa_admin')` is enabled, redirecting admins to their profile page to configure 2FA before allowing access to the dashboard.
+  - Session handles the state via `$_SESSION['2fa_enabled']`. Always make sure `2fa_enabled` is correctly updated in the Session when a user enables/disables 2FA in the Profile controller.
+
 ---
 
 ## 🎯 Quick Checklist for New Features / Modules
@@ -265,9 +272,15 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] **Active/Hover States:** Must use `primary-*` classes (e.g. `bg-primary-50`) instead of hardcoding slate/blue.
 
 ### 3. DataTables
-- [ ] Use **Server-Side Processing** for everything.
+- [ ] Use **Client-Side Processing** (PHP rendered `<tbody>`) as the default for instant loading and to prevent FOUC/flicker.
+- [ ] Apply `LIMIT 1000` (or similar) to SQL queries if the dataset (like logs) can grow infinitely.
 - [ ] DO NOT define `language:` blocks inline; it's handled globally in the layout.
 - [ ] **DOM Standard:** If a custom DOM is needed, you MUST append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to place Length (`l`), Info (`i`), and Pagination (`p`) firmly at the bottom.
 
 ### 4. PHP 8.1+ Null Safety
 - [ ] Any nullable string variable fetched from the DB MUST use the `?? ''` null coalescing operator before being passed to string functions.
+
+### 5. Advanced Security & Error Handling
+- [ ] **Rate Limiting:** Protect sensitive endpoints (Login, OTP, Password Reset) against brute-force attacks by integrating with the `rate_limits` table structure.
+- [ ] **Error Logging:** Do not output raw errors in production. `APP_DEBUG=false` ensures `App\Core\ErrorHandler` logs errors to `storage/logs/error.log`.
+- [ ] **Maintenance Mode:** Utilize `app/Views/errors/maintenance.php` when locking down the system for critical updates.

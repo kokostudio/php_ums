@@ -231,6 +231,41 @@
         .dark .swal2-icon.swal2-success { border-color: #22c55e !important; color: #22c55e !important; }
         .dark .swal2-icon.swal2-info { border-color: #3b82f6 !important; color: #3b82f6 !important; }
 
+        /* ── Fix DataTables Loading FOUC (แว็บ ๆ ตอนโหลดหน้า) ── */
+        table[id$="Table"]:not(.dataTable) {
+            opacity: 0;
+            visibility: hidden;
+        }
+        table.dataTable {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease-in;
+        }
+
+        /* ── Fix DataTables Processing Flicker (แว็บ ๆ) ── */
+        div.dataTables_wrapper { position: relative; min-height: 450px; }
+        div.dataTables_wrapper div.dataTables_processing {
+            position: absolute !important;
+            top: 45px !important; /* Below table header */
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 45px) !important;
+            z-index: 20 !important;
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(2px) !important;
+            margin: 0 !important;
+            padding: 2rem !important;
+            display: none; /* Will be set to flex by DataTables when active but we override display */
+        }
+        div.dataTables_wrapper div.dataTables_processing[style*="display: block"] {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+        }
+        .dark div.dataTables_wrapper div.dataTables_processing {
+            background: rgba(15, 23, 42, 0.7) !important;
+        }
+
         /* ── Premium DataTables Styling (Replaced by Official Tailwind CSS) ── */
     </style>
 
@@ -257,7 +292,7 @@
                 "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
                 "infoFiltered": "(กรองข้อมูล _MAX_ ทุกรายการ)",
                 "lengthMenu": "แสดง _MENU_ รายการ",
-                "loadingRecords": "กำลังโหลดข้อมูล...",
+                "loadingRecords": "",
                 "processing": "<div class=\'animate-pulse space-y-4\'><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div></div>",
                 "search": "ค้นหา:",
                 "zeroRecords": "ไม่พบข้อมูล",

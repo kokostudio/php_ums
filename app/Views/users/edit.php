@@ -33,7 +33,7 @@
                 
                 <div class="w-32 h-32 rounded-full border-4 border-slate-50 dark:border-slate-800 shadow-sm overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800 flex items-center justify-center relative group cursor-pointer" onclick="document.getElementById('avatar').click()">
                     <?php
-                        $avatarUrl = !empty($user['avatar']) ? '/uploads/avatars/' . $user['avatar'] : 'https://ui-avatars.com/api/?name=' . urlencode($user['username']) . '&background=random';
+                        $avatarUrl = !empty($user['profile_image']) ? '/uploads/avatars/' . $user['profile_image'] : 'https://ui-avatars.com/api/?name=' . urlencode($user['username']) . '&background=random';
                     ?>
                     <img id="avatar-preview" src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar Preview" class="w-full h-full object-cover">
                     

@@ -41,8 +41,7 @@ class Security
             $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
             
             if (!Session::verifyCsrfToken($token)) {
-                http_response_code(403);
-                die("CSRF Token Verification Failed.");
+                throw new \Exception("CSRF Token Verification Failed.", 403);
             }
         }
     }
@@ -52,7 +51,10 @@ class Security
      */
     private static function getHashids(): \Hashids\Hashids
     {
-        $salt = $_ENV['APP_KEY'] ?? 'CoreSystemDefaultSalt123!@#';
+        if (empty($_ENV['APP_KEY'])) {
+            throw new \Exception("APP_KEY is missing in .env file. Security salt is required.", 500);
+        }
+        $salt = $_ENV['APP_KEY'];
         return new \Hashids\Hashids($salt, 8);
     }
 
@@ -72,5 +74,35 @@ class Security
     {
         $decoded = self::getHashids()->decode($hash);
         return !empty($decoded) ? $decoded[0] : null;
+    }
+    /**
+     * Validate password against complexity rules defined in Settings.
+     * Returns an array of error messages, or empty array if valid.
+     */
+    public static function validatePasswordComplexity(string $password): array
+    {
+        $errors = [];
+        $minLength = (int)Settings::get('password_min_length', 6);
+        if (strlen($password) < $minLength) {
+            $errors[] = __("auth.pwd_min_length", ['length' => $minLength]);
+        }
+        
+        if (Settings::get('pwd_require_upper') == '1' && !preg_match('/[A-Z]/', $password)) {
+            $errors[] = __("auth.pwd_req_upper");
+        }
+        
+        if (Settings::get('pwd_require_lower') == '1' && !preg_match('/[a-z]/', $password)) {
+            $errors[] = __("auth.pwd_req_lower");
+        }
+        
+        if (Settings::get('pwd_require_number') == '1' && !preg_match('/[0-9]/', $password)) {
+            $errors[] = __("auth.pwd_req_number");
+        }
+        
+        if (Settings::get('pwd_require_special') == '1' && !preg_match('/[^a-zA-Z0-9]/', $password)) {
+            $errors[] = __("auth.pwd_req_special");
+        }
+
+        return $errors;
     }
 }

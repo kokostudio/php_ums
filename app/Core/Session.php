@@ -12,6 +12,10 @@ class Session
             ini_set('session.use_only_cookies', '1');
             ini_set('session.cookie_samesite', 'Lax');
 
+            $lifetime = (int)Settings::get('session_lifetime', 120) * 60;
+            ini_set('session.gc_maxlifetime', (string)$lifetime);
+            session_set_cookie_params($lifetime);
+
             $handler = new DatabaseSessionHandler();
             session_set_save_handler($handler, true);
 

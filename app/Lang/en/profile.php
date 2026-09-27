@@ -7,6 +7,7 @@ return [
     'last_login'        => 'Last Login:',
     'never'             => 'Never',
     'general_info'      => 'General Information',
+    'profile_info'      => 'Profile Information',
     'first_name'        => 'First Name',
     'last_name'         => 'Last Name',
     'profile_picture'   => 'Profile Picture',
@@ -52,6 +53,16 @@ return [
     'revoke_confirm'         => 'Are you sure you want to revoke this session? The user on that device will be logged out.',
     'current_session'        => 'Current Session',
     'no_active_sessions'     => 'No active sessions found.',
+
+    // Social Connections
+    'social_connections'     => 'Social Connections',
+    'social_connections_desc'=> 'Connect your social accounts to log in quickly.',
+    'connected'              => 'Connected',
+    'not_connected'          => 'Not connected',
+    'disconnect'             => 'Disconnect',
+    'connect'                => 'Connect',
+    'disconnect_confirm_google' => 'Are you sure you want to disconnect Google?',
+    'disconnect_confirm_line'   => 'Are you sure you want to disconnect LINE?',
 
     // Cropper
     'crop_profile_picture'   => 'Crop Profile Picture',

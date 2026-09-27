@@ -24,6 +24,18 @@ class AuthMiddleware implements MiddlewareInterface
             exit;
         }
 
+        // Force 2FA for Admins
+        if (Session::get('role_id') == 1 && \App\Core\Settings::get('force_2fa_admin', 0) == 1) {
+            if (!Session::get('2fa_enabled')) {
+                $uri = $_SERVER['REQUEST_URI'];
+                if ($uri !== '/profile' && !str_starts_with($uri, '/profile/2fa') && $uri !== '/logout') {
+                    Session::setFlash('error', __('auth.force_2fa_warning') ?? 'Administrator policy requires you to enable Two-Factor Authentication.');
+                    header("Location: /profile");
+                    exit;
+                }
+            }
+        }
+
         return true;
     }
 }

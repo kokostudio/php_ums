@@ -22,7 +22,6 @@ class View
         require $viewFile;
         $content = ob_get_clean();
 
-        // Wrap in layout if specified
         if ($layout) {
             $layoutFile = __DIR__ . "/../Views/layouts/{$layout}.php";
             if (file_exists($layoutFile)) {
@@ -33,6 +32,35 @@ class View
         } else {
             echo $content;
         }
+    }
+
+    /**
+     * Render a view file with extracted variables and optional layout, returning as string
+     */
+    public static function renderToString(string $view, array $data = [], ?string $layout = null): string
+    {
+        $viewFile = __DIR__ . "/../Views/{$view}.php";
+
+        if (!file_exists($viewFile)) {
+            throw new \Exception("View file not found: {$view}");
+        }
+
+        extract($data);
+        
+        ob_start();
+        require $viewFile;
+        $content = ob_get_clean();
+
+        if ($layout) {
+            $layoutFile = __DIR__ . "/../Views/layouts/{$layout}.php";
+            if (file_exists($layoutFile)) {
+                ob_start();
+                require $layoutFile;
+                return ob_get_clean();
+            }
+        }
+        
+        return $content;
     }
 
     /**

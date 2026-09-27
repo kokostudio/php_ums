@@ -8,14 +8,6 @@ use App\Core\Session;
 
 class NotificationController extends Controller
 {
-    private function json($data, $status = 200)
-    {
-        header('Content-Type: application/json; charset=utf-8');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
     public function index()
     {
         $userId = Session::get('user_id');

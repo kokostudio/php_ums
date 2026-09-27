@@ -59,7 +59,23 @@
                     <i class="ph ph-sign-in mr-2 text-lg"></i> <?php echo __('auth.sign_in') ?>
                 </button>
             </div>
+        </form>
 
+        <?php if ($unverifiedEmail = \App\Core\Session::getFlash('unverified_email')): ?>
+        <form action="/resend-verification" method="POST" class="mt-4">
+            <input type="hidden" name="csrf_token" value="<?php echo \App\Core\Session::getCsrfToken() ?>">
+            <input type="hidden" name="email" value="<?php echo htmlspecialchars($unverifiedEmail) ?>">
+            <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl text-sm font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                <i class="ph ph-envelope-simple mr-2"></i> ส่งอีเมลยืนยันอีกครั้ง
+            </button>
+        </form>
+        <?php endif; ?>
+
+            <?php 
+                $googleEnabled = \App\Core\Settings::get('enable_google_login') === '1';
+                $lineEnabled = \App\Core\Settings::get('enable_line_login') === '1';
+                if ($googleEnabled || $lineEnabled): 
+            ?>
             <!-- Social Login Divider -->
             <div class="relative py-2">
                 <div class="absolute inset-0 flex items-center">
@@ -71,25 +87,32 @@
             </div>
 
             <!-- Social Login Buttons -->
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid <?= ($googleEnabled && $lineEnabled) ? 'grid-cols-2' : 'grid-cols-1' ?> gap-3">
+                <?php if ($googleEnabled): ?>
                 <a href="/auth/google" class="w-full flex justify-center items-center px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-5 h-5 mr-2">
                     Google
                 </a>
+                <?php endif; ?>
+                
+                <?php if ($lineEnabled): ?>
                 <a href="/auth/line" class="w-full flex justify-center items-center px-4 py-2.5 rounded-xl border border-[#00B900] bg-[#00B900] text-sm font-medium text-white hover:bg-[#009900] transition-colors shadow-sm shadow-[#00B900]/20">
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.963 8.89 9.382 9.615.366.079.866.242 1.002.553.121.282.079.722.037 1.011-.044.29-.205 1.229-.247 1.489-.053.318-.242.977.854.514 1.096-.461 5.922-3.488 8.169-6.028 2.062-2.316 2.803-4.706 2.803-7.154zm-14.717 3.393h-2.613c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285.158 0 .285.128.285.285v4.978h2.328c.157 0 .285.128.285.285s-.128.285-.285.285zm3.433 0h-.569c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285.158 0 .285.128.285.285v5.263c0 .156-.127.285-.285.285zm4.846-5.548v5.263c0 .156-.128.285-.285.285h-.569c-.046 0-.091-.011-.131-.031-.038-.022-.07-.052-.093-.089l-2.607-3.791v3.626c0 .156-.128.285-.285.285h-.569c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285h.569c.046 0 .092.012.131.032.038.021.07.051.093.088l2.607 3.792v-3.627c0-.157.128-.285.285-.285h.569c.158 0 .285.128.285.285z"/>
                     </svg>
                     LINE
                 </a>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
 
+            <?php if (\App\Core\Settings::get('enable_registration') !== '0'): ?>
             <div class="text-center pt-4">
                 <p class="text-sm text-gray-600 dark:text-slate-400">
                     ยังไม่มีบัญชี? <a href="/register" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline transition-colors">สมัครสมาชิก</a>
                 </p>
             </div>
-        </form>
+            <?php endif; ?>
     </div>
 </div>
 

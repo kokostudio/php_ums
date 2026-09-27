@@ -31,10 +31,16 @@ $router->get('/lang/{locale}', [\App\Controllers\LangController::class, 'switch'
 // --- Define Routes Here ---
 // Auth Routes
 $router->get('/login', [\App\Controllers\AuthController::class, 'showLogin']);
-$router->post('/login', [\App\Controllers\AuthController::class, 'login']);
+$router->post('/login', [\App\Controllers\AuthController::class, 'login'], [\App\Middlewares\RateLimitMiddleware::class]);
 $router->get('/login/2fa', [\App\Controllers\AuthController::class, 'show2faForm']);
-$router->post('/login/2fa', [\App\Controllers\AuthController::class, 'verify2faLogin']);
+$router->post('/login/2fa', [\App\Controllers\AuthController::class, 'verify2faLogin'], [\App\Middlewares\RateLimitMiddleware::class]);
 $router->post('/logout', [\App\Controllers\AuthController::class, 'logout']);
+
+// Registration & Email Verification
+$router->get('/register', [\App\Controllers\AuthController::class, 'showRegister']);
+$router->post('/register', [\App\Controllers\AuthController::class, 'register'], [\App\Middlewares\RateLimitMiddleware::class]);
+$router->get('/verify-email', [\App\Controllers\AuthController::class, 'verifyEmail']);
+$router->post('/resend-verification', [\App\Controllers\AuthController::class, 'resendVerification'], [\App\Middlewares\RateLimitMiddleware::class]);
 
 // Social Auth Routes
 $router->get('/auth/google', [\App\Controllers\SocialAuthController::class, 'redirectToGoogle']);
@@ -44,7 +50,7 @@ $router->get('/auth/line/callback', [\App\Controllers\SocialAuthController::clas
 
 // Forgot/Reset Password
 $router->get('/forgot-password', [\App\Controllers\AuthController::class, 'forgotPassword']);
-$router->post('/forgot-password', [\App\Controllers\AuthController::class, 'sendResetLink']);
+$router->post('/forgot-password', [\App\Controllers\AuthController::class, 'sendResetLink'], [\App\Middlewares\RateLimitMiddleware::class]);
 $router->get('/reset-password', [\App\Controllers\AuthController::class, 'resetPassword']);
 $router->post('/reset-password', [\App\Controllers\AuthController::class, 'updatePassword']);
 
@@ -52,21 +58,21 @@ $router->post('/reset-password', [\App\Controllers\AuthController::class, 'updat
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
 
 // User Management Routes (Protected by Auth and Permission if fully strictly applied, but for now just Auth is fine as base)
-$router->get('/users', [\App\Controllers\UserController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
-$router->get('/users/data', [\App\Controllers\UserController::class, 'data'], [\App\Middlewares\AuthMiddleware::class]);
-$router->get('/users/create', [\App\Controllers\UserController::class, 'create'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/users/create', [\App\Controllers\UserController::class, 'store'], [\App\Middlewares\AuthMiddleware::class]);
-$router->get('/users/{id}/edit', [\App\Controllers\UserController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/users/{id}/edit', [\App\Controllers\UserController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/users/{id}/delete', [\App\Controllers\UserController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/users', [\App\Controllers\UserController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'read']]);
+$router->get('/users/data', [\App\Controllers\UserController::class, 'data'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'read']]);
+$router->get('/users/create', [\App\Controllers\UserController::class, 'create'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'create']]);
+$router->post('/users/create', [\App\Controllers\UserController::class, 'store'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'create']]);
+$router->get('/users/{id}/edit', [\App\Controllers\UserController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'update']]);
+$router->post('/users/{id}/edit', [\App\Controllers\UserController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'update']]);
+$router->post('/users/{id}/delete', [\App\Controllers\UserController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'delete']]);
 
 // Roles & Permissions Routes
-$router->get('/roles', [\App\Controllers\RoleController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
-$router->get('/roles/create', [\App\Controllers\RoleController::class, 'create'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/roles/create', [\App\Controllers\RoleController::class, 'store'], [\App\Middlewares\AuthMiddleware::class]);
-$router->get('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
-$router->post('/roles/{id}/delete', [\App\Controllers\RoleController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/roles', [\App\Controllers\RoleController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'read']]);
+$router->get('/roles/create', [\App\Controllers\RoleController::class, 'create'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'create']]);
+$router->post('/roles/create', [\App\Controllers\RoleController::class, 'store'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'create']]);
+$router->get('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'update']]);
+$router->post('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'update']]);
+$router->post('/roles/{id}/delete', [\App\Controllers\RoleController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'delete']]);
 
 // Activity & Audit Logs Routes
 $router->get('/logs/activity', [\App\Controllers\LogController::class, 'activity'], [\App\Middlewares\AuthMiddleware::class]);
@@ -88,6 +94,7 @@ $router->post('/profile/2fa/enable', [\App\Controllers\ProfileController::class,
 $router->post('/profile/2fa/disable', [\App\Controllers\ProfileController::class, 'disable2fa'], [\App\Middlewares\AuthMiddleware::class]);
 $router->get('/profile/sessions', [\App\Controllers\ProfileController::class, 'sessions'], [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/profile/sessions/{id}/revoke', [\App\Controllers\ProfileController::class, 'revokeSession'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/profile/social/{provider}/disconnect', [\App\Controllers\ProfileController::class, 'disconnectSocial'], [\App\Middlewares\AuthMiddleware::class]);
 
 // --- API Routes (Stateless / JWT) ---
 $router->post('/api/v1/login', [\App\Controllers\Api\AuthController::class, 'login']);

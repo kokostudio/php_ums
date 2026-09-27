@@ -7,6 +7,7 @@ return [
     'last_login'        => 'เข้าสู่ระบบล่าสุด:',
     'never'             => 'ไม่เคย',
     'general_info'      => 'ข้อมูลทั่วไป',
+    'profile_info'      => 'ข้อมูลโปรไฟล์',
     'first_name'        => 'ชื่อ',
     'last_name'         => 'นามสกุล',
     'profile_picture'   => 'รูปโปรไฟล์',
@@ -52,6 +53,16 @@ return [
     'revoke_confirm'         => 'คุณแน่ใจหรือไม่ว่าต้องการเพิกถอนเซสชันนี้? ผู้ใช้ในอุปกรณ์นั้นจะถูกออกจากระบบ',
     'current_session'        => 'เซสชันปัจจุบัน',
     'no_active_sessions'     => 'ไม่พบเซสชันที่เปิดใช้งาน',
+
+    // Social Connections
+    'social_connections'     => 'การเชื่อมต่อโซเชียล',
+    'social_connections_desc'=> 'เชื่อมต่อบัญชีโซเชียลของคุณเพื่อเข้าสู่ระบบอย่างรวดเร็ว',
+    'connected'              => 'เชื่อมต่อแล้ว',
+    'not_connected'          => 'ยังไม่ได้เชื่อมต่อ',
+    'disconnect'             => 'ยกเลิกการเชื่อมต่อ',
+    'connect'                => 'เชื่อมต่อ',
+    'disconnect_confirm_google' => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ Google?',
+    'disconnect_confirm_line'   => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ LINE?',
 
     // Cropper
     'crop_profile_picture'   => 'ครอบตัดรูปโปรไฟล์',

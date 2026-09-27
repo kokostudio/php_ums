@@ -199,6 +199,87 @@
             <?php endif; ?>
         </div>
 
+        <!-- Social Connections -->
+        <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2 flex items-center">
+                <i class="ph ph-share-network mr-2 text-blue-500"></i> <?= __('profile.social_connections') ?? 'Social Connections' ?>
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-slate-400 mb-6"><?= __('profile.social_connections_desc') ?? 'Connect your social accounts to log in quickly.' ?></p>
+
+            <div class="space-y-4">
+                <!-- Google -->
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 dark:border-slate-600 mr-4">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 dark:text-white">Google</h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400">
+                                <?php if (!empty($user['google_id'])): ?>
+                                    <span class="text-green-600 dark:text-green-400"><i class="ph-fill ph-check-circle mr-1"></i><?= __('profile.connected') ?? 'Connected' ?></span>
+                                <?php else: ?>
+                                    <?= __('profile.not_connected') ?? 'Not connected' ?>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <?php if (!empty($user['google_id'])): ?>
+                            <form action="/profile/social/google/disconnect" method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
+                                <button type="submit" onclick="return confirm('<?= __('profile.disconnect_confirm_google') ?? 'Are you sure you want to disconnect Google?' ?>')" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                                    <?= __('profile.disconnect') ?? 'Disconnect' ?>
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <a href="/auth/google" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm inline-block">
+                                <?= __('profile.connect') ?? 'Connect' ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- LINE -->
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-[#00C300] rounded-full flex items-center justify-center shadow-sm mr-4">
+                            <i class="ph-fill ph-chat-circle-dots text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 dark:text-white">LINE</h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400">
+                                <?php if (!empty($user['line_id'])): ?>
+                                    <span class="text-green-600 dark:text-green-400"><i class="ph-fill ph-check-circle mr-1"></i><?= __('profile.connected') ?? 'Connected' ?></span>
+                                <?php else: ?>
+                                    <?= __('profile.not_connected') ?? 'Not connected' ?>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <?php if (!empty($user['line_id'])): ?>
+                            <form action="/profile/social/line/disconnect" method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
+                                <button type="submit" onclick="return confirm('<?= __('profile.disconnect_confirm_line') ?? 'Are you sure you want to disconnect LINE?' ?>')" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                                    <?= __('profile.disconnect') ?? 'Disconnect' ?>
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <a href="/auth/line" class="px-4 py-2 text-sm font-medium text-white bg-[#00C300] rounded-lg hover:bg-[#00a800] transition-colors shadow-sm inline-block">
+                                <?= __('profile.connect') ?? 'Connect' ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Active Sessions -->
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6 flex items-center justify-between">
             <div>

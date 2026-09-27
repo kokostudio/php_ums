@@ -38,9 +38,9 @@
 - **Changelog:** การปรับปรุงฟีเจอร์หลัก (Core Features) ต้องมีการอัปเดตบันทึกการเปลี่ยนแปลงลงในไฟล์ `CHANGELOG.md` เสมอ **(โดยให้บันทึกรายละเอียดเป็นภาษาไทยเท่านั้น)**
 
 ## 6. Performance & Data Handling (ประสิทธิภาพและการจัดการข้อมูล)
-- **High Performance & Big Data:** ระบบต้องถูกออกแบบมาให้ทำงานรวดเร็วและรองรับการโหลดข้อมูลจำนวนมหาศาล (Large Datasets) ได้โดยไม่กระทบต่อประสบการณ์ผู้ใช้
-  - ทางฝั่ง Backend (Database & PHP) ให้ใช้งาน Server-Side Processing เสมอเวลาเรียกข้อมูลตาราง (เช่น DataTables)
-  - วางโครงสร้าง Index ของ Database ให้เหมาะสมกับ Query ที่มีการค้นหาบ่อยครั้ง
+- **Instant Load & FOUC Prevention (DataTables):** ระบบเน้นการแสดงผลแบบทันที (Instant Load) โดยไม่มีอาการกระพริบ (FOUC) ตอนโหลดหน้าเว็บ
+  - ให้ใช้ **Client-Side DataTables** เป็นสถาปัตยกรรมหลัก (ดึงข้อมูลผ่าน PHP และวนลูปสร้าง `<tbody>` โดยตรงใน HTML) แทนการใช้ AJAX Server-Side Processing
+  - สำหรับข้อมูลที่มีขนาดใหญ่มาก (เช่น Logs) ให้ใช้ `LIMIT 1000` ใน SQL Query เพื่อจำกัดข้อมูลแทนการทำ Pagination ผ่าน AJAX เพื่อรักษาความเร็วในการโหลด
 - **Client-Side Caching (LocalStorage):** 
   - ให้ประยุกต์ใช้ **LocalStorage / SessionStorage** ฝั่ง Frontend เพื่อลดภาระการโหลดข้อมูลซ้ำซ้อนจากฝั่ง Server สำหรับข้อมูลที่ไม่มีการเปลี่ยนแปลงบ่อย (Static/Reference Data)
   - ออกแบบกลไก Cache Invalidation ที่ชาญฉลาด (อัปเดต LocalStorage ใหม่ทันทีเมื่อมีการอัปเดตข้อมูลจาก API)
@@ -146,9 +146,11 @@
 - [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
 
 ### 3. DataTables (ตารางข้อมูล)
-- [ ] ต้องทำเป็น **Server-Side Processing** เสมอ หากมีข้อมูลจำนวนมาก
+- [ ] **สถาปัตยกรรมหลัก:** ใช้ **Client-Side Processing** (วนลูปสร้าง `<tbody>` ด้วย PHP) เพื่อป้องกันการกระพริบ (FOUC) และการโหลดโครงร่างตาราง (Skeleton) ให้แสดงผลได้ทันที 100%
+- [ ] **ข้อมูลขนาดใหญ่:** ใส่ `LIMIT 1000` (หรือตัวเลขที่เหมาะสม) ใน SQL Query สำหรับตารางข้อมูลที่ใหญ่มาก (เช่น Activity Logs, Audit Logs) แทนการใช้ Server-Side AJAX
+- [ ] **Server-Side AJAX:** อนุญาตให้ใช้เฉพาะกรณีที่ข้อมูลมีขนาดใหญ่มหาศาล (100k+ rows) และการใช้ `LIMIT 1000` ไม่ตอบโจทย์ทางธุรกิจจริงๆ เท่านั้น
 - [ ] ห้ามใส่การตั้งค่าภาษา (`language`) ยิบย่อยลงไปเอง เพราะระบบจัดการให้ที่ไฟล์ Layout แล้ว
-- [ ] **DOM Layout มาตรฐาน:** หากต้องตั้งค่าหน้าตาของ DataTable เอง ต้องใช้ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ เพื่อจัดระเบียบ Length, Info, Pagination ให้อยู่ด้านล่างตารางอย่างสวยงาม
+- [ ] **DOM Layout มาตรฐาน:** หากต้องตั้งค่าหน้าตาของ DataTable เอง (เช่น ซ่อน Search เริ่มต้น) ต้องใส่ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ เพื่อจัดระเบียบ Length, Info, Pagination ให้อยู่ด้านล่างสุดของตารางอย่างสวยงาม
 
 ### 4. Null Safety (PHP 8.1+)
 - [ ] ตัวแปรใดที่ดึงจากฐานข้อมูลและอาจมีโอกาสเป็น `null` ต้องครอบด้วย `?? ''` ก่อนนำไปใช้ร่วมกับฟังก์ชันจัดการ String เสมอ
@@ -161,3 +163,18 @@
   - เพิ่มมิติด้วยเอฟเฟกต์ Hover (เช่น `hover:-translate-y-1`, `hover:scale-105`)
   - ใช้เงาสะท้อนแบบเรืองแสง (Glow shadows) แทนเงาดำปกติ เพื่อความหรูหรา
 - **Modern Charts:** การตั้งค่ากราฟ (Chart.js) ให้ใช้เส้นโค้งมนสมูท (`tension: 0.4`), เพิ่มการถมสีแบบไล่ระดับ (Linear Gradients) สำหรับกราฟเส้น, และใช้ชุดสีโทน Premium Palette สำหรับกราฟวงกลม พร้อมปรับ Tooltip ให้เข้ากับธีม
+
+## 18. Advanced Security (Password Policy & 2FA)
+- **Password Complexity:** รหัสผ่านต้องถูกตรวจสอบความซับซ้อนตามนโยบายที่ตั้งไว้ใน Settings (`pwd_require_upper`, `pwd_require_lower`, `pwd_require_number`, `pwd_require_special`, `password_min_length`) เสมอเมื่อมีการสร้างหรือเปลี่ยนรหัสผ่าน
+- **Validation Class:** ใช้เมธอด `\App\Core\Security::validatePasswordComplexity($password)` ในการตรวจสอบและรับค่า Error Array ออกมาแสดงผล
+- **Two-Factor Authentication (2FA):** 
+  - ระบบรองรับ 2FA (Google Authenticator) โดยอิงตามคอลัมน์ `google2fa_secret`
+  - หาก `force_2fa_admin` ถูกเปิดใช้งาน ผู้ใช้ที่มีสิทธิ์ระดับ Admin จะต้องถูกบังคับให้ตั้งค่า 2FA ทันทีที่เข้าสู่ระบบ 
+  - การบังคับใช้ถูกจัดการโดย `AuthMiddleware` ซึ่งจะ Redirect ไปที่หน้า Profile เพื่อบังคับให้ผู้ใช้เปิดใช้งาน 2FA ก่อนเข้าถึงระบบส่วนอื่น
+
+## 19. System Maintenance & Error Handling
+- **Maintenance Mode:** ระบบรองรับโหมดบำรุงรักษา (Maintenance Mode) โดยแสดงหน้า `app/Views/errors/maintenance.php` ป้องกันผู้ใช้ทั่วไปเข้าใช้งานระหว่างอัปเดตระบบ
+- **Error Handling:** จัดการข้อผิดพลาดและ Exception ทั้งหมดผ่าน `App\Core\ErrorHandler` โดยในโหมด Production (`APP_DEBUG=false`) จะซ่อนข้อผิดพลาดไม่ให้แสดงออกหน้าจอ แต่จะบันทึกรายละเอียด (Stack Trace) ลงใน `storage/logs/error.log` แทนเพื่อความปลอดภัย
+
+## 20. Rate Limiting (Security)
+- **Brute Force Protection:** ระบบมีตาราง `rate_limits` (`ip_address`, `endpoint`, `attempts`, `lockout_time`) เพื่อป้องกันการโจมตีแบบ Brute Force หรือสแปม Request ในจุดสำคัญ เช่น หน้า Login, OTP หรือการร้องขอรีเซ็ตรหัสผ่าน
