@@ -411,6 +411,40 @@
                     </div>
 
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
+                        <label for="login_logo_size" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ขนาดโลโก้ในหน้าล็อกอิน (Login Logo Size)</label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">ปรับขนาดความสูงของโลโก้ในหน้าล็อกอิน</p>
+                        <select id="login_logo_size" name="login_logo_size" class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            <option value="h-8" <?= ($settings['login_logo_size'] ?? 'h-12') === 'h-8' ? 'selected' : '' ?>>เล็ก (Small)</option>
+                            <option value="h-12" <?= ($settings['login_logo_size'] ?? 'h-12') === 'h-12' ? 'selected' : '' ?>>ปานกลาง (Medium - Default)</option>
+                            <option value="h-16" <?= ($settings['login_logo_size'] ?? 'h-12') === 'h-16' ? 'selected' : '' ?>>ใหญ่ (Large)</option>
+                            <option value="h-24" <?= ($settings['login_logo_size'] ?? 'h-12') === 'h-24' ? 'selected' : '' ?>>ใหญ่มาก (Extra Large)</option>
+                            <option value="h-32" <?= ($settings['login_logo_size'] ?? 'h-12') === 'h-32' ? 'selected' : '' ?>>ใหญ่พิเศษ (Jumbo)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
+                        <label for="login_title_size" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ขนาดตัวอักษรหัวข้อ (Login Title Size)</label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">ปรับขนาดความใหญ่ของหัวข้อในหน้าล็อกอิน</p>
+                        <select id="login_title_size" name="login_title_size" class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            <option value="text-3xl md:text-4xl" <?= ($settings['login_title_size'] ?? 'text-4xl md:text-5xl') === 'text-3xl md:text-4xl' ? 'selected' : '' ?>>เล็ก (Small)</option>
+                            <option value="text-4xl md:text-5xl" <?= ($settings['login_title_size'] ?? 'text-4xl md:text-5xl') === 'text-4xl md:text-5xl' ? 'selected' : '' ?>>ปานกลาง (Medium - Default)</option>
+                            <option value="text-5xl md:text-6xl" <?= ($settings['login_title_size'] ?? 'text-4xl md:text-5xl') === 'text-5xl md:text-6xl' ? 'selected' : '' ?>>ใหญ่ (Large)</option>
+                            <option value="text-6xl md:text-7xl" <?= ($settings['login_title_size'] ?? 'text-4xl md:text-5xl') === 'text-6xl md:text-7xl' ? 'selected' : '' ?>>ใหญ่พิเศษ (Extra Large)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
+                        <label for="login_site_name_size" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ขนาดตัวอักษรชื่อโปรแกรม (Program Name Size)</label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">ปรับขนาดชื่อโปรแกรมที่แสดงข้างโลโก้ในหน้าล็อกอิน</p>
+                        <select id="login_site_name_size" name="login_site_name_size" class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            <option value="text-lg" <?= ($settings['login_site_name_size'] ?? 'text-xl') === 'text-lg' ? 'selected' : '' ?>>เล็ก (Small)</option>
+                            <option value="text-xl" <?= ($settings['login_site_name_size'] ?? 'text-xl') === 'text-xl' ? 'selected' : '' ?>>ปานกลาง (Medium - Default)</option>
+                            <option value="text-2xl" <?= ($settings['login_site_name_size'] ?? 'text-xl') === 'text-2xl' ? 'selected' : '' ?>>ใหญ่ (Large)</option>
+                            <option value="text-3xl" <?= ($settings['login_site_name_size'] ?? 'text-xl') === 'text-3xl' ? 'selected' : '' ?>>ใหญ่มาก (Extra Large)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
                         <label for="login_background" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.login_bg') ?></label>
                         <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.login_bg_hint') ?></p>
                         <?php if (!empty($settings['login_background'])): ?>

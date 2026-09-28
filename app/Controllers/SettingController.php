@@ -56,7 +56,7 @@ class SettingController extends Controller
                 'login_feature1_icon', 'login_feature1_text',
                 'login_feature2_icon', 'login_feature2_text',
                 'login_feature3_icon', 'login_feature3_text',
-                'login_pattern'
+                'login_pattern', 'login_logo_size', 'login_title_size', 'login_site_name_size'
             ],
             'security' => ['password_min_length', 'login_max_attempts', 'login_lockout_time', 'session_lifetime', 'require_email_verification'],
             'social'   => [

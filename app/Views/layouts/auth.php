@@ -12,7 +12,7 @@ $primaryHex = [
 ][$sidebarTheme] ?? '#64748b';
 ?>
 <!DOCTYPE html>
-<html lang="<?= \App\Core\Lang::locale() ?>" class="dark bg-slate-50 dark:bg-[#0f172a]"> <!-- Added dark as default fallback if needed, but script will override -->
+<html lang="<?= \App\Core\Lang::locale() ?>" class="dark bg-slate-50 dark:bg-[#0f172a] <?= htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>"> <!-- Added dark as default fallback if needed, but script will override -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,20 +88,23 @@ $currentLocale = \App\Core\Lang::locale();
         <div class="relative z-10 flex-1 flex flex-col justify-center">
             <!-- Logo -->
             <div class="flex items-center space-x-3 mb-10">
-                <?php $logo = Settings::get('site_logo'); if ($logo): ?>
-                    <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="h-12 w-auto drop-shadow-md">
+                <?php 
+                $logo = Settings::get('login_logo') ?: Settings::get('site_logo'); 
+                $logoSizeClass = Settings::get('login_logo_size', 'h-12');
+                if ($logo): ?>
+                    <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="<?= $logoSizeClass ?> w-auto drop-shadow-md transition-all duration-300">
                 <?php else: ?>
                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-900/20">
                         <i class="ph-fill ph-cube text-2xl"></i>
                     </div>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-xl font-bold text-white tracking-wide"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></h1>
+                    <h1 class="<?= htmlspecialchars(Settings::get('login_site_name_size', 'text-xl')) ?> font-bold text-white tracking-wide"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></h1>
                     <p class="text-[10px] text-blue-300 uppercase font-bold tracking-widest"><?= htmlspecialchars(Settings::get('login_edition', 'ERP EDITION')) ?></p>
                 </div>
             </div>
             
-            <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-2 leading-tight"><?= htmlspecialchars(Settings::get('login_title', 'จัดการร้านค้า')) ?><br><span class="text-blue-400"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></span></h2>
+            <h2 class="<?= htmlspecialchars(Settings::get('login_title_size', 'text-4xl md:text-5xl')) ?> font-extrabold text-white mb-2 leading-tight"><?= htmlspecialchars(Settings::get('login_title', 'จัดการร้านค้า')) ?><br><span class="text-blue-400"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></span></h2>
             <p class="text-blue-200/80 mb-12 text-sm"><?= htmlspecialchars(Settings::get('login_subtitle', 'เข้าสู่ระบบศูนย์กลาง ' . Settings::get('site_name', 'WorkPOS'))) ?></p>
             
             <?php if (Settings::get('login_features_enabled', '1') == '1'): ?>
