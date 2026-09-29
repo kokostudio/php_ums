@@ -460,6 +460,54 @@
 
             <?php elseif ($tab === 'translations'): ?>
             <!-- ===== TRANSLATIONS TAB ===== -->
+            
+            <!-- Sticky Header for the entire tab -->
+            <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-0">
+                    <i class="ph ph-gear mr-2"></i>การตั้งค่าปุ่มสลับภาษา
+                </h3>
+                <button type="submit" form="translationsSettingsForm" class="px-5 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm flex items-center">
+                    <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
+                </button>
+            </div>
+
+            <form action="/settings/translations" method="POST" id="translationsSettingsForm" class="mb-10 pb-8 border-b border-gray-100 dark:border-slate-800">
+                <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
+
+                <div class="space-y-6">
+                    <!-- Enable Switcher Toggle -->
+                    <div class="flex items-center justify-between max-w-lg">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-800 dark:text-white">แสดงปุ่มสลับภาษา</h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400">เปิด/ปิด ปุ่มสลับภาษาที่แถบเมนูด้านบน</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="hidden" name="enable_language_switcher" value="0">
+                            <input type="checkbox" name="enable_language_switcher" value="1" class="sr-only peer" <?= (!isset($settings['enable_language_switcher']) || $settings['enable_language_switcher'] == '1') ? 'checked' : '' ?>>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Available Languages -->
+                    <?php 
+                        $availLangs = isset($settings['available_languages']) && $settings['available_languages'] !== '' ? explode(',', $settings['available_languages']) : ['th', 'en']; 
+                    ?>
+                    <div class="pt-4 border-t border-gray-100 dark:border-slate-800">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">ภาษาที่เปิดให้ใช้งาน</label>
+                        <div class="flex gap-4">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="available_languages[]" value="th" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" <?= in_array('th', $availLangs) ? 'checked' : '' ?>>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-slate-300">ภาษาไทย (TH)</span>
+                            </label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="available_languages[]" value="en" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" <?= in_array('en', $availLangs) ? 'checked' : '' ?>>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-slate-300">English (EN)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
             <?php 
                 $namespaces = [];
                 if (isset($translations)) {
@@ -624,7 +672,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: '<?= __('common.error') ?>',
-                            text: 'An unexpected error occurred.'
+                            text: '<?= __('common.unexpected_error') ?>'
                         });
                     }
                 });

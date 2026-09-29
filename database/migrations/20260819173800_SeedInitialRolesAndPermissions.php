@@ -33,6 +33,13 @@ class SeedInitialRolesAndPermissions extends Migration
             INSERT IGNORE INTO role_permissions (role_id, permission_id) 
             SELECT 1, id FROM permissions
         ");
+
+        // Grant some permissions to Admin (role 2) - e.g., view users, create users, edit users, view roles, view settings
+        // IDs: 1, 2, 3, 5, 9
+        $adminPerms = [1, 2, 3, 5, 9];
+        foreach ($adminPerms as $permId) {
+            $this->db->exec("INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (2, $permId)");
+        }
     }
 
     public function down(): void

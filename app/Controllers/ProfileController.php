@@ -74,7 +74,7 @@ class ProfileController extends Controller
         $lastName = Security::sanitize($_POST['last_name'] ?? '');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', 'Invalid email format.');
+            Session::setFlash('error', __('messages.invalid_email_format'));
             $this->redirect('/profile');
         }
 
@@ -82,7 +82,7 @@ class ProfileController extends Controller
         $check = $db->prepare("SELECT id FROM users WHERE email = :email AND id != :id");
         $check->execute(['email' => $email, 'id' => $userId]);
         if ($check->fetch()) {
-            Session::setFlash('error', 'Email is already taken by another user.');
+            Session::setFlash('error', __('messages.email_taken'));
             $this->redirect('/profile');
         }
 
@@ -168,12 +168,12 @@ class ProfileController extends Controller
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
-            Session::setFlash('error', 'All password fields are required.');
+            Session::setFlash('error', __('messages.all_password_fields_required'));
             $this->redirect('/profile');
         }
 
         if ($newPassword !== $confirmPassword) {
-            Session::setFlash('error', 'New passwords do not match.');
+            Session::setFlash('error', __('messages.new_passwords_not_match'));
             $this->redirect('/profile');
         }
 

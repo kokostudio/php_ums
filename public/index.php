@@ -21,9 +21,11 @@ Config::load(__DIR__ . '/../.env');
 // 4. Initialize Multi-Language System
 \App\Core\Lang::init();
 
-// 5. Initialize Router
-$router = new Router();
+// 5. Initialize Session (Globally)
+\App\Core\Session::init();
 
+// 6. Initialize Router
+$router = new Router();
 // Language Switch Route
 $router->get('/lang/{locale}', [\App\Controllers\LangController::class, 'switch']);
 

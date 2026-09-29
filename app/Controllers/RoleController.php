@@ -90,7 +90,7 @@ class RoleController extends Controller
             $this->redirect('/roles');
         } catch (\Exception $e) {
             $db->rollBack();
-            Session::setFlash('error', 'Failed to create role: ' . $e->getMessage());
+            Session::setFlash('error', __('messages.failed_create_role') . ' ' . $e->getMessage());
             $this->redirect('/roles/create');
         }
     }
@@ -99,7 +99,7 @@ class RoleController extends Controller
     {
         $realId = Security::decodeId($id);
         if (!$realId) {
-            Session::setFlash('error', 'Invalid role ID.');
+            Session::setFlash('error', __('messages.invalid_role_id'));
             $this->redirect('/roles');
         }
 
@@ -109,7 +109,7 @@ class RoleController extends Controller
         $role = $stmt->fetch();
 
         if (!$role) {
-            Session::setFlash('error', 'Role not found.');
+            Session::setFlash('error', __('messages.role_not_found'));
             $this->redirect('/roles');
         }
 
@@ -130,7 +130,7 @@ class RoleController extends Controller
         Security::checkCsrf();
         $realId = Security::decodeId($id);
         if (!$realId) {
-            Session::setFlash('error', 'Invalid role ID.');
+            Session::setFlash('error', __('messages.invalid_role_id'));
             $this->redirect('/roles');
         }
 
@@ -146,7 +146,7 @@ class RoleController extends Controller
         }
 
         if ($realId == 1 && $name !== 'Super Admin') {
-            Session::setFlash('error', 'Cannot rename the Super Admin role.');
+            Session::setFlash('error', __('messages.cannot_rename_superadmin'));
             $this->redirect("/roles/{$id}/edit");
         }
 
@@ -193,7 +193,7 @@ class RoleController extends Controller
             $this->redirect('/roles');
         } catch (\Exception $e) {
             $db->rollBack();
-            Session::setFlash('error', 'Failed to update role.');
+            Session::setFlash('error', __('messages.failed_update_role'));
             $this->redirect("/roles/{$id}/edit");
         }
     }
@@ -203,7 +203,7 @@ class RoleController extends Controller
         Security::checkCsrf();
         $realId = Security::decodeId($id);
         if (!$realId) {
-            $this->json(['status' => 'error', 'message' => 'Invalid role ID.'], 400);
+            $this->json(['status' => 'error', 'message' => __('messages.invalid_role_id')], 400);
             return;
         }
 
@@ -239,7 +239,7 @@ class RoleController extends Controller
                 $this->json(['success' => true, 'message' => 'Role deleted successfully.']);
             } else {
                 $db->rollBack();
-                $this->json(['success' => false, 'message' => 'Role not found.'], 404);
+                $this->json(['success' => false, 'message' => __('messages.role_not_found')], 404);
             }
         } catch (\Exception $e) {
             $db->rollBack();

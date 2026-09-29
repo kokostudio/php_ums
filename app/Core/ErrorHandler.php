@@ -48,8 +48,13 @@ class ErrorHandler
             echo "<h1>Fatal Error</h1>";
             echo "<pre>{$message}</pre>";
         } else {
-            echo "<h1>500 Internal Server Error</h1>";
-            echo "<p>An unexpected error occurred. Please try again later.</p>";
+            if ($code == 404) {
+                echo "<h1>404 Not Found</h1>";
+                echo "<p>The page you are looking for could not be found.</p>";
+            } else {
+                echo "<h1>500 Internal Server Error</h1>";
+                echo "<p>An unexpected error occurred. Please try again later.</p>";
+            }
         }
     }
 

@@ -40,6 +40,17 @@ class MigrationRunner
         $stmt->execute(['migration' => $migration]);
     }
 
+    public function dropAllTables()
+    {
+        $this->db->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $tables = $this->db->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
+        foreach ($tables as $table) {
+            $this->db->exec("DROP TABLE `$table`");
+        }
+        $this->db->exec('SET FOREIGN_KEY_CHECKS = 1');
+        echo "All tables dropped." . PHP_EOL;
+    }
+
     public function applyMigrations()
     {
         $appliedMigrations = $this->getAppliedMigrations();
@@ -77,6 +88,25 @@ class MigrationRunner
 $migrationsDir = __DIR__ . '/../database/migrations';
 if (!is_dir($migrationsDir)) {
     mkdir($migrationsDir, 0755, true);
+}
+
+$options = getopt('', ['refresh']);
+$isRefresh = isset($options['refresh']);
+
+if ($isRefresh) {
+    echo "Refreshing migration database...\n";
+    $tempRunner = new class {
+        private \PDO $db;
+        public function __construct() { $this->db = \App\Core\Database::getInstance(); }
+        public function dropAll() {
+            $this->db->exec('SET FOREIGN_KEY_CHECKS = 0');
+            $tables = $this->db->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
+            foreach ($tables as $table) { $this->db->exec("DROP TABLE `$table`"); }
+            $this->db->exec('SET FOREIGN_KEY_CHECKS = 1');
+        }
+    };
+    $tempRunner->dropAll();
+    echo "All tables dropped.\n";
 }
 
 $runner = new MigrationRunner();

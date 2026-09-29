@@ -182,10 +182,21 @@ $currentLocale = \App\Core\Lang::locale();
         <!-- Top Toolbar -->
         <div class="flex items-center justify-end p-6 space-x-4 relative z-10">
             <!-- Language Toggle -->
+            <?php 
+                $enableLangSwitcher = Settings::get('enable_language_switcher', '1');
+                $availLangsStr = Settings::get('available_languages', 'th,en');
+                $availLangs = $availLangsStr !== '' ? explode(',', $availLangsStr) : [];
+            ?>
+            <?php if ($enableLangSwitcher == '1' && count($availLangs) > 0): ?>
             <div class="flex items-center bg-gray-200/50 dark:bg-slate-800/80 rounded-lg p-1 text-[11px] font-medium border border-gray-300/50 dark:border-slate-700 transition-colors">
+                <?php if (in_array('th', $availLangs)): ?>
                 <a href="/lang/th" class="px-3 py-1 rounded-md <?= $currentLocale === 'th' ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300' ?> transition-colors">ไทย</a>
+                <?php endif; ?>
+                <?php if (in_array('en', $availLangs)): ?>
                 <a href="/lang/en" class="px-3 py-1 rounded-md <?= $currentLocale === 'en' ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300' ?> transition-colors">EN</a>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
             
             <!-- Theme Toggle -->
             <button onclick="toggleTheme()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-slate-200 transition-colors w-8 h-8 flex items-center justify-center rounded-md bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-slate-700/50 shadow-sm">

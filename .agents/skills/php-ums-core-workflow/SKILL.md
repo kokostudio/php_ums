@@ -246,12 +246,17 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 - **Auto Registration:** Social logins automatically create a new user and assign the default system role if the email or provider ID doesn't exist.
 - **Extended Profile:** User profiles include First Name (`first_name`) and Last Name (`last_name`). Always include these fields in user creation/editing forms and profile settings.
 
-### 17. Advanced Security (Password Policy & 2FA)
+### 17. Advanced Security (Password Policy, 2FA & RBAC)
 - **Password Complexity:** All newly created or updated passwords MUST pass the `\App\Core\Security::validatePasswordComplexity($password)` check. This helper validates against the settings defined in the database (`pwd_require_upper`, `pwd_require_lower`, `pwd_require_number`, `pwd_require_special`, `password_min_length`).
 - **Two-Factor Authentication (2FA):** 
   - Managed via `google2fa_secret`.
   - The `AuthMiddleware` enforces a "Force 2FA for Admins" policy if `Settings::get('force_2fa_admin')` is enabled, redirecting admins to their profile page to configure 2FA before allowing access to the dashboard.
   - Session handles the state via `$_SESSION['2fa_enabled']`. Always make sure `2fa_enabled` is correctly updated in the Session when a user enables/disables 2FA in the Profile controller.
+- **RBAC Superadmin Protection:**
+  - Users with usernames `superadmin` or `admin` are protected core accounts.
+  - Lower roles MUST NOT be able to delete or edit these accounts.
+  - Backend controllers (like `UserController`) must explicitly reject updates or deletes to these accounts if the requester is not a superadmin themselves.
+  - The UI (e.g. `users/index.php`) must visually disable the edit/delete buttons for these accounts.
 
 ---
 
@@ -266,6 +271,7 @@ To ensure absolute compliance with the system architecture, always verify the fo
 
 ### 2. Views & UI (Frontend)
 - [ ] **NO Hardcoded Text:** Always use the `<?= __('module.key') ?>` helper for translations.
+- [ ] **Flash & Popup Translations:** All controller `Session::setFlash()` messages and `Swal.fire()` messages must be translated via `__()` helper. No raw strings allowed.
 - [ ] **Date Standard:** Always use `formatDate()` (PHP) or `formatDate()` (JS) to ensure the `d/m/Y` global standard.
 - [ ] **Primary Buttons:** Must use `bg-sidebar` so the color matches the dynamic theme.
 - [ ] **Destructive Buttons:** Must use `bg-red-500` and MUST trigger a **SweetAlert2 (`Swal.fire`)** confirmation dialog, not native `confirm()`.

@@ -13,3 +13,7 @@ package-lock.json
 logs/
 *.log
 *.sqlite
+
+# User Uploads & Cache
+storage/cache/
+public/uploads/

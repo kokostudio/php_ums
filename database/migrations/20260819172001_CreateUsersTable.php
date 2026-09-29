@@ -21,11 +21,14 @@ class CreateUsersTable extends Migration
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ");
 
-        // Insert default Super Admin user (password: password123)
-        $hash = password_hash('password123', PASSWORD_BCRYPT, ['cost' => 12]);
+        // Insert default Super Admin and Admin users
+        $hash = password_hash('password', PASSWORD_BCRYPT, ['cost' => 12]);
         $this->db->exec("
             INSERT INTO roles (id, name, description) VALUES (1, 'Super Admin', 'System Administrator') ON DUPLICATE KEY UPDATE name=name;
-            INSERT INTO users (username, email, password, role_id) VALUES ('admin', 'admin@example.com', '{$hash}', 1) ON DUPLICATE KEY UPDATE username=username;
+            INSERT INTO users (username, email, password, role_id) VALUES ('superadmin', 'superadmin@example.com', '{$hash}', 1) ON DUPLICATE KEY UPDATE username=username;
+            
+            INSERT INTO roles (id, name, description) VALUES (2, 'Admin', 'ผู้ดูแลระบบ (บางส่วน)') ON DUPLICATE KEY UPDATE name=name;
+            INSERT INTO users (username, email, password, role_id) VALUES ('admin', 'admin@example.com', '{$hash}', 2) ON DUPLICATE KEY UPDATE username=username;
         ");
     }
 

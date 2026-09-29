@@ -158,11 +158,17 @@
                     </td>
                     <td class="p-4 text-right">
                         <div class="flex justify-end gap-2">
-                            <a href="/users/<?= $user['hash_id'] ?>/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1 rounded hover:bg-blue-50 dark:hover:bg-slate-800" title="<?= __('common.edit') ?>">
-                                <i class="ph ph-pencil-simple text-lg"></i>
-                            </a>
-                            <?php if (strtolower($user['username']) === 'admin'): ?>
-                                <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1 rounded" title="Cannot delete admin user">
+                            <?php if (in_array(strtolower($user['username']), ['admin', 'superadmin']) && \App\Core\Session::get('role_id') != 1 && \App\Core\Session::get('user_id') != $user['id']): ?>
+                                <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1 rounded" title="Cannot edit system administrator">
+                                    <i class="ph ph-pencil-simple text-lg"></i>
+                                </button>
+                            <?php else: ?>
+                                <a href="/users/<?= $user['hash_id'] ?>/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1 rounded hover:bg-blue-50 dark:hover:bg-slate-800" title="<?= __('common.edit') ?>">
+                                    <i class="ph ph-pencil-simple text-lg"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (in_array(strtolower($user['username']), ['admin', 'superadmin'])): ?>
+                                <button disabled class="text-gray-300 dark:text-slate-600 cursor-not-allowed p-1 rounded" title="Cannot delete system administrator">
                                     <i class="ph ph-trash text-lg"></i>
                                 </button>
                             <?php else: ?>
@@ -266,7 +272,7 @@ $(document).ready(function() {
                     });
                 })
                 .catch(error => {
-                    Swal.fire('<?= __('common.error') ?>!', error.response?.data?.message || 'Failed to delete user.', 'error');
+                    Swal.fire('<?= __('common.error') ?>!', error.response?.data?.message || '<?= __('users.failed_delete') ?>', 'error');
                 });
             }
         });

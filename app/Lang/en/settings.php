@@ -7,6 +7,16 @@ return [
     'email_settings'  => 'Email Settings',
     'coming_soon'     => 'Coming Soon',
 
+    // Translations Tab
+    'trans_title'     => 'Translations',
+    'trans_namespace' => 'Namespace',
+    'trans_key'       => 'Key',
+    'trans_th_value'  => 'TH Value',
+    'trans_en_value'  => 'EN Value',
+    'trans_edit'      => 'Edit Translation',
+    'trans_th_label'  => 'Thai Translation',
+    'trans_en_label'  => 'English Translation',
+
     // General
     'site_name'       => 'System / Site Name',
     'site_name_hint'  => 'Appears in topbar, page titles, and email notifications.',

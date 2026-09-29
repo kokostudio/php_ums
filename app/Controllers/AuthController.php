@@ -109,7 +109,7 @@ class AuthController extends Controller
     {
         if (\App\Core\Settings::get('enable_registration') === '0') {
             Session::init();
-            Session::setFlash('error', __('messages.registration_disabled') ?? 'Registration is currently disabled.');
+            Session::setFlash('error', __('messages.registration_disabled') ?? __('messages.registration_disabled_text'));
             $this->redirect('/login');
         }
 
@@ -123,7 +123,7 @@ class AuthController extends Controller
     {
         if (\App\Core\Settings::get('enable_registration') === '0') {
             Session::init();
-            Session::setFlash('error', __('messages.registration_disabled') ?? 'Registration is currently disabled.');
+            Session::setFlash('error', __('messages.registration_disabled') ?? __('messages.registration_disabled_text'));
             $this->redirect('/login');
         }
 
@@ -231,7 +231,7 @@ class AuthController extends Controller
         $email = Security::sanitize($_POST['email'] ?? '');
         
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', 'Invalid email format.');
+            Session::setFlash('error', __('messages.invalid_email_format'));
             $this->redirect('/login');
         }
         
@@ -328,7 +328,7 @@ class AuthController extends Controller
         $email = Security::sanitize($_POST['email'] ?? '');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', 'Invalid email format.');
+            Session::setFlash('error', __('messages.invalid_email_format'));
             $this->redirect('/forgot-password');
         }
 

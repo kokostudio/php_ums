@@ -16,7 +16,7 @@ class SocialAuthController extends Controller
     public function redirectToGoogle()
     {
         if (Settings::get('enable_google_login') !== '1') {
-            Session::setFlash('error', 'Google Login is disabled.');
+            Session::setFlash('error', __('messages.google_login_disabled'));
             $this->redirect('/login');
         }
 
@@ -44,7 +44,7 @@ class SocialAuthController extends Controller
     public function handleGoogleCallback()
     {
         if (Settings::get('enable_google_login') !== '1') {
-            Session::setFlash('error', 'Google Login is disabled.');
+            Session::setFlash('error', __('messages.google_login_disabled'));
             $this->redirect('/login');
         }
 
@@ -53,7 +53,7 @@ class SocialAuthController extends Controller
         $savedState = Session::get('oauth_state');
 
         if (!$code || !$state || $state !== $savedState) {
-            Session::setFlash('error', 'Google Login failed or was cancelled.');
+            Session::setFlash('error', __('messages.google_login_failed'));
             $this->redirect('/login');
         }
 
@@ -83,7 +83,7 @@ class SocialAuthController extends Controller
         $tokenData = json_decode($response, true);
 
         if (isset($tokenData['error'])) {
-            Session::setFlash('error', 'Failed to obtain Google access token.');
+            Session::setFlash('error', __('messages.google_token_failed'));
             $this->redirect('/login');
         }
 
@@ -100,7 +100,7 @@ class SocialAuthController extends Controller
         $userData = json_decode($userInfoResponse, true);
 
         if (!isset($userData['id'])) {
-            Session::setFlash('error', 'Failed to fetch user data from Google.');
+            Session::setFlash('error', __('messages.google_data_failed'));
             $this->redirect('/login');
         }
 
@@ -111,7 +111,7 @@ class SocialAuthController extends Controller
         $profileImage = $userData['picture'] ?? null;
 
         if (!$email) {
-            Session::setFlash('error', 'Email is required from Google account.');
+            Session::setFlash('error', __('messages.google_email_required'));
             $this->redirect('/login');
         }
 
@@ -124,7 +124,7 @@ class SocialAuthController extends Controller
     public function redirectToLine()
     {
         if (Settings::get('enable_line_login') !== '1') {
-            Session::setFlash('error', 'LINE Login is disabled.');
+            Session::setFlash('error', __('messages.line_login_disabled'));
             $this->redirect('/login');
         }
 
@@ -153,7 +153,7 @@ class SocialAuthController extends Controller
     public function handleLineCallback()
     {
         if (Settings::get('enable_line_login') !== '1') {
-            Session::setFlash('error', 'LINE Login is disabled.');
+            Session::setFlash('error', __('messages.line_login_disabled'));
             $this->redirect('/login');
         }
 
@@ -163,7 +163,7 @@ class SocialAuthController extends Controller
         $savedState = Session::get('oauth_state');
 
         if ($error || !$code || !$state || $state !== $savedState) {
-            Session::setFlash('error', 'LINE Login failed or was cancelled.');
+            Session::setFlash('error', __('messages.line_login_failed'));
             $this->redirect('/login');
         }
 
@@ -193,7 +193,7 @@ class SocialAuthController extends Controller
         $tokenData = json_decode($response, true);
 
         if (isset($tokenData['error'])) {
-            Session::setFlash('error', 'Failed to obtain LINE access token.');
+            Session::setFlash('error', __('messages.line_token_failed'));
             $this->redirect('/login');
         }
 
@@ -211,7 +211,7 @@ class SocialAuthController extends Controller
         $profileData = json_decode($profileResponse, true);
 
         if (!isset($profileData['userId'])) {
-            Session::setFlash('error', 'Failed to fetch user profile from LINE.');
+            Session::setFlash('error', __('messages.line_data_failed'));
             $this->redirect('/login');
         }
 
@@ -261,9 +261,9 @@ class SocialAuthController extends Controller
             // ==========================================
             if ($existingUser) {
                 if ($existingUser['id'] == $currentUserId) {
-                    Session::setFlash('success', 'Your account is already linked to this ' . ucfirst($provider) . ' account.');
+                    Session::setFlash('success', __('messages.social_already_linked', ['provider' => ucfirst($provider)]));
                 } else {
-                    Session::setFlash('error', 'This ' . ucfirst($provider) . ' account is already linked to another user.');
+                    Session::setFlash('error', __('messages.social_linked_other', ['provider' => ucfirst($provider)]));
                 }
                 $this->redirect('/profile');
             }
@@ -282,7 +282,7 @@ class SocialAuthController extends Controller
             }
 
             Logger::activity("Linked " . ucfirst($provider) . " account to profile.");
-            Session::setFlash('success', ucfirst($provider) . ' account has been successfully linked to your profile.');
+            Session::setFlash('success', __('messages.social_link_success', ['provider' => ucfirst($provider)]));
             $this->redirect('/profile');
             return;
         }

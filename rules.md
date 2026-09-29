@@ -140,6 +140,7 @@
 
 ### 2. View & UI (หน้าบ้าน)
 - [ ] **ห้าม Hardcode ข้อความภาษา** ให้ใช้ `<?= __('module.key') ?>` ตลอดทั้งหน้า
+- [ ] **ข้อความแจ้งเตือนทั้งหมด** ทั้งใน Controllers (ผ่าน `Session::setFlash()`) และใน Views (ผ่าน `Swal.fire()`) ต้องถูกแปลผ่าน `__()` เสมอ ห้ามใส่ String ดิบๆ ลงไป
 - [ ] แสดงวันที่ต้องใช้ `formatDate($date)` (ฝั่งเซิร์ฟเวอร์) หรือ `formatDate(data)` (ฝั่ง JS) เท่านั้น (รูปแบบมาตรฐาน `d/m/Y`)
 - [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้)
 - [ ] **ปุ่มอันตราย** (ลบ, ระงับ) ต้องใช้ `bg-red-500` และต้องแสดงหน้าต่างยืนยันด้วย **SweetAlert2 (`Swal.fire`)** เท่านั้น ห้ามใช้ `confirm()` ปกติ
@@ -164,13 +165,17 @@
   - ใช้เงาสะท้อนแบบเรืองแสง (Glow shadows) แทนเงาดำปกติ เพื่อความหรูหรา
 - **Modern Charts:** การตั้งค่ากราฟ (Chart.js) ให้ใช้เส้นโค้งมนสมูท (`tension: 0.4`), เพิ่มการถมสีแบบไล่ระดับ (Linear Gradients) สำหรับกราฟเส้น, และใช้ชุดสีโทน Premium Palette สำหรับกราฟวงกลม พร้อมปรับ Tooltip ให้เข้ากับธีม
 
-## 18. Advanced Security (Password Policy & 2FA)
+## 18. Advanced Security (Password Policy, 2FA & RBAC Protection)
 - **Password Complexity:** รหัสผ่านต้องถูกตรวจสอบความซับซ้อนตามนโยบายที่ตั้งไว้ใน Settings (`pwd_require_upper`, `pwd_require_lower`, `pwd_require_number`, `pwd_require_special`, `password_min_length`) เสมอเมื่อมีการสร้างหรือเปลี่ยนรหัสผ่าน
 - **Validation Class:** ใช้เมธอด `\App\Core\Security::validatePasswordComplexity($password)` ในการตรวจสอบและรับค่า Error Array ออกมาแสดงผล
 - **Two-Factor Authentication (2FA):** 
   - ระบบรองรับ 2FA (Google Authenticator) โดยอิงตามคอลัมน์ `google2fa_secret`
   - หาก `force_2fa_admin` ถูกเปิดใช้งาน ผู้ใช้ที่มีสิทธิ์ระดับ Admin จะต้องถูกบังคับให้ตั้งค่า 2FA ทันทีที่เข้าสู่ระบบ 
   - การบังคับใช้ถูกจัดการโดย `AuthMiddleware` ซึ่งจะ Redirect ไปที่หน้า Profile เพื่อบังคับให้ผู้ใช้เปิดใช้งาน 2FA ก่อนเข้าถึงระบบส่วนอื่น
+- **RBAC Superadmin Protection:**
+  - บัญชีระบบขั้นสูงสุดที่มี username ว่า `superadmin` หรือ `admin` จะต้องถูกบล็อก (Disabled) ปุ่มลบ (Delete) บนหน้า UI เพื่อป้องกันข้อผิดพลาด
+  - ห้ามผู้ใช้ที่มีระดับสิทธิ์ (Role) ต่ำกว่า เข้าไปแก้ไขข้อมูลหรือลบบัญชี `admin` และ `superadmin` โดยเด็ดขาด 
+  - ต้องมีการตรวจสอบซ้อนที่ฝั่ง Backend ในเมธอด `update()` และ `delete()` ของ `UserController` เสมอ
 
 ## 19. System Maintenance & Error Handling
 - **Maintenance Mode:** ระบบรองรับโหมดบำรุงรักษา (Maintenance Mode) โดยแสดงหน้า `app/Views/errors/maintenance.php` ป้องกันผู้ใช้ทั่วไปเข้าใช้งานระหว่างอัปเดตระบบ

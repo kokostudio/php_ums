@@ -168,7 +168,7 @@ class UserController extends Controller
     {
         $realId = Security::decodeId($id);
         if (!$realId) {
-            Session::setFlash('error', 'Invalid user ID.');
+            Session::setFlash('error', __('messages.invalid_user_id'));
             $this->redirect('/users');
         }
 
@@ -182,6 +182,13 @@ class UserController extends Controller
             $this->redirect('/users');
         }
 
+        if (in_array(strtolower($user['username']), ['admin', 'superadmin'])) {
+            if (Session::get('role_id') != 1 && Session::get('user_id') != $user['id']) {
+                Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.');
+                $this->redirect('/users');
+            }
+        }
+
         $roles = $db->query("SELECT id, name FROM roles ORDER BY name")->fetchAll();
         $this->view('users/edit', ['pageTitle' => 'Edit User', 'user' => $user, 'roles' => $roles]);
     }
@@ -191,7 +198,7 @@ class UserController extends Controller
         Security::checkCsrf();
         $realId = Security::decodeId($id);
         if (!$realId) {
-            Session::setFlash('error', 'Invalid user ID.');
+            Session::setFlash('error', __('messages.invalid_user_id'));
             $this->redirect('/users');
         }
 
@@ -203,6 +210,13 @@ class UserController extends Controller
 
         if (!$oldUser) {
             $this->redirect('/users');
+        }
+
+        if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin'])) {
+            if (Session::get('role_id') != 1 && Session::get('user_id') != $oldUser['id']) {
+                Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.');
+                $this->redirect('/users');
+            }
         }
 
         $errors = Validator::validate($_POST, [
@@ -251,7 +265,7 @@ class UserController extends Controller
         $checkStmt = $db->prepare("SELECT id FROM users WHERE (username = :username OR email = :email) AND id != :id");
         $checkStmt->execute(['username' => $username, 'email' => $email, 'id' => $realId]);
         if ($checkStmt->fetch()) {
-            Session::setFlash('error', 'Username or Email already exists for another user.');
+            Session::setFlash('error', __('messages.user_email_exists_other'));
             $this->redirect("/users/{$id}/edit");
         }
 
@@ -296,7 +310,7 @@ class UserController extends Controller
         Security::checkCsrf();
         $realId = Security::decodeId($id);
         if (!$realId) {
-            $this->json(['status' => 'error', 'message' => 'Invalid user ID.'], 400);
+            $this->json(['status' => 'error', 'message' => __('messages.invalid_user_id')], 400);
         }
 
         $db = Database::getInstance();
@@ -311,8 +325,8 @@ class UserController extends Controller
         $oldUser = $stmt->fetch();
 
         if ($oldUser) {
-            if (strtolower($oldUser['username']) === 'admin') {
-                $this->json(['success' => false, 'message' => 'The admin user cannot be deleted.'], 403);
+            if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin'])) {
+                $this->json(['success' => false, 'message' => 'System administrators cannot be deleted.'], 403);
             }
 
             unset($oldUser['password']);

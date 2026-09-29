@@ -46,7 +46,7 @@ class SettingController extends Controller
     public function update($tab = 'general')
     {
         Security::checkCsrf();
-        $tab = in_array($tab, ['general', 'login', 'security', 'social']) ? $tab : 'general';
+        $tab = in_array($tab, ['general', 'login', 'security', 'social', 'translations']) ? $tab : 'general';
 
         // Keys allowed per tab
         $textKeysByTab = [
@@ -81,19 +81,29 @@ class SettingController extends Controller
             }
 
             if ($tab === 'general') {
-                Settings::set('maintenance_mode', isset($_POST['maintenance_mode']) ? '1' : '0');
-                Settings::set('enable_registration', isset($_POST['enable_registration']) ? '1' : '0');
+                Settings::set('maintenance_mode', !empty($_POST['maintenance_mode']) ? '1' : '0');
+                Settings::set('enable_registration', !empty($_POST['enable_registration']) ? '1' : '0');
             }
             if ($tab === 'security') {
-                Settings::set('pwd_require_upper', isset($_POST['pwd_require_upper']) ? '1' : '0');
-                Settings::set('pwd_require_lower', isset($_POST['pwd_require_lower']) ? '1' : '0');
-                Settings::set('pwd_require_number', isset($_POST['pwd_require_number']) ? '1' : '0');
-                Settings::set('pwd_require_special', isset($_POST['pwd_require_special']) ? '1' : '0');
-                Settings::set('force_2fa_admin', isset($_POST['force_2fa_admin']) ? '1' : '0');
+                Settings::set('pwd_require_upper', !empty($_POST['pwd_require_upper']) ? '1' : '0');
+                Settings::set('pwd_require_lower', !empty($_POST['pwd_require_lower']) ? '1' : '0');
+                Settings::set('pwd_require_number', !empty($_POST['pwd_require_number']) ? '1' : '0');
+                Settings::set('pwd_require_special', !empty($_POST['pwd_require_special']) ? '1' : '0');
+                Settings::set('force_2fa_admin', !empty($_POST['force_2fa_admin']) ? '1' : '0');
             }
             if ($tab === 'social') {
-                Settings::set('enable_google_login', isset($_POST['enable_google_login']) ? '1' : '0');
-                Settings::set('enable_line_login', isset($_POST['enable_line_login']) ? '1' : '0');
+                Settings::set('enable_google_login', !empty($_POST['enable_google_login']) ? '1' : '0');
+                Settings::set('enable_line_login', !empty($_POST['enable_line_login']) ? '1' : '0');
+            }
+            if ($tab === 'translations') {
+                Settings::set('enable_language_switcher', !empty($_POST['enable_language_switcher']) ? '1' : '0');
+                $langs = $_POST['available_languages'] ?? [];
+                if (is_array($langs)) {
+                    $langs = array_map('\App\Core\Security::sanitize', $langs);
+                    Settings::set('available_languages', implode(',', $langs));
+                } else {
+                    Settings::set('available_languages', '');
+                }
             }
 
             // 2. File Uploads

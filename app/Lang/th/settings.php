@@ -7,6 +7,16 @@ return [
     'email_settings'  => 'ตั้งค่าอีเมล',
     'coming_soon'     => 'เร็วๆ นี้',
 
+    // Translations Tab
+    'trans_title'     => 'การแปลภาษา',
+    'trans_namespace' => 'หมวดหมู่ (Namespace)',
+    'trans_key'       => 'คีย์ (Key)',
+    'trans_th_value'  => 'ข้อความ (TH)',
+    'trans_en_value'  => 'ข้อความ (EN)',
+    'trans_edit'      => 'แก้ไขคำแปล',
+    'trans_th_label'  => 'คำแปลภาษาไทย',
+    'trans_en_label'  => 'คำแปลภาษาอังกฤษ',
+
     // General
     'site_name'       => 'ชื่อเว็บไซต์',
     'site_name_hint'  => 'ชื่อนี้จะแสดงที่มุมซ้ายบน หัวข้อหน้าเว็บ และอีเมลแจ้งเตือน',
