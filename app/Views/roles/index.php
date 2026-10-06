@@ -62,26 +62,29 @@
                     </td>
                     <td class="p-4 text-right">
                         <div class="flex justify-end gap-2">
-                            <a href="/roles/<?= $role['hash_id'] ?>/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1 rounded hover:bg-blue-50 dark:hover:bg-slate-800" title="<?= __('roles.edit_role') ?>">
-                                <i class="ph ph-shield-check text-xl"></i>
-                            </a>
-                            <?php if ($role['id'] != 1): ?>
-                            <button onclick="deleteRole('<?= $role['hash_id'] ?>')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1 rounded hover:bg-red-50 dark:hover:bg-slate-800" title="<?= __('common.delete') ?>">
-                                <i class="ph ph-trash text-xl"></i>
-                            </button>
-                            <?php else: ?>
-                            <span class="p-1 w-7 h-7 inline-block"></span>
+                            <?php if (\App\Core\RBAC::hasPermission('roles', 'edit')): ?>
+                                <?php if ($role['id'] != 1 || \App\Core\Session::get('role_id') == 1): ?>
+                                <a href="/roles/<?= $role['hash_id'] ?>/edit" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition p-1 rounded hover:bg-blue-50 dark:hover:bg-slate-800" title="<?= __('roles.edit_role') ?>">
+                                    <i class="ph ph-shield-check text-xl"></i>
+                                </a>
+                                <?php else: ?>
+                                <span class="p-1 w-7 h-7 inline-block"></span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if (\App\Core\RBAC::hasPermission('roles', 'delete')): ?>
+                                <?php if ($role['id'] != 1): ?>
+                                <button onclick="deleteRole('<?= $role['hash_id'] ?>')" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition p-1 rounded hover:bg-red-50 dark:hover:bg-slate-800" title="<?= __('common.delete') ?>">
+                                    <i class="ph ph-trash text-xl"></i>
+                                </button>
+                                <?php else: ?>
+                                <span class="p-1 w-7 h-7 inline-block"></span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
-                
-                <?php if (empty($roles)): ?>
-                <tr>
-                    <td colspan="5" class="p-8 text-center text-gray-400"><?= __('common.no_data') ?></td>
-                </tr>
-                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -90,7 +93,7 @@
 <script>
 $(document).ready(function() {
     const table = $('#rolesTable').DataTable({
-        dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
+        dom: 'rt<"flex flex-col md:flex-row justify-between items-center p-4 border-t border-gray-100 dark:border-slate-800"<"flex items-center text-sm text-gray-500 dark:text-slate-400 gap-4"li>p><"clear">',
         pageLength: 10,
         order: [[0, 'asc']],
         columnDefs: [

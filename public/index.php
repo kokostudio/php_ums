@@ -60,20 +60,20 @@ $router->post('/reset-password', [\App\Controllers\AuthController::class, 'updat
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
 
 // User Management Routes (Protected by Auth and Permission if fully strictly applied, but for now just Auth is fine as base)
-$router->get('/users', [\App\Controllers\UserController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'read']]);
-$router->get('/users/data', [\App\Controllers\UserController::class, 'data'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'read']]);
+$router->get('/users', [\App\Controllers\UserController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'view']]);
+$router->get('/users/data', [\App\Controllers\UserController::class, 'data'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'view']]);
 $router->get('/users/create', [\App\Controllers\UserController::class, 'create'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'create']]);
 $router->post('/users/create', [\App\Controllers\UserController::class, 'store'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'create']]);
-$router->get('/users/{id}/edit', [\App\Controllers\UserController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'update']]);
-$router->post('/users/{id}/edit', [\App\Controllers\UserController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'update']]);
+$router->get('/users/{id}/edit', [\App\Controllers\UserController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'edit']]);
+$router->post('/users/{id}/edit', [\App\Controllers\UserController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'edit']]);
 $router->post('/users/{id}/delete', [\App\Controllers\UserController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'delete']]);
 
 // Roles & Permissions Routes
-$router->get('/roles', [\App\Controllers\RoleController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'read']]);
+$router->get('/roles', [\App\Controllers\RoleController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'view']]);
 $router->get('/roles/create', [\App\Controllers\RoleController::class, 'create'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'create']]);
 $router->post('/roles/create', [\App\Controllers\RoleController::class, 'store'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'create']]);
-$router->get('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'update']]);
-$router->post('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'update']]);
+$router->get('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'edit']]);
+$router->post('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'edit']]);
 $router->post('/roles/{id}/delete', [\App\Controllers\RoleController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'delete']]);
 
 // Activity & Audit Logs Routes

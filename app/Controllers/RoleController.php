@@ -13,10 +13,12 @@ class RoleController extends Controller
     public function index()
     {
         $db = Database::getInstance();
+        $whereClause = Session::get('role_id') != 1 ? "WHERE r.id != 1" : "";
         $roles = $db->query("
             SELECT r.*, COUNT(u.id) as users_count 
             FROM roles r 
             LEFT JOIN users u ON r.id = u.role_id 
+            $whereClause
             GROUP BY r.id 
             ORDER BY r.id ASC
         ")->fetchAll();
@@ -113,6 +115,11 @@ class RoleController extends Controller
             $this->redirect('/roles');
         }
 
+        if ($realId == 1 && Session::get('role_id') != 1) {
+            Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'Access denied.');
+            $this->redirect('/roles');
+        }
+
         $stmtPerms = $db->prepare("SELECT permission_id FROM role_permissions WHERE role_id = :id");
         $stmtPerms->execute(['id' => $realId]);
         $assignedPerms = $stmtPerms->fetchAll(\PDO::FETCH_COLUMN);
@@ -135,6 +142,11 @@ class RoleController extends Controller
         }
 
         $db = Database::getInstance();
+
+        if ($realId == 1 && Session::get('role_id') != 1) {
+            Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'Access denied.');
+            $this->redirect('/roles');
+        }
 
         $name = Security::sanitize($_POST['name'] ?? '');
         $description = Security::sanitize($_POST['description'] ?? '');

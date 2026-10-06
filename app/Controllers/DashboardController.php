@@ -10,12 +10,17 @@ class DashboardController extends Controller
     public function index()
     {
         $db = Database::getInstance();
+        $isSuperAdmin = \App\Core\Session::get('role_id') == 1;
+        $userWhere = $isSuperAdmin ? "" : " WHERE role_id != 1 OR role_id IS NULL";
+        $userAnd = $isSuperAdmin ? "" : " AND (role_id != 1 OR role_id IS NULL)";
+        $roleWhere = $isSuperAdmin ? "" : " WHERE id != 1";
+        $roleAnd = $isSuperAdmin ? "" : " WHERE r.id != 1"; // Used where r is the alias
         
         $stats = [
-            'total_users' => $db->query("SELECT COUNT(id) FROM users")->fetchColumn(),
-            'total_roles' => $db->query("SELECT COUNT(id) FROM roles")->fetchColumn(),
-            'active_users' => $db->query("SELECT COUNT(id) FROM users WHERE status = 'active'")->fetchColumn(),
-            'online_users' => $db->query("SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE last_activity >= " . (time() - 900) . " AND user_id IS NOT NULL")->fetchColumn(),
+            'total_users' => $db->query("SELECT COUNT(id) FROM users" . $userWhere)->fetchColumn(),
+            'total_roles' => $db->query("SELECT COUNT(id) FROM roles" . $roleWhere)->fetchColumn(),
+            'active_users' => $db->query("SELECT COUNT(id) FROM users WHERE status = 'active'" . $userAnd)->fetchColumn(),
+            'online_users' => $db->query("SELECT COUNT(DISTINCT s.user_id) FROM user_sessions s JOIN users u ON s.user_id = u.id WHERE s.last_activity >= " . (time() - 900) . $userAnd)->fetchColumn(),
         ];
 
         // Dynamic Cards Registry
@@ -53,6 +58,7 @@ class DashboardController extends Controller
                 COUNT(id) as count 
             FROM users 
             WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+            $userAnd
             GROUP BY month 
             ORDER BY month ASC
         ";
@@ -84,6 +90,7 @@ class DashboardController extends Controller
             SELECT r.name, COUNT(u.id) as count
             FROM roles r
             LEFT JOIN users u ON u.role_id = r.id
+            $roleAnd
             GROUP BY r.id
         ";
         $rolesDataRaw = $db->query($rolesQuery)->fetchAll();
@@ -125,10 +132,12 @@ class DashboardController extends Controller
         ];
 
         // Fetch Recent Activities
+        $exclusion = \App\Core\Session::get('role_id') != 1 ? "WHERE u.role_id != 1 OR u.role_id IS NULL" : "";
         $recentActivities = $db->query("
             SELECT a.*, u.username, u.profile_image
             FROM activity_logs a 
             LEFT JOIN users u ON a.user_id = u.id 
+            $exclusion
             ORDER BY a.created_at DESC 
             LIMIT 5
         ")->fetchAll();

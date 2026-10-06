@@ -31,7 +31,7 @@ class ErrorHandler
     public static function handleException(\Throwable $exception): void
     {
         $code = $exception->getCode();
-        if ($code != 404) {
+        if (!in_array($code, [403, 404, 429])) {
             $code = 500;
         }
         
@@ -44,13 +44,20 @@ class ErrorHandler
 
         self::log($message);
 
-        if (Config::get('APP_DEBUG') === 'true') {
+        if (Config::get('APP_DEBUG') === 'true' && $code == 500) {
             echo "<h1>Fatal Error</h1>";
             echo "<pre>{$message}</pre>";
         } else {
             if ($code == 404) {
                 echo "<h1>404 Not Found</h1>";
                 echo "<p>The page you are looking for could not be found.</p>";
+            } elseif ($code == 403) {
+                echo "<h1>403 Forbidden</h1>";
+                echo "<p>" . htmlspecialchars($exception->getMessage()) . "</p>";
+                echo "<a href='/dashboard'>Return to Dashboard</a>";
+            } elseif ($code == 429) {
+                echo "<h1>429 Too Many Requests</h1>";
+                echo "<p>" . htmlspecialchars($exception->getMessage()) . "</p>";
             } else {
                 echo "<h1>500 Internal Server Error</h1>";
                 echo "<p>An unexpected error occurred. Please try again later.</p>";

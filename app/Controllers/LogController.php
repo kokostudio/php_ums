@@ -4,16 +4,26 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Core\Session;
 
 class LogController extends Controller
 {
+    private function getRoleExclusionClause(): string
+    {
+        return Session::get('role_id') != 1 ? "(u.role_id != 1 OR u.role_id IS NULL)" : "";
+    }
+
     public function activity()
     {
         $db = Database::getInstance();
+        $exclusion = $this->getRoleExclusionClause();
+        $whereSql = $exclusion ? "WHERE $exclusion" : "";
+        
         $query = "
             SELECT a.id, a.action, a.ip_address, a.created_at, u.username
             FROM activity_logs a
             LEFT JOIN users u ON a.user_id = u.id
+            $whereSql
             ORDER BY a.id DESC
             LIMIT 1000
         ";
@@ -35,16 +45,28 @@ class LogController extends Controller
         $searchValue = $_GET['search']['value'] ?? '';
 
         $params = [];
-        $whereClause = "";
+        $whereConditions = [];
+        
+        $exclusion = $this->getRoleExclusionClause();
+        if ($exclusion) {
+            $whereConditions[] = $exclusion;
+        }
 
         if (!empty($searchValue)) {
-            $whereClause = "WHERE a.action LIKE :search1 OR u.username LIKE :search2 OR a.ip_address LIKE :search3";
+            $whereConditions[] = "(a.action LIKE :search1 OR u.username LIKE :search2 OR a.ip_address LIKE :search3)";
             $params['search1'] = "%{$searchValue}%";
             $params['search2'] = "%{$searchValue}%";
             $params['search3'] = "%{$searchValue}%";
         }
 
-        $totalRecords = $db->query("SELECT COUNT(id) FROM activity_logs")->fetchColumn();
+        $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
+
+        // Total records (respecting role exclusion)
+        $totalRecordsQuery = "SELECT COUNT(a.id) FROM activity_logs a LEFT JOIN users u ON a.user_id = u.id";
+        if ($exclusion) {
+            $totalRecordsQuery .= " WHERE $exclusion";
+        }
+        $totalRecords = $db->query($totalRecordsQuery)->fetchColumn();
 
         $stmtFiltered = $db->prepare("SELECT COUNT(a.id) FROM activity_logs a LEFT JOIN users u ON a.user_id = u.id {$whereClause}");
         $stmtFiltered->execute($params);
@@ -80,10 +102,14 @@ class LogController extends Controller
     public function audit()
     {
         $db = Database::getInstance();
+        $exclusion = $this->getRoleExclusionClause();
+        $whereSql = $exclusion ? "WHERE $exclusion" : "";
+        
         $query = "
             SELECT a.id, a.table_name, a.record_id, a.action, a.old_values, a.new_values, a.created_at, u.username
             FROM audit_logs a
             LEFT JOIN users u ON a.user_id = u.id
+            $whereSql
             ORDER BY a.id DESC
             LIMIT 1000
         ";
@@ -105,16 +131,28 @@ class LogController extends Controller
         $searchValue = $_GET['search']['value'] ?? '';
 
         $params = [];
-        $whereClause = "";
+        $whereConditions = [];
+        
+        $exclusion = $this->getRoleExclusionClause();
+        if ($exclusion) {
+            $whereConditions[] = $exclusion;
+        }
 
         if (!empty($searchValue)) {
-            $whereClause = "WHERE a.table_name LIKE :search1 OR a.action LIKE :search2 OR u.username LIKE :search3";
+            $whereConditions[] = "(a.table_name LIKE :search1 OR a.action LIKE :search2 OR u.username LIKE :search3)";
             $params['search1'] = "%{$searchValue}%";
             $params['search2'] = "%{$searchValue}%";
             $params['search3'] = "%{$searchValue}%";
         }
 
-        $totalRecords = $db->query("SELECT COUNT(id) FROM audit_logs")->fetchColumn();
+        $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
+
+        // Total records (respecting role exclusion)
+        $totalRecordsQuery = "SELECT COUNT(a.id) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id";
+        if ($exclusion) {
+            $totalRecordsQuery .= " WHERE $exclusion";
+        }
+        $totalRecords = $db->query($totalRecordsQuery)->fetchColumn();
 
         $stmtFiltered = $db->prepare("SELECT COUNT(a.id) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id {$whereClause}");
         $stmtFiltered->execute($params);

@@ -132,11 +132,11 @@ class SettingController extends Controller
             }
 
             Logger::activity("Updated system settings (tab: {$tab}).");
-            Session::setFlash('success', __('messages.settings_saved'));
+            Session::setFlash('success', __('settings.settings_saved'));
             $this->redirect("/settings/{$tab}");
 
         } catch (\Exception $e) {
-            Session::setFlash('error', __('messages.failed_update_settings') . ' ' . $e->getMessage());
+            Session::setFlash('error', __('settings.failed_update_settings') . ' ' . $e->getMessage());
             $this->redirect("/settings/{$tab}");
         }
     }
@@ -173,7 +173,7 @@ class SettingController extends Controller
             $stmt->execute([$namespace, $keyName, $enValue]);
 
             Logger::activity("Updated translation for {$namespace}.{$keyName}");
-            echo json_encode(['success' => true, 'message' => __('messages.translation_updated')]);
+            echo json_encode(['success' => true, 'message' => __('settings.translation_updated')]);
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }

@@ -39,3 +39,9 @@ re-read whole files.
 After big code changes, refresh the graph with `graft build` (deterministic,
 no API key, $0).
 <!-- graft:end -->
+
+<!-- rules:start -->
+## AI Agent Rules
+
+**ENCODING & MOJIBAKE PREVENTION**: This project uses Thai language heavily. NEVER use Windows PowerShell commands (like `Set-Content`, `Out-File`, `echo`) or inline PowerShell scripts to write or modify files containing Thai (multi-byte) characters. PowerShell can silently corrupt the encoding (causing mojibake/ภาษาต่างดาว). Always use the native `replace_file_content` tool, `write_to_file` tool, or write safe PHP scripts to handle file modifications.
+<!-- rules:end -->

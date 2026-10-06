@@ -287,7 +287,7 @@
             dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"<"flex items-center gap-2"l><"flex items-center gap-2"f>>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip><"clear">',
             language: {
                 <?php echo \App\Core\Lang::locale() === 'th' ? '
-                "emptyTable": "ไม่มีข้อมูลในตาราง",
+                "emptyTable": "<div class=\'flex flex-col items-center justify-center py-10 text-center\'><div class=\'w-16 h-16 bg-gray-100 dark:bg-slate-800/80 rounded-full flex items-center justify-center mb-3\'><i class=\'ph ph-folder-open text-2xl text-gray-400 dark:text-slate-500\'></i></div><p class=\'text-sm font-medium text-gray-500 dark:text-slate-400\'>ไม่มีข้อมูลในตาราง</p></div>",
                 "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
                 "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
                 "infoFiltered": "(กรองข้อมูล _MAX_ ทุกรายการ)",
@@ -295,7 +295,7 @@
                 "loadingRecords": "",
                 "processing": "<div class=\'animate-pulse space-y-4\'><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div></div>",
                 "search": "ค้นหา:",
-                "zeroRecords": "ไม่พบข้อมูล",
+                "zeroRecords": "<div class=\'flex flex-col items-center justify-center py-10 text-center\'><div class=\'w-16 h-16 bg-gray-100 dark:bg-slate-800/80 rounded-full flex items-center justify-center mb-3\'><i class=\'ph ph-magnifying-glass text-2xl text-gray-400 dark:text-slate-500\'></i></div><p class=\'text-sm font-medium text-gray-500 dark:text-slate-400\'>ไม่พบข้อมูล</p></div>",
                 "paginate": {
                     "first": "หน้าแรก",
                     "last": "หน้าสุดท้าย",
@@ -305,6 +305,8 @@
                 ' : '
                 "search": "Search:",
                 "lengthMenu": "Show _MENU_ entries",
+                "emptyTable": "<div class=\'flex flex-col items-center justify-center py-10 text-center\'><div class=\'w-16 h-16 bg-gray-100 dark:bg-slate-800/80 rounded-full flex items-center justify-center mb-3\'><i class=\'ph ph-folder-open text-2xl text-gray-400 dark:text-slate-500\'></i></div><p class=\'text-sm font-medium text-gray-500 dark:text-slate-400\'>No data available in table</p></div>",
+                "zeroRecords": "<div class=\'flex flex-col items-center justify-center py-10 text-center\'><div class=\'w-16 h-16 bg-gray-100 dark:bg-slate-800/80 rounded-full flex items-center justify-center mb-3\'><i class=\'ph ph-magnifying-glass text-2xl text-gray-400 dark:text-slate-500\'></i></div><p class=\'text-sm font-medium text-gray-500 dark:text-slate-400\'>No matching records found</p></div>",
                 "processing": "<div class=\'animate-pulse space-y-4\'><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div><div class=\'h-8 bg-slate-200 dark:bg-slate-700 rounded w-full\'></div></div>"
                 ' ?>
             }
@@ -464,7 +466,7 @@
         </header>
 
         <!-- Dynamic Content Area -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8 pb-0 md:pb-0">
             <div class="w-full">
                 <!-- Flash Messages (Toast Notifications) -->
                 <?php if ($flashSuccess = Session::getFlash('success')): ?>
@@ -537,7 +539,7 @@
                 <?php echo $content ?? '' ?>
 
                 <!-- Footer -->
-                <footer class="mt-10 py-6 border-t border-gray-200/60 dark:border-slate-800/60">
+                <footer class="mt-6 py-4 border-t border-gray-200/60 dark:border-slate-800/60">
                     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="text-sm font-medium text-gray-500 dark:text-slate-400">
                             <?php echo Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>

@@ -16,9 +16,11 @@ class UserController extends Controller
     public function index()
     {
         $db = Database::getInstance();
-        $roles = $db->query("SELECT id, name FROM roles ORDER BY id ASC")->fetchAll();
+        $roleWhere = \App\Core\Session::get('role_id') != 1 ? "WHERE id != 1" : "";
+        $roles = $db->query("SELECT id, name FROM roles $roleWhere ORDER BY id ASC")->fetchAll();
         
-        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.profile_image, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id ORDER BY u.id DESC";
+        $userWhere = \App\Core\Session::get('role_id') != 1 ? "WHERE u.role_id != 1" : "";
+        $baseQuery = "SELECT u.id, u.username, u.email, u.status, u.created_at, u.profile_image, r.name as role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id $userWhere ORDER BY u.id DESC";
         $users = $db->query($baseQuery)->fetchAll();
         foreach ($users as &$row) {
             $row['hash_id'] = Security::encodeId((int)$row['id']);
@@ -53,6 +55,10 @@ class UserController extends Controller
         $extraWhere = [];
         $extraParams = [];
 
+        if (\App\Core\Session::get('role_id') != 1) {
+            $extraWhere[] = "u.role_id != 1";
+        }
+
         if (!empty($_GET['role_filter'])) {
             $extraWhere[] = "u.role_id = :role_filter";
             $extraParams['role_filter'] = $_GET['role_filter'];
@@ -61,6 +67,8 @@ class UserController extends Controller
             $extraWhere[] = "u.status = :status_filter";
             $extraParams['status_filter'] = $_GET['status_filter'];
         }
+
+        $baseCountQuery = \App\Core\Session::get('role_id') != 1 ? "SELECT COUNT(id) FROM users WHERE role_id != 1" : "SELECT COUNT(id) FROM users";
 
         $result = DataTableHelper::process(
             $db,
@@ -71,7 +79,7 @@ class UserController extends Controller
             'u.id',
             $extraWhere,
             $extraParams,
-            "SELECT COUNT(id) FROM users"
+            $baseCountQuery
         );
 
         // Encode IDs for the frontend
@@ -85,7 +93,8 @@ class UserController extends Controller
     public function create()
     {
         $db = Database::getInstance();
-        $roles = $db->query("SELECT id, name FROM roles ORDER BY name")->fetchAll();
+        $roleWhere = \App\Core\Session::get('role_id') != 1 ? "WHERE id != 1" : "";
+        $roles = $db->query("SELECT id, name FROM roles $roleWhere ORDER BY name")->fetchAll();
         $this->view('users/create', ['pageTitle' => 'Add New User', 'roles' => $roles]);
     }
 
@@ -141,6 +150,11 @@ class UserController extends Controller
 
         $hashedPassword = Security::hashPassword($password);
 
+        if ($roleId == 1 && Session::get('role_id') != 1) {
+            Session::setFlash('error', 'You cannot assign the Super Admin role.');
+            $this->redirect('/users/create');
+        }
+
         try {
             $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id, status, profile_image) VALUES (:username, :email, :password, :role_id, :status, :profile_image)");
             $stmt->execute([
@@ -182,14 +196,15 @@ class UserController extends Controller
             $this->redirect('/users');
         }
 
-        if (in_array(strtolower($user['username']), ['admin', 'superadmin'])) {
+        if (in_array(strtolower($user['username']), ['admin', 'superadmin']) || $user['role_id'] == 1) {
             if (Session::get('role_id') != 1 && Session::get('user_id') != $user['id']) {
                 Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.');
                 $this->redirect('/users');
             }
         }
 
-        $roles = $db->query("SELECT id, name FROM roles ORDER BY name")->fetchAll();
+        $roleWhere = \App\Core\Session::get('role_id') != 1 ? "WHERE id != 1" : "";
+        $roles = $db->query("SELECT id, name FROM roles $roleWhere ORDER BY name")->fetchAll();
         $this->view('users/edit', ['pageTitle' => 'Edit User', 'user' => $user, 'roles' => $roles]);
     }
 
@@ -212,7 +227,7 @@ class UserController extends Controller
             $this->redirect('/users');
         }
 
-        if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin'])) {
+        if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin']) || $oldUser['role_id'] == 1) {
             if (Session::get('role_id') != 1 && Session::get('user_id') != $oldUser['id']) {
                 Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.');
                 $this->redirect('/users');
@@ -245,6 +260,11 @@ class UserController extends Controller
         $status = Security::sanitize($_POST['status'] ?? 'active');
 
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
+
+        if ($roleId == 1 && Session::get('role_id') != 1) {
+            Session::setFlash('error', 'You cannot assign the Super Admin role.');
+            $this->redirect("/users/{$id}/edit");
+        }
 
         $avatarName = $oldUser['profile_image'] ?? null;
         try {
@@ -325,7 +345,7 @@ class UserController extends Controller
         $oldUser = $stmt->fetch();
 
         if ($oldUser) {
-            if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin'])) {
+            if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin']) || $oldUser['role_id'] == 1) {
                 $this->json(['success' => false, 'message' => 'System administrators cannot be deleted.'], 403);
             }
 

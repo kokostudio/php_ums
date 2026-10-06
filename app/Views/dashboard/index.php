@@ -195,7 +195,7 @@ $username = Session::get('user_username') ?? 'Admin';
                         <i class="ph-fill ph-ghost text-4xl opacity-50 text-slate-400"></i>
                     </div>
                     <p class="text-base font-medium"><?= __('dashboard.no_recent_activity') ?? 'No recent activities found.' ?></p>
-                    <p class="text-sm text-slate-400 mt-1">Things are pretty quiet right now.</p>
+                    <p class="text-sm text-slate-400 mt-1"><?= __('dashboard.things_are_quiet') ?? 'Things are pretty quiet right now.' ?></p>
                 </div>
             <?php endif; ?>
         </div>

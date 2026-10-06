@@ -277,11 +277,13 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] **Destructive Buttons:** Must use `bg-red-500` and MUST trigger a **SweetAlert2 (`Swal.fire`)** confirmation dialog, not native `confirm()`.
 - [ ] **Active/Hover States:** Must use `primary-*` classes (e.g. `bg-primary-50`) instead of hardcoding slate/blue.
 
-### 3. DataTables
+### 3. DataTables & Layout Styling
 - [ ] Use **Client-Side Processing** (PHP rendered `<tbody>`) as the default for instant loading and to prevent FOUC/flicker.
 - [ ] Apply `LIMIT 1000` (or similar) to SQL queries if the dataset (like logs) can grow infinitely.
-- [ ] DO NOT define `language:` blocks inline; it's handled globally in the layout.
-- [ ] **DOM Standard:** If a custom DOM is needed, you MUST append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to place Length (`l`), Info (`i`), and Pagination (`p`) firmly at the bottom.
+- [ ] DO NOT define `language:` blocks inline; it's handled globally in the layout (including beautiful HTML empty states with icons for `emptyTable` and `zeroRecords`).
+- [ ] **Empty State Fallback:** NEVER add manual `<td colspan="...">No data</td>` fallbacks inside `<tbody>` when the array is empty. DataTables natively handles empty tables. Manual HTML fallbacks cause "Incorrect column count" JS crashes.
+- [ ] **DOM Standard:** NEVER override `dom:` locally unless absolutely necessary (e.g. removing default search). If you do, use the perfectly balanced grouped layout: `dom: 'rt<"flex flex-col md:flex-row justify-between items-center p-4 border-t border-gray-100 dark:border-slate-800"<"flex items-center text-sm text-gray-500 dark:text-slate-400 gap-4"li>p><"clear">',`. Do NOT use the old `"lip"` grouped flex container as it distorts alignment.
+- [ ] **Layout Footer Balancing:** If adjusting global layout margins, ensure `<main>` does not have excessive bottom padding (`pb-0`) that pushes the footer up, and ensure `<footer>` has symmetrical vertical padding (e.g., `py-4`) so it centers beautifully between the content separator and the bottom of the screen.
 
 ### 4. PHP 8.1+ Null Safety
 - [ ] Any nullable string variable fetched from the DB MUST use the `?? ''` null coalescing operator before being passed to string functions.
@@ -290,3 +292,12 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] **Rate Limiting:** Protect sensitive endpoints (Login, OTP, Password Reset) against brute-force attacks by integrating with the `rate_limits` table structure.
 - [ ] **Error Logging:** Do not output raw errors in production. `APP_DEBUG=false` ensures `App\Core\ErrorHandler` logs errors to `storage/logs/error.log`.
 - [ ] **Maintenance Mode:** Utilize `app/Views/errors/maintenance.php` when locking down the system for critical updates.
+
+
+### 18. Encoding & Mojibake Prevention (CRITICAL)
+- **The Issue:** Modifying files containing Thai characters or any multi-byte UTF-8 text using Windows PowerShell commands (`Set-Content`, `echo`, `cat >`, or `Out-File`) often results in severe encoding corruption (Mojibake / ภาษาต่างดาว). 
+- **The Rule:** NEVER use PowerShell terminal commands or inline PowerShell scripts to append, edit, or create files that contain Thai characters.
+- **The Solution:** 
+  1. ALWAYS use the Agent's native `replace_file_content` tool for targeted edits.
+  2. ALWAYS use the Agent's native `write_to_file` tool to create new files or append to files.
+  3. If you must use a script to modify files, write a standalone PHP script (e.g. `file_put_contents`) that doesn't involve passing multi-byte strings through the shell execution layer.

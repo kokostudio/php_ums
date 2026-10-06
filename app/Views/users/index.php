@@ -180,12 +180,6 @@
                     </td>
                 </tr>
                 <?php endforeach; ?>
-                
-                <?php if (empty($users)): ?>
-                <tr>
-                    <td colspan="7" class="p-8 text-center text-gray-400"><?= __('common.no_data') ?? 'No data available' ?></td>
-                </tr>
-                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -201,7 +195,7 @@ $(document).ready(function() {
     });
 
     const table = $('#usersTable').DataTable({
-        dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
+        dom: 'rt<"flex flex-col md:flex-row justify-between items-center p-4 border-t border-gray-100 dark:border-slate-800"<"flex items-center text-sm text-gray-500 dark:text-slate-400 gap-4"li>p><"clear">',
         pageLength: 10,
         order: [[0, 'desc']], // Default sorting
         columnDefs: [
