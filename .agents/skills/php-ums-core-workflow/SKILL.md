@@ -301,3 +301,9 @@ To ensure absolute compliance with the system architecture, always verify the fo
   1. ALWAYS use the Agent's native `replace_file_content` tool for targeted edits.
   2. ALWAYS use the Agent's native `write_to_file` tool to create new files or append to files.
   3. If you must use a script to modify files, write a standalone PHP script (e.g. `file_put_contents`) that doesn't involve passing multi-byte strings through the shell execution layer.
+
+### 19. Currency & Symbol Restrictions: NO '฿' SYMBOL (CRITICAL)
+- **The Rule:** NEVER use the Thai Baht currency symbol `฿` anywhere in the project (UI, tables, mock data, charts, reports, translations, or code).
+- **The Reason:** Requested by system guidelines/standards; symbol `฿` must be completely omitted or replaced with 'บาท' / 'THB' as appropriate.
+- **Action:** Remove all instances of `฿` across views, translations, and templates.
+

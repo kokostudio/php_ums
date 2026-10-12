@@ -44,4 +44,6 @@ no API key, $0).
 ## AI Agent Rules
 
 **ENCODING & MOJIBAKE PREVENTION**: This project uses Thai language heavily. NEVER use Windows PowerShell commands (like `Set-Content`, `Out-File`, `echo`) or inline PowerShell scripts to write or modify files containing Thai (multi-byte) characters. PowerShell can silently corrupt the encoding (causing mojibake/ภาษาต่างดาว). Always use the native `replace_file_content` tool, `write_to_file` tool, or write safe PHP scripts to handle file modifications.
+
+**NO BAHT SYMBOL (฿) RULE**: Do NOT use the Thai Baht currency symbol `฿` anywhere in the project (UI, tables, mock data, charts, reports, translations, or code). Always omit it or use 'บาท' / 'THB' as specified by context. Remove all instances of `฿`.
 <!-- rules:end -->
