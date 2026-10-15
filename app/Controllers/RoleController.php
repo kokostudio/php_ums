@@ -214,23 +214,39 @@ class RoleController extends Controller
     {
         Security::checkCsrf();
         $realId = Security::decodeId($id);
+
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+               || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+               || (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+
         if (!$realId) {
-            $this->json(['status' => 'error', 'message' => __('messages.invalid_role_id')], 400);
-            return;
+            if ($isAjax) {
+                return $this->json(['success' => false, 'message' => __('messages.invalid_role_id')], 400);
+            }
+            Session::setFlash('error', __('messages.invalid_role_id'));
+            return $this->redirect('/roles');
         }
 
         $db = Database::getInstance();
 
         if ($realId == 1) {
-            $this->json(['success' => false, 'message' => 'Cannot delete the Super Admin role.'], 403);
-            return;
+            $msg = 'Cannot delete the Super Admin role.';
+            if ($isAjax) {
+                return $this->json(['success' => false, 'message' => $msg], 403);
+            }
+            Session::setFlash('error', $msg);
+            return $this->redirect('/roles');
         }
 
         $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE role_id = :id");
         $stmt->execute(['id' => $realId]);
         if ($stmt->fetchColumn() > 0) {
-            $this->json(['success' => false, 'message' => 'Cannot delete this role because there are users assigned to it.'], 403);
-            return;
+            $msg = 'Cannot delete this role because there are users assigned to it.';
+            if ($isAjax) {
+                return $this->json(['success' => false, 'message' => $msg], 403);
+            }
+            Session::setFlash('error', $msg);
+            return $this->redirect('/roles');
         }
 
         try {
@@ -248,14 +264,27 @@ class RoleController extends Controller
 
                 Logger::activity("Deleted role ID: {$realId}");
                 Logger::audit('roles', $realId, 'delete', $oldRole, null);
-                $this->json(['success' => true, 'message' => 'Role deleted successfully.']);
+
+                if ($isAjax) {
+                    return $this->json(['success' => true, 'message' => 'Role deleted successfully.']);
+                }
+                Session::setFlash('success', 'Role deleted successfully.');
+                return $this->redirect('/roles');
             } else {
                 $db->rollBack();
-                $this->json(['success' => false, 'message' => __('messages.role_not_found')], 404);
+                if ($isAjax) {
+                    return $this->json(['success' => false, 'message' => __('messages.role_not_found')], 404);
+                }
+                Session::setFlash('error', __('messages.role_not_found'));
+                return $this->redirect('/roles');
             }
         } catch (\Exception $e) {
             $db->rollBack();
-            $this->json(['success' => false, 'message' => 'Failed to delete role.'], 500);
+            if ($isAjax) {
+                return $this->json(['success' => false, 'message' => 'Failed to delete role.'], 500);
+            }
+            Session::setFlash('error', 'Failed to delete role.');
+            return $this->redirect('/roles');
         }
     }
 }

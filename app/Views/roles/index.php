@@ -119,18 +119,20 @@ function deleteRole(id) {
         cancelButtonText: '<?= __('common.cancel') ?>'
     }).then((result) => {
         if (result.isConfirmed) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/roles/' + id + '/delete';
-            
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = 'csrf_token';
-            csrfInput.value = '<?= \App\Core\Session::getCsrfToken() ?>';
-            
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
+            axios.post('/roles/' + id + '/delete', {
+                csrf_token: '<?= \App\Core\Session::getCsrfToken() ?>'
+            }, {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => {
+                Swal.fire('<?= __('common.success') ?>!', response.data.message || '<?= __('common.success') ?>', 'success')
+                .then(() => {
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire('<?= __('common.error') ?>!', error.response?.data?.message || '<?= __('common.error') ?>', 'error');
+            });
         }
     });
 }

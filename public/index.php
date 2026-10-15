@@ -67,6 +67,7 @@ $router->post('/users/create', [\App\Controllers\UserController::class, 'store']
 $router->get('/users/{id}/edit', [\App\Controllers\UserController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'edit']]);
 $router->post('/users/{id}/edit', [\App\Controllers\UserController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'edit']]);
 $router->post('/users/{id}/delete', [\App\Controllers\UserController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'users', 'delete']]);
+$router->get('/users/{id}/delete', function() { header('Location: /users'); exit; }, [\App\Middlewares\AuthMiddleware::class]);
 
 // Roles & Permissions Routes
 $router->get('/roles', [\App\Controllers\RoleController::class, 'index'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'view']]);
@@ -75,6 +76,7 @@ $router->post('/roles/create', [\App\Controllers\RoleController::class, 'store']
 $router->get('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'edit'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'edit']]);
 $router->post('/roles/{id}/edit', [\App\Controllers\RoleController::class, 'update'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'edit']]);
 $router->post('/roles/{id}/delete', [\App\Controllers\RoleController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class, [\App\Middlewares\PermissionMiddleware::class, 'roles', 'delete']]);
+$router->get('/roles/{id}/delete', function() { header('Location: /roles'); exit; }, [\App\Middlewares\AuthMiddleware::class]);
 
 // Activity & Audit Logs Routes
 $router->get('/logs/activity', [\App\Controllers\LogController::class, 'activity'], [\App\Middlewares\AuthMiddleware::class]);
