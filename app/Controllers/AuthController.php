@@ -82,6 +82,9 @@ class AuthController extends Controller
             $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");
             $updateStmt->execute(['id' => $user['id']]);
 
+            // Reset rate limiter attempts on success
+            \App\Core\RateLimiter::reset('/login');
+
             Logger::activity("User logged in successfully.");
 
             $this->redirect('/dashboard');
@@ -305,6 +308,10 @@ class AuthController extends Controller
 
             $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");
             $updateStmt->execute(['id' => $user['id']]);
+
+            // Reset rate limiter attempts on success
+            \App\Core\RateLimiter::reset('/login');
+            \App\Core\RateLimiter::reset('/login/2fa');
 
             Logger::activity("User logged in successfully with 2FA.");
             $this->redirect('/dashboard');
