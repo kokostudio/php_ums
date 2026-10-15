@@ -378,6 +378,47 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Group: Restaurant & POS -->
+                <?php
+                    $posRoutes   = ['/pos/tables', '/pos/menu', '/pos/kitchen', '/pos/cashier', '/pos/reports'];
+                    $isPosActive = false;
+                    foreach ($posRoutes as $route) {
+                        if (strpos($currentUri, $route) === 0) {
+                            $isPosActive = true;
+                            break;
+                        }
+                    }
+                ?>
+                <div class="sidebar-group mt-2">
+                    <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isPosActive ? 'text-white bg-primary-900/50' : 'text-slate-200 hover:text-white hover:bg-primary-900/30' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
+                        <div class="flex items-center">
+                            <i class="ph ph-storefront text-lg mr-3"></i>
+                            <span><?php echo __('pos.pos_system') ?></span>
+                        </div>
+                        <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 <?php echo $isPosActive ? 'rotate-90' : '' ?>"></i>
+                    </button>
+                    <div class="submenu overflow-hidden <?php echo $isPosActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
+                        <a href="/pos/tables" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/tables') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-squares-four text-lg mr-3 <?php echo strpos($currentUri, '/pos/tables') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.tables') ?></span>
+                        </a>
+                        <a href="/pos/menu" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/menu') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-bowl-food text-lg mr-3 <?php echo strpos($currentUri, '/pos/menu') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.menu_management') ?></span>
+                        </a>
+                        <a href="/pos/kitchen" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-cooking-pot text-lg mr-3 <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.kitchen_display') ?></span>
+                        </a>
+                        <a href="/pos/cashier" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/cashier') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-receipt text-lg mr-3 <?php echo strpos($currentUri, '/pos/cashier') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.cashier_billing') ?></span>
+                        </a>
+                        <a href="/pos/reports" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/reports') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <i class="ph ph-chart-line-up text-lg mr-3 <?php echo strpos($currentUri, '/pos/reports') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.reports') ?></span>
+                        </a>
+                        <a href="/pos/queue-display" target="_blank" class="flex items-center px-3 py-2 text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent" title="เปิดจอเรียกคิวหน้าร้าน (เปิดแท็บใหม่)">
+                            <i class="ph ph-television text-lg mr-3 opacity-80 text-amber-400"></i> <span>จอเรียกคิวหน้าร้าน (TV)</span>
+                        </a>
+                    </div>
+                </div>
             </nav>
         </div>
 

@@ -108,6 +108,55 @@ $router->post('/api/notifications/read', [\App\Controllers\NotificationControlle
 $router->post('/api/notifications/read-all', [\App\Controllers\NotificationController::class, 'markAllAsRead'], [\App\Middlewares\AuthMiddleware::class]);
 $router->get('/api/search', [\App\Controllers\SearchController::class, 'search'], [\App\Middlewares\AuthMiddleware::class]);
 
+// --- POS & Restaurant Management Routes ---
+$router->get('/pos/tables', [\App\Controllers\Pos\TableController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/tables/create', [\App\Controllers\Pos\TableController::class, 'store'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/tables/{id}/edit', [\App\Controllers\Pos\TableController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/tables/{id}/delete', [\App\Controllers\Pos\TableController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/tables/{id}/reset', [\App\Controllers\Pos\TableController::class, 'reset'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/pos/tables/qr/{token}', [\App\Controllers\Pos\TableController::class, 'qr']);
+$router->get('/pos/tables/print-qr/{id}', [\App\Controllers\Pos\TableController::class, 'printQr'], [\App\Middlewares\AuthMiddleware::class]);
+
+$router->get('/pos/menu', [\App\Controllers\Pos\MenuController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/create', [\App\Controllers\Pos\MenuController::class, 'store'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/{id}/edit', [\App\Controllers\Pos\MenuController::class, 'update'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/{id}/delete', [\App\Controllers\Pos\MenuController::class, 'delete'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/{id}/toggle-stock', [\App\Controllers\Pos\MenuController::class, 'toggleStock'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/categories/create', [\App\Controllers\Pos\MenuController::class, 'storeCategory'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/menu/categories/{id}/delete', [\App\Controllers\Pos\MenuController::class, 'deleteCategory'], [\App\Middlewares\AuthMiddleware::class]);
+
+$router->get('/pos/kitchen', [\App\Controllers\Pos\KitchenController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/pos/kitchen/active-orders', [\App\Controllers\Pos\KitchenController::class, 'activeOrdersJson'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/kitchen/update-status', [\App\Controllers\Pos\KitchenController::class, 'updateStatus'], [\App\Middlewares\AuthMiddleware::class]);
+
+$router->get('/pos/cashier', [\App\Controllers\Pos\CashierController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/pos/cashier/table/{id}', [\App\Controllers\Pos\CashierController::class, 'tableDetails'], [\App\Middlewares\AuthMiddleware::class]);
+$router->post('/pos/cashier/checkout', [\App\Controllers\Pos\CashierController::class, 'checkout'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/pos/cashier/receipt/{id}', [\App\Controllers\Pos\CashierController::class, 'receipt'], [\App\Middlewares\AuthMiddleware::class]);
+
+$router->get('/pos/reports', [\App\Controllers\Pos\ReportController::class, 'index'], [\App\Middlewares\AuthMiddleware::class]);
+
+// --- QSR Queue Display (TV Screen) ---
+$router->get('/pos/queue-display', [\App\Controllers\Pos\QueueController::class, 'index']);
+$router->get('/pos/queue/data', [\App\Controllers\Pos\QueueController::class, 'data']);
+
+// --- Customer Public Mobile Ordering Routes ---
+$router->get('/order/takeaway', function() {
+    header('Location: /order/table/takeaway');
+    exit;
+});
+$router->get('/order/qsr', function() {
+    header('Location: /order/table/qsr');
+    exit;
+});
+$router->get('/order/table/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'menu']);
+$router->post('/order/submit/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'submitOrder']);
+$router->get('/order/track/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'track']);
+$router->get('/order/bill/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'bill']);
+$router->get('/order/promptpay-qr/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'promptPayQr']);
+$router->get('/order/api/status/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'apiStatus']);
+$router->post('/order/call-waiter/{token}', [\App\Controllers\Ordering\TableOrderController::class, 'callWaiter']);
+
 $router->get('/', function() {
     header('Location: /login');
     exit;
