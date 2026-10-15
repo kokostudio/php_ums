@@ -268,13 +268,17 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] Controller method parameter names MUST match the Route named parameters exactly (e.g., `{id}` -> `function edit($id)`).
 - [ ] Enforce **CSRF Protection** on all POST handlers (`Security::checkCsrf()`).
 - [ ] Decode IDs (`decodeId`) instantly when received, and Encode IDs (`encodeId`) before returning them to the UI.
+- [ ] Register **GET Fallback Redirects** in `public/index.php` for delete endpoints (`/resource/{id}/delete`) to avoid 404s on browser reloads.
+- [ ] Reset login rate limits on successful auth (`RateLimiter::reset('/login')`).
 
 ### 2. Views & UI (Frontend)
+- [ ] **Sidebar Exposure:** Always add new modules prominently to the sidebar navigation in `layouts/app.php` with direct links.
 - [ ] **NO Hardcoded Text:** Always use the `<?= __('module.key') ?>` helper for translations.
 - [ ] **Flash & Popup Translations:** All controller `Session::setFlash()` messages and `Swal.fire()` messages must be translated via `__()` helper. No raw strings allowed.
 - [ ] **Date Standard:** Always use `formatDate()` (PHP) or `formatDate()` (JS) to ensure the `d/m/Y` global standard.
 - [ ] **Primary Buttons:** Must use `bg-sidebar` so the color matches the dynamic theme.
 - [ ] **Destructive Buttons:** Must use `bg-red-500` and MUST trigger a **SweetAlert2 (`Swal.fire`)** confirmation dialog, not native `confirm()`.
+- [ ] **AJAX Deletion:** Delete actions MUST use `axios.post` with SweetAlert2, NEVER traditional HTML `form.submit()`.
 - [ ] **Active/Hover States:** Must use `primary-*` classes (e.g. `bg-primary-50`) instead of hardcoding slate/blue.
 
 ### 3. DataTables & Layout Styling
@@ -306,4 +310,25 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - **The Rule:** NEVER use the Thai Baht currency symbol `฿` anywhere in the project (UI, tables, mock data, charts, reports, translations, or code).
 - **The Reason:** Requested by system guidelines/standards; symbol `฿` must be completely omitted or replaced with 'บาท' / 'THB' as appropriate.
 - **Action:** Remove all instances of `฿` across views, translations, and templates.
+
+### 20. Sidebar Visibility & Direct Navigation (CRITICAL UI CONVENTION)
+- **The Issue:** Creating new features or modules without adding them to the sidebar leaves users unaware of how to access them, forcing manual typing of URLs or searching through chat.
+- **The Rule:** Whenever developing or adding any new system/module, NEVER leave it hidden in collapsed menus or expect the user to type URLs manually.
+- **The Solution:** Always add the module prominently to the sidebar navigation in `app/Views/layouts/app.php`, keeping it expanded or immediately visible, with clear direct links to all sub-pages, dashboards, and test/demo features.
+
+### 21. Delete Operations (AJAX + SweetAlert + GET Fallback)
+- **The Issue:** Traditional HTML `form.submit()` to a delete endpoint causes the browser to navigate to `/resource/{id}/delete`, rendering raw JSON. If the user refreshes, a GET request is sent, triggering a 404 error.
+- **The Rule:** NEVER use `form.submit()` for table row deletions.
+- **The Solution:**
+  1. Always use `axios.post()` with SweetAlert2 (`Swal.fire`) confirmation dialogs (following the pattern in `users/index.php` and `roles/index.php`).
+  2. On success, remove the row with DataTables API (`table.row($tr).remove().draw()`) or reload the view gracefully.
+  3. Controllers must support dual responses: return JSON `['success' => true]` for AJAX, and traditional POST redirect with flash for non-AJAX.
+  4. Register GET fallback routes in `public/index.php` for `/resource/{id}/delete` that redirect to `/resource` to prevent 404s on browser reloads.
+
+### 22. Rate Limiting & Auth Lockout Prevention
+- **The Issue:** Failed login attempts accumulating indefinitely across multiple days can cause users to hit HTTP 429 "Too Many Requests" prematurely.
+- **The Solution:**
+  1. In `RateLimiter::check()`, always check elapsed time against `updated_at` (sliding time window) rather than letting old attempts persist indefinitely.
+  2. Always call `RateLimiter::reset('/login')` upon successful login and 2FA authentication in `AuthController`.
+
 

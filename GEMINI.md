@@ -46,4 +46,10 @@ no API key, $0).
 **ENCODING & MOJIBAKE PREVENTION**: This project uses Thai language heavily. NEVER use Windows PowerShell commands (like `Set-Content`, `Out-File`, `echo`) or inline PowerShell scripts to write or modify files containing Thai (multi-byte) characters. PowerShell can silently corrupt the encoding (causing mojibake/ภาษาต่างดาว). Always use the native `replace_file_content` tool, `write_to_file` tool, or write safe PHP scripts to handle file modifications.
 
 **NO BAHT SYMBOL (฿) RULE**: Do NOT use the Thai Baht currency symbol `฿` anywhere in the project (UI, tables, mock data, charts, reports, translations, or code). Always omit it or use 'บาท' / 'THB' as specified by context. Remove all instances of `฿`.
+
+**SIDEBAR VISIBILITY & DIRECT NAVIGATION**: Whenever developing or adding any new system/module, NEVER leave it hidden in collapsed menus or expect the user to type URLs in chat or the browser address bar. Always add it prominently and visibly to the sidebar navigation (`app/Views/layouts/app.php`), keeping it immediately accessible with clear direct links to all sub-pages, dashboards, and test/demo features.
+
+**AJAX DELETE OPERATIONS & GET FALLBACKS**: NEVER use traditional HTML `form.submit()` for delete operations. Always use `axios.post` with SweetAlert2 (`Swal.fire`) confirmation dialogs (matching `users/index.php` and `roles/index.php`) so the browser does not navigate to `/delete` URLs or display raw JSON. Controllers must handle both AJAX (JSON response) and standard POST (redirect with flash). In `public/index.php`, always register a GET fallback redirect for `/resource/{id}/delete` back to the index view to prevent 404 errors if users reload or directly navigate.
+
+**RATE LIMITING & 429 PREVENTION**: Always call `RateLimiter::reset('/login')` upon successful login and 2FA verification. `RateLimiter` must use a sliding time window (relative to `updated_at`) so failed attempts do not accumulate indefinitely and lock users out unexpectedly.
 <!-- rules:end -->
