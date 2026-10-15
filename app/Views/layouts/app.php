@@ -379,9 +379,9 @@
                     </div>
                 </div>
 
-                <!-- Group: Restaurant & POS -->
+                <!-- Section: Restaurant & POS System -->
                 <?php
-                    $posRoutes   = ['/pos/tables', '/pos/menu', '/pos/kitchen', '/pos/cashier', '/pos/reports'];
+                    $posRoutes   = ['/pos/tables', '/pos/menu', '/pos/kitchen', '/pos/cashier', '/pos/reports', '/pos/queue-display'];
                     $isPosActive = false;
                     foreach ($posRoutes as $route) {
                         if (strpos($currentUri, $route) === 0) {
@@ -390,23 +390,34 @@
                         }
                     }
                 ?>
-                <div class="sidebar-group mt-2">
+                <div class="pt-5 pb-1 px-3">
+                    <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span>ระบบสั่งอาหาร & POS</span>
+                        <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">POS & QR</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-group">
                     <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isPosActive ? 'text-white bg-primary-900/50' : 'text-slate-200 hover:text-white hover:bg-primary-900/30' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
                         <div class="flex items-center">
-                            <i class="ph ph-storefront text-lg mr-3"></i>
+                            <i class="ph ph-storefront text-lg mr-3 text-amber-400"></i>
                             <span><?php echo __('pos.pos_system') ?></span>
                         </div>
-                        <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 <?php echo $isPosActive ? 'rotate-90' : '' ?>"></i>
+                        <i class="ph ph-caret-right text-xs caret-icon transition-transform duration-200 rotate-90"></i>
                     </button>
-                    <div class="submenu overflow-hidden <?php echo $isPosActive ? '' : 'hidden' ?> mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
+                    <!-- Submenu: Open by default so items are immediately visible -->
+                    <div class="submenu overflow-hidden mt-1 space-y-1 pl-4 border-l-2 border-primary-800/50 ml-5">
                         <a href="/pos/tables" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/tables') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-squares-four text-lg mr-3 <?php echo strpos($currentUri, '/pos/tables') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.tables') ?></span>
                         </a>
                         <a href="/pos/menu" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/menu') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-bowl-food text-lg mr-3 <?php echo strpos($currentUri, '/pos/menu') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.menu_management') ?></span>
                         </a>
-                        <a href="/pos/kitchen" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
-                            <i class="ph ph-cooking-pot text-lg mr-3 <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.kitchen_display') ?></span>
+                        <a href="/pos/kitchen" class="flex items-center justify-between px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
+                            <div class="flex items-center">
+                                <i class="ph ph-cooking-pot text-lg mr-3 <?php echo strpos($currentUri, '/pos/kitchen') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.kitchen_display') ?></span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">KDS</span>
                         </a>
                         <a href="/pos/cashier" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/cashier') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-receipt text-lg mr-3 <?php echo strpos($currentUri, '/pos/cashier') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.cashier_billing') ?></span>
@@ -414,10 +425,37 @@
                         <a href="/pos/reports" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/pos/reports') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-chart-line-up text-lg mr-3 <?php echo strpos($currentUri, '/pos/reports') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('pos.reports') ?></span>
                         </a>
-                        <a href="/pos/queue-display" target="_blank" class="flex items-center px-3 py-2 text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent" title="เปิดจอเรียกคิวหน้าร้าน (เปิดแท็บใหม่)">
-                            <i class="ph ph-television text-lg mr-3 opacity-80 text-amber-400"></i> <span>จอเรียกคิวหน้าร้าน (TV)</span>
+                        <a href="/pos/queue-display" target="_blank" class="flex items-center justify-between px-3 py-2 text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent" title="เปิดจอเรียกคิวหน้าร้าน (เปิดแท็บใหม่)">
+                            <div class="flex items-center">
+                                <i class="ph ph-television text-lg mr-3 opacity-80 text-amber-400"></i> <span>จอเรียกคิวหน้าร้าน (TV)</span>
+                            </div>
+                            <i class="ph ph-arrow-square-out text-xs text-slate-400"></i>
                         </a>
                     </div>
+                </div>
+
+                <!-- Section: Customer Ordering Demo -->
+                <div class="pt-4 pb-1 px-3">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i class="ph ph-device-mobile text-xs text-emerald-400"></i>
+                        <span>สั่งอาหารผ่าน QR (จำลองลูกค้า)</span>
+                    </p>
+                </div>
+                <div class="space-y-1 px-1">
+                    <a href="/order/table/caa1c86dd6ac84e9f00b00dff100fccd" target="_blank" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-primary-900/30 transition-colors group" title="จำลองลูกค้าสแกน QR สั่งที่โต๊ะ T01 (เปิดแท็บใหม่)">
+                        <div class="flex items-center">
+                            <i class="ph ph-qr-code text-lg mr-3 text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                            <span>สั่งอาหารโต๊ะ T01</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">ทานที่ร้าน</span>
+                    </a>
+                    <a href="/order/table/takeaway" target="_blank" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-primary-900/30 transition-colors group" title="จำลองลูกค้าสั่งกลับบ้าน QSR Counter (เปิดแท็บใหม่)">
+                        <div class="flex items-center">
+                            <i class="ph ph-bag text-lg mr-3 text-amber-400 group-hover:scale-110 transition-transform"></i>
+                            <span>สั่งกลับบ้าน (QSR)</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">กลับบ้าน</span>
+                    </a>
                 </div>
             </nav>
         </div>
@@ -1080,6 +1118,18 @@
                             <a href="/settings" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center"><i class="ph ph-gear text-lg"></i></div>
                                 <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.system_settings') ?></div>
+                            </a>
+                            <a href="/pos/tables" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 flex items-center justify-center"><i class="ph ph-squares-four text-lg"></i></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300">โต๊ะอาหาร & QR Code</div>
+                            </a>
+                            <a href="/pos/kitchen" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-500 flex items-center justify-center"><i class="ph ph-cooking-pot text-lg"></i></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300">หน้าจอห้องครัว (KDS)</div>
+                            </a>
+                            <a href="/pos/cashier" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center"><i class="ph ph-receipt text-lg"></i></div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300">แคชเชียร์ & คิดเงิน</div>
                             </a>
                         </div>
                     </div>
