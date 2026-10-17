@@ -879,6 +879,15 @@
                 let totalResults = 0;
 
                 const categories = {
+                    menus: {
+                        title: '<?php echo __('common.main_menu') ?? 'เมนูระบบ / Navigation' ?>',
+                        icon: 'ph-compass',
+                        color: 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 dark:text-indigo-400',
+                        getUrl: item => item.url,
+                        formatName: item => highlight(item.title, query),
+                        formatSub: item => highlight(item.description, query),
+                        getIconHtml: item => `<div class="w-8 h-8 rounded-lg ${item.color || 'bg-indigo-50 text-indigo-500'} flex items-center justify-center flex-shrink-0"><i class="ph-fill ${item.icon || 'ph-compass'} text-lg"></i></div>`
+                    },
                     users: {
                         title: '<?php echo __('common.user_management') ?>',
                         icon: 'ph-users-three',
@@ -944,10 +953,13 @@
                         const link = document.createElement('a');
                         link.href = category.getUrl(item);
                         link.className = 'flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/30 border border-transparent hover:border-slate-100 dark:hover:border-slate-800/50 transition-all';
-                        link.innerHTML = `
+                        const iconBox = category.getIconHtml ? category.getIconHtml(item) : `
                             <div class="w-8 h-8 rounded-lg ${category.color} flex items-center justify-center flex-shrink-0">
                                 <i class="ph-fill ${category.icon} text-lg"></i>
                             </div>
+                        `;
+                        link.innerHTML = `
+                            ${iconBox}
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-800 dark:text-slate-200 truncate">${category.formatName(item)}</p>
                                 <p class="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">${category.formatSub(item)}</p>
@@ -1022,24 +1034,89 @@
                 <div id="globalSearchResults" class="flex-1 overflow-y-auto p-4 space-y-4">
                     <!-- Quick Links / Default State -->
                     <div id="searchDefaultState" class="space-y-4">
-                        <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2"><?php echo __('common.main_menu') ?></div>
+                        <div class="flex items-center justify-between px-2">
+                            <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider"><?php echo __('common.main_menu') ?></span>
+                            <span class="text-[11px] text-slate-400 dark:text-slate-500">พิมพ์คำค้นหาหรือคลิกเลือกเมนูด้านล่าง</span>
+                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <a href="/users" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
-                                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center"><i class="ph ph-users text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.user_management') ?></div>
+                            <a href="/dashboard" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-squares-four text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.dashboard') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">ภาพรวมระบบและสถิติ</div>
+                                </div>
                             </a>
-                            <a href="/roles" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
-                                <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-500 flex items-center justify-center"><i class="ph ph-shield-check text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.roles_permissions') ?></div>
+                            <a href="/users" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/20 text-sky-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-users text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.user_management') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">จัดการรายชื่อผู้ใช้และสถานะ</div>
+                                </div>
                             </a>
-                            <a href="/logs/activity" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center"><i class="ph ph-activity text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.activity_logs') ?></div>
+                            <a href="/roles" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-shield-check text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.roles_permissions') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">กำหนดกลุ่มสิทธิ์และ RBAC</div>
+                                </div>
                             </a>
-                            <a href="/settings" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all">
-                                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center"><i class="ph ph-gear text-lg"></i></div>
-                                <div class="text-sm font-medium text-gray-700 dark:text-slate-300"><?php echo __('common.system_settings') ?></div>
+                            <a href="/logs/activity" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-activity text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.activity_logs') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">ประวัติกิจกรรมและการเข้าใช้</div>
+                                </div>
                             </a>
+                            <a href="/logs/audit" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 text-cyan-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-file-search text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.audit_logs') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">ตรวจสอบประวัติการแก้ไขข้อมูล</div>
+                                </div>
+                            </a>
+                            <a href="/settings" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-gear text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('common.system_settings') ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">การตั้งค่าระบบหลักและเว็บไซต์</div>
+                                </div>
+                            </a>
+                            <a href="/profile" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-user-circle text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('profile.title') ?? 'โปรไฟล์ของฉัน' ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">ข้อมูลส่วนตัวและรหัสผ่าน</div>
+                                </div>
+                            </a>
+                            <a href="/profile/sessions" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 flex items-center justify-center flex-shrink-0"><i class="ph ph-devices text-lg"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-slate-200"><?php echo __('profile.active_sessions') ?? 'เซสชันที่ใช้งาน' ?></div>
+                                    <div class="text-xs text-slate-400 dark:text-slate-500">จัดการอุปกรณ์ที่เข้าสู่ระบบ</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Quick Settings Badges -->
+                        <div class="pt-2 border-t border-gray-100 dark:border-slate-800">
+                            <div class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">ตั้งค่าด่วน (Settings Tabs)</div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <a href="/settings/general" class="px-2.5 py-1 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center">
+                                    <i class="ph ph-sliders mr-1.5"></i> ทั่วไป
+                                </a>
+                                <a href="/settings/security" class="px-2.5 py-1 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center">
+                                    <i class="ph ph-lock-key mr-1.5"></i> ความปลอดภัย & 2FA
+                                </a>
+                                <a href="/settings/login" class="px-2.5 py-1 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center">
+                                    <i class="ph ph-paint-brush mr-1.5"></i> หน้าล็อกอิน
+                                </a>
+                                <a href="/settings/social" class="px-2.5 py-1 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center">
+                                    <i class="ph ph-share-network mr-1.5"></i> Google & LINE
+                                </a>
+                                <a href="/settings/translations" class="px-2.5 py-1 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-gray-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center">
+                                    <i class="ph ph-translate mr-1.5"></i> แปลภาษา
+                                </a>
+                            </div>
                         </div>
                     </div>
 
