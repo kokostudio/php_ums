@@ -79,8 +79,11 @@ class RoleController extends Controller
 
             if (!empty($perms) && is_array($perms)) {
                 $insertPerms = $db->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (:role, :perm)");
-                foreach ($perms as $permId) {
-                    $insertPerms->execute(['role' => $roleId, 'perm' => $permId]);
+                foreach ($perms as $permIdHash) {
+                    $permId = is_numeric($permIdHash) ? (int)$permIdHash : Security::decodeId($permIdHash);
+                    if ($permId) {
+                        $insertPerms->execute(['role' => $roleId, 'perm' => $permId]);
+                    }
                 }
             }
 
@@ -185,8 +188,11 @@ class RoleController extends Controller
             
                 if (!empty($perms) && is_array($perms)) {
                     $insertPerms = $db->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (:role, :perm)");
-                    foreach ($perms as $permId) {
-                        $insertPerms->execute(['role' => $realId, 'perm' => $permId]);
+                    foreach ($perms as $permIdHash) {
+                        $permId = is_numeric($permIdHash) ? (int)$permIdHash : Security::decodeId($permIdHash);
+                        if ($permId) {
+                            $insertPerms->execute(['role' => $realId, 'perm' => $permId]);
+                        }
                     }
                 }
             }

@@ -78,6 +78,19 @@ class SearchController extends Controller
             $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery, 'q3' => $likeQuery]);
             $translations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+            foreach ($users as &$u) {
+                $u['id'] = \App\Core\Security::encodeId((int)$u['id']);
+            }
+            foreach ($roles as &$r) {
+                $r['id'] = \App\Core\Security::encodeId((int)$r['id']);
+            }
+            foreach ($logs as &$l) {
+                $l['id'] = \App\Core\Security::encodeId((int)$l['id']);
+            }
+            foreach ($translations as &$t) {
+                $t['id'] = \App\Core\Security::encodeId((int)$t['id']);
+            }
+
             return $this->json([
                 'success' => true,
                 'results' => [

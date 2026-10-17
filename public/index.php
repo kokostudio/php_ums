@@ -98,6 +98,7 @@ $router->post('/profile/2fa/enable', [\App\Controllers\ProfileController::class,
 $router->post('/profile/2fa/disable', [\App\Controllers\ProfileController::class, 'disable2fa'], [\App\Middlewares\AuthMiddleware::class]);
 $router->get('/profile/sessions', [\App\Controllers\ProfileController::class, 'sessions'], [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/profile/sessions/{id}/revoke', [\App\Controllers\ProfileController::class, 'revokeSession'], [\App\Middlewares\AuthMiddleware::class]);
+$router->get('/profile/sessions/{id}/revoke', function() { header('Location: /profile/sessions'); exit; }, [\App\Middlewares\AuthMiddleware::class]);
 $router->post('/profile/social/{provider}/disconnect', [\App\Controllers\ProfileController::class, 'disconnectSocial'], [\App\Middlewares\AuthMiddleware::class]);
 
 // --- API Routes (Stateless / JWT) ---

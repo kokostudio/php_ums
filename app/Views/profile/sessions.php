@@ -68,12 +68,9 @@
                         </td>
                         <td class="py-4 px-6 text-right">
                             <?php if (!$isCurrent): ?>
-                                <form action="/profile/sessions/<?= htmlspecialchars($session['id']) ?>/revoke" method="POST" class="inline m-0">
-                                    <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
-                                    <button type="button" onclick="confirmRevoke(this)" class="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors shadow-sm">
-                                        <i class="ph ph-trash mr-1"></i> <?= __('profile.revoke') ?>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="confirmRevoke('<?= htmlspecialchars($session['hash_id']) ?>', this)" class="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors shadow-sm inline-flex items-center">
+                                    <i class="ph ph-trash mr-1"></i> <?= __('profile.revoke') ?>
+                                </button>
                             <?php else: ?>
                                 <span class="text-xs text-gray-400 dark:text-slate-500 italic"><?= __('profile.current_session') ?></span>
                             <?php endif; ?>
@@ -94,7 +91,7 @@
 </div>
 
 <script>
-function confirmRevoke(button) {
+function confirmRevoke(hashId, button) {
     Swal.fire({
         title: '<?= __('common.confirm') ?>',
         text: '<?= __('profile.revoke_confirm') ?>',
@@ -106,7 +103,42 @@ function confirmRevoke(button) {
         cancelButtonText: '<?= __('common.cancel') ?>'
     }).then((result) => {
         if (result.isConfirmed) {
-            button.closest('form').submit();
+            const tr = button.closest('tr');
+            axios.post('/profile/sessions/' + encodeURIComponent(hashId) + '/revoke', {
+                csrf_token: '<?= \App\Core\Session::getCsrfToken() ?>'
+            }, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                if (response.data && response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<?= __('common.success') ?? 'Success' ?>',
+                        text: response.data.message || '<?= __('messages.session_revoked') ?>',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    tr.style.transition = 'all 0.3s ease';
+                    tr.style.opacity = '0';
+                    setTimeout(() => {
+                        tr.remove();
+                    }, 300);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '<?= __('common.error') ?? 'Error' ?>',
+                        text: response.data.message || 'Failed to revoke session'
+                    });
+                }
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '<?= __('common.error') ?? 'Error' ?>',
+                    text: error.response?.data?.message || 'Error communicating with server'
+                });
+            });
         }
     });
 }

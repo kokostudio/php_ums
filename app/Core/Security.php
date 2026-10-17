@@ -47,34 +47,63 @@ class Security
     }
 
     /**
-     * Get Hashids instance with a consistent salt
+     * Get Hashids instance with a consistent salt and optional context
      */
-    private static function getHashids(): \Hashids\Hashids
+    private static function getHashids(string $context = ''): \Hashids\Hashids
     {
         if (empty($_ENV['APP_KEY'])) {
             throw new \Exception("APP_KEY is missing in .env file. Security salt is required.", 500);
         }
-        $salt = $_ENV['APP_KEY'];
+        $salt = $_ENV['APP_KEY'] . ($context !== '' ? '_' . $context : '');
         return new \Hashids\Hashids($salt, 8);
     }
 
     /**
      * Encode an integer ID to an 8-character hash
      */
-    public static function encodeId(int $id): string
+    public static function encodeId(int $id, string $context = ''): string
     {
-        return self::getHashids()->encode($id);
+        return self::getHashids($context)->encode($id);
     }
 
     /**
      * Decode an 8-character hash back to integer ID
      * Returns null if invalid
      */
-    public static function decodeId(string $hash): ?int
+    public static function decodeId(string $hash, string $context = ''): ?int
     {
-        $decoded = self::getHashids()->decode($hash);
+        $decoded = self::getHashids($context)->decode($hash);
         return !empty($decoded) ? $decoded[0] : null;
     }
+
+    /**
+     * Encrypt an arbitrary string (e.g. Session ID, tokens) into a URL-safe token using AES-256-CBC
+     */
+    public static function encrypt(string $data): string
+    {
+        $key = hash('sha256', $_ENV['APP_KEY'] ?? 'ums_secret_key', true);
+        $iv = openssl_random_pseudo_bytes(16);
+        $ciphertext = openssl_encrypt($data, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        return rtrim(strtr(base64_encode($iv . $ciphertext), '+/', '-_'), '=');
+    }
+
+    /**
+     * Decrypt an encrypted URL-safe token back to the original string
+     * Returns null if decryption fails or token is tampered
+     */
+    public static function decrypt(string $token): ?string
+    {
+        $key = hash('sha256', $_ENV['APP_KEY'] ?? 'ums_secret_key', true);
+        $decoded = base64_decode(strtr($token, '-_', '+/'));
+        if (!$decoded || strlen($decoded) <= 16) {
+            return null;
+        }
+        $iv = substr($decoded, 0, 16);
+        $ciphertext = substr($decoded, 16);
+        $decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        return $decrypted !== false ? $decrypted : null;
+    }
+
     /**
      * Validate password against complexity rules defined in Settings.
      * Returns an array of error messages, or empty array if valid.

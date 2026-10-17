@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Core\Security;
 use App\Core\Session;
 
 class LogController extends Controller
@@ -91,6 +92,10 @@ class LogController extends Controller
         
         $data = $stmt->fetchAll();
 
+        foreach ($data as &$row) {
+            $row['id'] = Security::encodeId((int)$row['id']);
+        }
+
         $this->json([
             "draw" => intval($draw),
             "recordsTotal" => intval($totalRecords),
@@ -176,6 +181,11 @@ class LogController extends Controller
         $stmt->execute();
         
         $data = $stmt->fetchAll();
+
+        foreach ($data as &$row) {
+            $row['id'] = Security::encodeId((int)$row['id']);
+            $row['record_id'] = Security::encodeId((int)$row['record_id']);
+        }
 
         $this->json([
             "draw" => intval($draw),

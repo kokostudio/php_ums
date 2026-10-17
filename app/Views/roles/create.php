@@ -80,7 +80,7 @@
                                 <?php foreach ($perms as $perm): ?>
                                     <label class="inline-flex items-start cursor-pointer group p-2 -m-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                                         <div class="pt-0.5">
-                                            <input type="checkbox" name="permissions[]" value="<?php echo $perm['id'] ?>" class="perm-checkbox w-4 h-4 text-primary-600 border-slate-300 dark:border-slate-500 rounded-sm focus:ring-primary-500 transition-all shadow-sm" data-module="<?php echo $module ?>">
+                                            <input type="checkbox" name="permissions[]" value="<?php echo \App\Core\Security::encodeId((int)$perm['id']) ?>" class="perm-checkbox w-4 h-4 text-primary-600 border-slate-300 dark:border-slate-500 rounded-sm focus:ring-primary-500 transition-all shadow-sm" data-module="<?php echo $module ?>">
                                         </div>
                                         <div class="ml-3 flex-1">
                                             <span class="block text-sm font-medium text-gray-800 dark:text-slate-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors capitalize"><?php echo htmlspecialchars($perm['action']) ?></span>

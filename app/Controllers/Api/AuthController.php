@@ -55,11 +55,14 @@ class AuthController
             $issuedAt = time();
             $expire = $issuedAt + 3600; // 1 hour token
 
+            $userIdHash = Security::encodeId((int)$user['id']);
+            $roleIdHash = Security::encodeId((int)$user['role_id']);
+
             $payload = [
                 'iat'  => $issuedAt,
                 'exp'  => $expire,
-                'sub'  => $user['id'],
-                'role' => $user['role_id'],
+                'sub'  => $userIdHash,
+                'role' => $roleIdHash,
                 'user' => $user['username']
             ];
 
@@ -70,9 +73,9 @@ class AuthController
                 'token' => $jwt,
                 'expires_in' => 3600,
                 'user' => [
-                    'id' => $user['id'],
+                    'id' => $userIdHash,
                     'username' => $user['username'],
-                    'role_id' => $user['role_id']
+                    'role_id' => $roleIdHash
                 ]
             ]);
 
@@ -89,10 +92,20 @@ class AuthController
             return $this->json(['error' => 'Not authenticated'], 401);
         }
 
+        $realId = is_numeric($jwtUser['sub']) ? (int)$jwtUser['sub'] : Security::decodeId((string)$jwtUser['sub']);
+        if (!$realId) {
+            return $this->json(['error' => 'Invalid user token'], 401);
+        }
+
         $db = Database::getInstance();
         $stmt = $db->prepare("SELECT id, username, email, role_id, status FROM users WHERE id = :id");
-        $stmt->execute(['id' => $jwtUser['sub']]);
+        $stmt->execute(['id' => $realId]);
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $user['id'] = Security::encodeId((int)$user['id']);
+            $user['role_id'] = Security::encodeId((int)$user['role_id']);
+        }
 
         return $this->json(['success' => true, 'user' => $user]);
     }

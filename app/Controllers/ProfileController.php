@@ -273,6 +273,10 @@ class ProfileController extends Controller
         $stmt->execute(['id' => $userId]);
         $sessions = $stmt->fetchAll();
 
+        foreach ($sessions as &$session) {
+            $session['hash_id'] = Security::encrypt($session['id']);
+        }
+
         $this->view('profile/sessions', [
             'pageTitle' => 'Active Sessions',
             'sessions' => $sessions,
@@ -283,19 +287,33 @@ class ProfileController extends Controller
     public function revokeSession($id)
     {
         Security::checkCsrf();
+        $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') || 
+                  (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+
         $db = Database::getInstance();
         $userId = Session::get('user_id');
 
+        // Decrypt the encrypted token, or fallback to raw ID
+        $realSessionId = Security::decrypt($id) ?? $id;
+
         // Prevent revoking the current session from here (use logout instead)
-        if ($id === session_id()) {
+        if ($realSessionId === session_id()) {
+            if ($isAjax) {
+                return $this->json(['success' => false, 'message' => 'Cannot revoke current session. Please use logout instead.'], 400);
+            }
             Session::setFlash('error', 'Cannot revoke current session. Please use logout instead.');
             $this->redirect('/profile/sessions');
         }
 
         $stmt = $db->prepare("DELETE FROM user_sessions WHERE id = :id AND user_id = :user_id");
-        $stmt->execute(['id' => $id, 'user_id' => $userId]);
+        $stmt->execute(['id' => $realSessionId, 'user_id' => $userId]);
 
-        Logger::activity("Revoked active session: {$id}");
+        Logger::activity("Revoked an active session.");
+
+        if ($isAjax) {
+            return $this->json(['success' => true, 'message' => __('messages.session_revoked')]);
+        }
+
         Session::setFlash('success', __('messages.session_revoked'));
         $this->redirect('/profile/sessions');
     }

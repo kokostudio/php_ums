@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Core\Security;
 use App\Core\Session;
 
 class NotificationController extends Controller
@@ -16,6 +17,11 @@ class NotificationController extends Controller
         $stmt = $db->prepare("SELECT * FROM notifications WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 20");
         $stmt->execute(['user_id' => $userId]);
         $notifications = $stmt->fetchAll();
+
+        foreach ($notifications as &$n) {
+            $n['id'] = Security::encodeId((int)$n['id']);
+            unset($n['user_id']);
+        }
 
         $unreadCountStmt = $db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = 0");
         $unreadCountStmt->execute(['user_id' => $userId]);
@@ -35,9 +41,12 @@ class NotificationController extends Controller
         $userId = Session::get('user_id');
 
         if ($id) {
-            $db = Database::getInstance();
-            $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = :id AND user_id = :user_id");
-            $stmt->execute(['id' => $id, 'user_id' => $userId]);
+            $realId = is_numeric($id) ? (int)$id : Security::decodeId((string)$id);
+            if ($realId) {
+                $db = Database::getInstance();
+                $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = :id AND user_id = :user_id");
+                $stmt->execute(['id' => $realId, 'user_id' => $userId]);
+            }
         }
 
         $this->json(['success' => true]);

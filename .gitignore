@@ -10,7 +10,7 @@ node_modules/
 package-lock.json
 
 # Logs & DB
-logs/
+/storage/logs/
 *.log
 *.sqlite
 
