@@ -6,9 +6,9 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
     <!-- Sidebar Navigation -->
-    <div class="lg:col-span-1">
+    <div class="lg:col-span-1 lg:sticky lg:top-6 self-start z-10">
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-colors">
             <ul class="flex flex-col py-2">
                 <li>
