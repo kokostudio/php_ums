@@ -331,4 +331,20 @@ To ensure absolute compliance with the system architecture, always verify the fo
   1. In `RateLimiter::check()`, always check elapsed time against `updated_at` (sliding time window) rather than letting old attempts persist indefinitely.
   2. Always call `RateLimiter::reset('/login')` upon successful login and 2FA authentication in `AuthController`.
 
+### 23. YouTube-Style Top Preloader Progress Bar (CRITICAL UX STANDARD)
+- **The Issue:** In multi-page applications, clicking links or navigating between pages without immediate visual feedback makes the app feel sluggish or unresponsive.
+- **The Rule:** All layouts and page navigation flows MUST maintain the YouTube-style top preloader progress bar.
+- **The Solution:**
+  1. Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right after the opening `<body>` tag in all layout files (`app/Views/layouts/*.php`).
+  2. The component automatically intercepts internal `<a>` clicks, form submissions, and non-polling Axios AJAX calls.
+  3. Preserves state across navigation via `sessionStorage` for seamless transition across page unload/load boundaries.
+
+### 24. Sticky Side Navigation & Tabs on Scroll (LAYOUT CONVENTION)
+- **The Issue:** On long forms or multi-tab settings screens, scrolling down causes the navigation sidebar/tabs to disappear off-screen, forcing users to scroll all the way back to the top to switch tabs.
+- **The Rule:** In multi-column layouts with side navigation or tabs (e.g. `settings/index.php`), the side navigation MUST remain sticky during scrolling on desktop screens.
+- **The Solution:**
+  1. Add `items-start` to the parent Grid container (e.g. `<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">`) to cancel CSS grid's default `stretch`.
+  2. Add `lg:sticky lg:top-6 self-start z-10` to the sidebar/tab column so it locks comfortably 24px below the top navbar during scrolling on desktop (`lg:`), while stacking normally on mobile.
+
+
 

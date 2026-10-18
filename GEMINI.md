@@ -52,4 +52,8 @@ no API key, $0).
 **AJAX DELETE OPERATIONS & GET FALLBACKS**: NEVER use traditional HTML `form.submit()` for delete operations. Always use `axios.post` with SweetAlert2 (`Swal.fire`) confirmation dialogs (matching `users/index.php` and `roles/index.php`) so the browser does not navigate to `/delete` URLs or display raw JSON. Controllers must handle both AJAX (JSON response) and standard POST (redirect with flash). In `public/index.php`, always register a GET fallback redirect for `/resource/{id}/delete` back to the index view to prevent 404 errors if users reload or directly navigate.
 
 **RATE LIMITING & 429 PREVENTION**: Always call `RateLimiter::reset('/login')` upon successful login and 2FA verification. `RateLimiter` must use a sliding time window (relative to `updated_at`) so failed attempts do not accumulate indefinitely and lock users out unexpectedly.
+
+**YOUTUBE-STYLE PRELOADER PROGRESS BAR**: All layouts (`app/Views/layouts/*.php`) and page navigation flows must maintain the YouTube-style top preloader progress bar (`app/Views/layouts/partials/progress_bar.php`). Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right after `<body>` in any layout. It automatically handles link clicks, form submissions, page transitions, and non-polling AJAX requests.
+
+**STICKY SIDE NAVIGATION & TABS ON SCROLL**: In multi-column views with side navigation or tabs alongside long forms/content (such as `settings/index.php`), always ensure the sidebar/tab card is sticky on scroll (`lg:sticky lg:top-6 self-start z-10` with `items-start` on the parent grid container) so navigation stays immediately accessible without requiring users to scroll all the way back to the top.
 <!-- rules:end -->
