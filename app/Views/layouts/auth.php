@@ -79,6 +79,8 @@ $currentLocale = \App\Core\Lang::locale();
 ?>
 <body class="antialiased min-h-screen flex flex-col md:flex-row transition-colors duration-300">
 
+    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
+
     <!-- LEFT PANEL (BRANDING) -->
     <div class="w-full md:w-5/12 lg:w-1/2 relative flex flex-col justify-between p-8 md:p-16 order-2 md:order-1 min-h-[50vh] md:min-h-screen <?= $bgClass ?>" style="<?= $bgStyle ?>">
         <!-- Background Overlay -->

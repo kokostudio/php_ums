@@ -315,6 +315,8 @@
 </head>
 <body class="text-gray-800 dark:text-slate-200 antialiased h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
+    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
+
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
