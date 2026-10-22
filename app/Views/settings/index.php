@@ -36,6 +36,11 @@
                         <i class="ph ph-share-network mr-3 text-lg"></i> <?= __('settings.social_login') ?? 'Social Login' ?>
                     </a>
                 </li>
+                <li>
+                    <a href="/settings/design_spec" class="flex items-center px-6 py-3 transition-colors <?= $tab === 'design_spec' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-medium border-r-2 border-primary-600 dark:border-primary-500' : 'text-gray-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300' ?>">
+                        <i class="ph ph-file-text mr-3 text-lg text-indigo-500"></i> <?= __('settings.design_spec') ?>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -872,6 +877,8 @@
                     </div>
                 </div>
             </form>
+            <?php elseif ($tab === 'design_spec'): ?>
+                <?php require __DIR__ . '/design_spec.php'; ?>
             <?php endif; ?>
 
         </div>

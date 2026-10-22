@@ -145,6 +145,15 @@ class SearchController extends Controller
         ];
 
         $menus[] = [
+            'title' => __('settings.design_spec') . ' (Design Specification)',
+            'description' => 'เอกสารข้อกำหนดการออกแบบระบบ สถาปัตยกรรม ฐานข้อมูล และมาตรฐาน UI/UX / System architecture & design spec',
+            'url' => '/settings/design_spec',
+            'icon' => 'ph-file-text',
+            'color' => 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 dark:text-indigo-400',
+            'keywords' => 'design spec specification ข้อกำหนดการออกแบบ สถาปัตยกรรม architecture database schema ui ux'
+        ];
+
+        $menus[] = [
             'title' => (__('profile.title') ?? 'โปรไฟล์ของฉัน') . ' (My Profile)',
             'description' => 'จัดการข้อมูลส่วนตัว รูปโปรไฟล์ เปลี่ยนรหัสผ่าน และเปิดใช้งาน 2FA / Profile & 2FA',
             'url' => '/profile',

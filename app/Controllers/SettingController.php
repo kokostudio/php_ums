@@ -14,7 +14,7 @@ class SettingController extends Controller
     public function index($tab = 'general')
     {
         // Valid tabs
-        $validTabs = ['general', 'login', 'translations', 'security', 'social'];
+        $validTabs = ['general', 'login', 'translations', 'security', 'social', 'design_spec'];
         
         if (!in_array($tab, $validTabs)) {
             $tab = 'general';
@@ -46,7 +46,11 @@ class SettingController extends Controller
     public function update($tab = 'general')
     {
         Security::checkCsrf();
-        $tab = in_array($tab, ['general', 'login', 'security', 'social', 'translations']) ? $tab : 'general';
+        $tab = in_array($tab, ['general', 'login', 'security', 'social', 'translations', 'design_spec']) ? $tab : 'general';
+        if ($tab === 'design_spec') {
+            $this->redirect('/settings/design_spec');
+            return;
+        }
 
         // Keys allowed per tab
         $textKeysByTab = [
