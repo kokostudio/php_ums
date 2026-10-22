@@ -1,17 +1,16 @@
 <?php
 /**
  * YouTube-Style Top Preloader Progress Bar Component
- * Provides a sleek, animated top progress bar during page navigation and AJAX transitions.
+ * Provides a sleek, crisp, flat top progress bar during page navigation and AJAX transitions.
+ * Clean YouTube red bar without blur or fuzzy glow (ไม่มีฟุ้ง ๆ).
  * Engineered for Chromium Paint-Holding: zero white flash, zero parser-blocking FOUC.
  */
 ?>
-<!-- Top Loading Progress Bar (YouTube Style) -->
-<div id="yt-progress-bar" class="yt-progress-bar" style="width: 0%; opacity: 0;">
-    <div class="yt-progress-bar-peg"></div>
-</div>
+<!-- Top Loading Progress Bar (YouTube Style - Flat & Crisp) -->
+<div id="yt-progress-bar" class="yt-progress-bar" style="width: 0%; opacity: 0;"></div>
 
 <style>
-    /* ── YouTube-Style Top Progress Bar ── */
+    /* ── YouTube-Style Top Progress Bar (Flat, Clean, No Glow/Blur) ── */
     #yt-progress-bar {
         position: fixed;
         top: 0;
@@ -19,24 +18,14 @@
         height: 3px;
         width: 0%;
         opacity: 0;
-        background: linear-gradient(90deg, #ef4444 0%, #ff2d55 50%, #f43f5e 100%);
-        box-shadow: 0 0 10px rgba(239, 68, 68, 0.7), 0 0 4px rgba(239, 68, 68, 0.9);
+        background: #ff0000;
+        box-shadow: none !important;
         z-index: 99999999;
         pointer-events: none;
         transition: width 200ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 250ms ease;
     }
     #yt-progress-bar.yt-active {
         opacity: 1 !important;
-    }
-    #yt-progress-bar .yt-progress-bar-peg {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 100px;
-        height: 100%;
-        box-shadow: 0 0 14px #ef4444, 0 0 6px #ef4444;
-        opacity: 1;
-        transform: rotate(3deg) translateY(-2px);
     }
 </style>
 
