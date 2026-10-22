@@ -11,6 +11,23 @@ return [
     'sign_in'           => 'เข้าสู่ระบบ',
     'sign_in_subtitle'  => 'เข้าสู่ระบบด้วยบัญชีของคุณ',
 
+    // Registration
+    'register'          => 'สมัครสมาชิก',
+    'register_subtitle' => 'สมัครสมาชิกเพื่อเข้าใช้งานระบบ',
+    'username_required' => 'กรุณากรอกชื่อผู้ใช้',
+    'password_required' => 'กรุณากรอกรหัสผ่าน',
+    'email_required'    => 'กรุณากรอกอีเมล',
+    'confirm_password_required' => 'กรุณายืนยันรหัสผ่าน',
+    'password_mismatch' => 'รหัสผ่านไม่ตรงกัน',
+    'email'             => 'อีเมล',
+    'full_name'         => 'ชื่อ-นามสกุล',
+    'already_have_account' => 'มีบัญชีผู้ใช้งานอยู่แล้ว?',
+    'dont_have_account' => 'ยังไม่มีบัญชีผู้ใช้งาน?',
+    'register_now'      => 'สมัครสมาชิกที่นี่',
+    'username_or_email_ph' => 'อีเมล หรือ ชื่อผู้ใช้งาน',
+    'resend_verification_email' => 'ส่งอีเมลยืนยันอีกครั้ง',
+    'or_login_with'     => 'หรือเข้าสู่ระบบด้วย',
+
     'forgot_password_title'    => 'ลืมรหัสผ่าน',
     'forgot_password_subtitle' => 'กรอกอีเมลเพื่อรับลิงก์รีเซ็ตรหัสผ่าน',
     'email_address'     => 'อีเมล',

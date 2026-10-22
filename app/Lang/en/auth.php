@@ -11,6 +11,23 @@ return [
     'sign_in'           => 'Sign In',
     'sign_in_subtitle'  => 'Sign in to your account',
 
+    // Registration
+    'register'          => 'Register',
+    'register_subtitle' => 'Create a new account',
+    'username_required' => 'Username is required',
+    'password_required' => 'Password is required',
+    'email_required'    => 'Email is required',
+    'confirm_password_required' => 'Please confirm your password',
+    'password_mismatch' => 'Passwords do not match',
+    'email'             => 'Email',
+    'full_name'         => 'Full Name',
+    'already_have_account' => 'Already have an account?',
+    'dont_have_account' => "Don't have an account?",
+    'register_now'      => 'Register here',
+    'username_or_email_ph' => 'Email or Username',
+    'resend_verification_email' => 'Resend verification email',
+    'or_login_with'     => 'Or sign in with',
+
     'forgot_password_title'    => 'Forgot Password',
     'forgot_password_subtitle' => 'Enter your email to receive a password reset link',
     'email_address'     => 'Email Address',

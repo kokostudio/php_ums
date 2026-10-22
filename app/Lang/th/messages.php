@@ -53,4 +53,5 @@ return [
     'user_not_found' => 'ไม่พบผู้ใช้',
     'user_email_exists_other' => 'อีเมลถูกใช้งานโดยบัญชีอื่นแล้ว',
     'user_updated' => 'อัปเดตผู้ใช้สำเร็จ',
+    'access_denied' => 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
 ];

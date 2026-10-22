@@ -8,6 +8,8 @@ return [
     'delete'        => 'ลบ',
     'edit'          => 'แก้ไข',
     'create'        => 'เพิ่มใหม่',
+    'add'           => 'เพิ่ม',
+    'print'         => 'พิมพ์',
     'search'        => 'ค้นหา',
     'filter'        => 'กรอง',
     'reset'         => 'รีเซ็ต',
@@ -24,6 +26,18 @@ return [
     'import'        => 'นำเข้า',
     'select_all'    => 'เลือกทั้งหมด',
     'deselect_all'  => 'ยกเลิกทั้งหมด',
+    'please_wait'   => 'กรุณารอสักครู่',
+    'welcome'       => 'ยินดีต้อนรับ',
+    'description'   => 'รายละเอียด',
+    'total'         => 'รวมทั้งหมด',
+    'upload_image'  => 'อัปโหลดรูปภาพ',
+    'change_image'  => 'เปลี่ยนรูปภาพ',
+    'phone'         => 'เบอร์โทรศัพท์',
+    'email'         => 'อีเมล',
+    'remaining'     => 'คงเหลือ',
+    'customer_name' => 'ชื่อลูกค้า',
+    'custom'        => 'กำหนดเอง',
+    'baht'          => 'บาท',
 
     // Status
     'status'        => 'สถานะ',
@@ -32,6 +46,13 @@ return [
     'banned'        => 'ถูกระงับ',
     'loading'       => 'กำลังโหลด...',
     'no_data'       => 'ไม่มีข้อมูล',
+    'pinned'        => 'ปักหมุดแล้ว',
+
+    // Maintenance
+    'maintenance'       => 'ระบบอยู่ในโหมดบำรุงรักษา',
+    'maintenance_title' => 'ปิดปรับปรุงระบบชั่วคราว',
+    'maintenance_desc'  => 'เรากำลังดำเนินการปรับปรุงระบบเพื่อเพิ่มประสิทธิภาพ กรุณากลับมาใหม่อีกครั้งในภายหลัง',
+    'unexpected_error'  => 'เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง',
 
     // Navigation
     'dashboard'     => 'แดชบอร์ด',
@@ -70,9 +91,26 @@ return [
     'of'            => 'จาก',
     'entries'       => 'รายการ',
 
+    // DataTables Translations
+    'dt_empty_table'     => 'ไม่มีข้อมูลในตาราง',
+    'dt_zero_records'    => 'ไม่พบข้อมูลที่ค้นหา',
+    'dt_info'            => 'แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ',
+    'dt_info_empty'      => 'แสดง 0 ถึง 0 จาก 0 รายการ',
+    'dt_info_filtered'   => '(กรองจากทั้งหมด _MAX_ รายการ)',
+    'dt_length_menu'     => 'แสดง _MENU_ รายการ',
+    'dt_search'          => 'ค้นหา:',
+    'dt_first'           => 'หน้าแรก',
+    'dt_last'            => 'หน้าสุดท้าย',
+    'dt_next'            => 'ถัดไป',
+    'dt_previous'        => 'ก่อนหน้า',
+    'no_results_for'     => 'ไม่พบผลลัพธ์สำหรับ',
+    'try_another_search' => 'กรุณาลองป้อนคำค้นหาคำอื่น',
+
     // Confirm dialog
     'delete_confirm_title' => 'ยืนยันการลบ?',
     'delete_confirm_text'  => 'การดำเนินการนี้ไม่สามารถย้อนกลับได้',
+    'confirm_delete_desc'  => 'การกระทำนี้ไม่สามารถย้อนกลับได้',
+    'yes_delete'           => 'ใช่, ลบข้อมูล',
     'delete_success'       => 'ลบข้อมูลสำเร็จ',
     'delete_error'         => 'เกิดข้อผิดพลาดในการลบ',
 

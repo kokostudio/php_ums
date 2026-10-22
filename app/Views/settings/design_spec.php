@@ -11,10 +11,10 @@
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800">
-                    <i class="ph ph-shield-check mr-1 text-sm"></i> Core Spec v1.0
+                    <i class="ph ph-shield-check mr-1 text-sm"></i> <?= __('settings.ds_version_badge') ?>
                 </span>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800">
-                    <i class="ph ph-check mr-1 text-sm"></i> Pure PHP 8.4+ MVC
+                    <i class="ph ph-check mr-1 text-sm"></i> <?= __('settings.ds_runtime_badge') ?>
                 </span>
             </div>
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
@@ -41,7 +41,7 @@
     <!-- Quick Jump Sub-Navigation -->
     <div class="bg-gray-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-gray-100 dark:border-slate-800">
         <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-2 px-1">
-            <i class="ph ph-list-numbers mr-1"></i> Quick Jump Navigation (ข้ามไปยังหัวข้อ)
+            <i class="ph ph-list-numbers mr-1"></i> <?= __('settings.ds_quick_jump') ?>
         </div>
         <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
             <a href="#sec-overview" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200/80 dark:border-slate-700 shadow-xs whitespace-nowrap transition-colors">
@@ -84,12 +84,12 @@
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_overview') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Pure PHP 8.4+ MVC Standard Core & Extensible Enterprise Architecture</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_overview_sub') ?></p>
             </div>
         </div>
 
         <p class="text-sm text-gray-600 dark:text-slate-300 leading-relaxed">
-            ระบบ <strong>Standard Core System (PHP UMS)</strong> ได้รับการออกแบบภายใต้แนวคิด <strong>"Core as a Manager & Modular Engine"</strong> เพื่อเป็นโครงสร้างแกนกลางสมบูรณ์แบบ (Enterprise-Grade Boilerplate) สำหรับการจัดการบัญชีผู้ใช้งาน, ระบบสิทธิ์ (RBAC), ความปลอดภัยระดับสูง (Hashids, 2FA, Multi-channel CSRF, Rate Limiting), บันทึกประวัติกิจกรรมและการตรวจสอบ (Activity & Audit Logs), และพจนานุกรมคำแปลภาษาคู่ขนาน 100% โดยไม่มีการครอบทับของเฟรมเวิร์กขนาดใหญ่ พร้อมนำไปต่อยอดเป็นระบบธุรกิจต่างๆ ได้อย่างไร้รอยต่อ
+            <?= __('settings.ds_overview_p') ?>
         </p>
 
         <!-- 2 Main Pillars Grid -->
@@ -101,16 +101,16 @@
                         <i class="ph ph-cube"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">Pure PHP 8.4+ MVC Architecture</h4>
-                        <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">สถาปัตยกรรมไร้เฟรมเวิร์ก ประสิทธิภาพสูงสุด</span>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm"><?= __('settings.ds_pillar1_title') ?></h4>
+                        <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium"><?= __('settings.ds_pillar1_sub') ?></span>
                     </div>
                 </div>
                 <ul class="text-xs text-gray-600 dark:text-slate-300 space-y-2 list-disc list-inside">
-                    <li>ทำงานบน PHP 8.4+ รองรับ Strict Types, Null-Safe Operators และ Named Arguments</li>
-                    <li>โหลดคลาสแบบ PSR-4 ผ่าน Composer โดยไม่มี Dependency ฟุ่มเฟือย</li>
-                    <li>เราเตอร์แบบ Clean URL รองรับ Dynamic Parameters และ Middleware Pipelines</li>
-                    <li>การเชื่อมต่อฐานข้อมูล PDO Prepared Statements 100% ป้องกัน SQL Injection อย่างเด็ดขาด</li>
-                    <li>ระบบความปลอดภัยหลายชั้น (Rate Limiting, CSRF, 2FA, Session Revoke)</li>
+                    <li><?= __('settings.ds_pillar1_item1') ?></li>
+                    <li><?= __('settings.ds_pillar1_item2') ?></li>
+                    <li><?= __('settings.ds_pillar1_item3') ?></li>
+                    <li><?= __('settings.ds_pillar1_item4') ?></li>
+                    <li><?= __('settings.ds_pillar1_item5') ?></li>
                 </ul>
             </div>
 
@@ -121,16 +121,16 @@
                         <i class="ph ph-tree-structure"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">Extensible Modular Foundation</h4>
-                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">โครงสร้างฐานรองรับการต่อขยายทุกประเภทระบบ</span>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm"><?= __('settings.ds_pillar2_title') ?></h4>
+                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium"><?= __('settings.ds_pillar2_sub') ?></span>
                     </div>
                 </div>
                 <ul class="text-xs text-gray-600 dark:text-slate-300 space-y-2 list-disc list-inside">
-                    <li>ระบบผู้ใช้งานและบทบาท RBAC ละเอียดระดับโมดูลและแอคชัน (<code class="text-emerald-600 dark:text-emerald-400 font-mono">module:action</code>)</li>
-                    <li>บันทึกประวัติความเปลี่ยนแปลงระดับฟิลด์ JSON (<code class="text-emerald-600 dark:text-emerald-400 font-mono">audit_logs</code>) เปรียบเทียบ Old/New Values สด</li>
-                    <li>พจนานุกรมแปลภาษา 2 ภาษา (TH/EN) จัดเก็บใน Database พร้อม UI ปรับแต่งคำแปลได้ทันที</li>
-                    <li>แถบโหลด YouTube-Style Progress Bar พร้อมระบบป้องกัน FOUC / จอกระพริบ</li>
-                    <li>รองรับการต่อขยายเป็นระบบ POS, E-Commerce, CRM, HR, คลังสินค้า หรือระบบสั่งอาหารได้ทันที</li>
+                    <li><?= __('settings.ds_pillar2_item1') ?></li>
+                    <li><?= __('settings.ds_pillar2_item2') ?></li>
+                    <li><?= __('settings.ds_pillar2_item3') ?></li>
+                    <li><?= __('settings.ds_pillar2_item4') ?></li>
+                    <li><?= __('settings.ds_pillar2_item5') ?></li>
                 </ul>
             </div>
         </div>
@@ -138,24 +138,24 @@
         <!-- 4 Golden Principles -->
         <div class="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40">
             <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 flex items-center gap-1.5 mb-2.5">
-                <i class="ph ph-seal-check text-base"></i> 4 กฎเหล็กของสถาปัตยกรรม (4 Golden Architecture Principles)
+                <i class="ph ph-seal-check text-base"></i> <?= __('settings.ds_golden_rules_title') ?>
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                 <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-100 dark:border-slate-800">
-                    <span class="font-bold text-gray-800 dark:text-white block mb-1">1. Zero Raw ID Exposure</span>
-                    <span class="text-gray-500 dark:text-slate-400">ห้ามเปิดเผย ID ตัวเลขเด็ดขาด ทุก ID ต้องเข้ารหัสเป็น Hashids 8 หลัก</span>
+                    <span class="font-bold text-gray-800 dark:text-white block mb-1"><?= __('settings.ds_rule1_title') ?></span>
+                    <span class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_rule1_desc') ?></span>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-100 dark:border-slate-800">
-                    <span class="font-bold text-gray-800 dark:text-white block mb-1">2. Instant Load & Zero FOUC</span>
-                    <span class="text-gray-500 dark:text-slate-400">เรนเดอร์ Client-Side DataTables ทันที และมีสคริปต์กันจอกระพริบใน Head เสมอ</span>
+                    <span class="font-bold text-gray-800 dark:text-white block mb-1"><?= __('settings.ds_rule2_title') ?></span>
+                    <span class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_rule2_desc') ?></span>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-100 dark:border-slate-800">
-                    <span class="font-bold text-gray-800 dark:text-white block mb-1">3. Shared Hosting Ready</span>
-                    <span class="text-gray-500 dark:text-slate-400">ทำงานได้บน Shared Hosting (cPanel / DirectAdmin) ผ่าน .htaccess โดยไม่ต้องมี SSH</span>
+                    <span class="font-bold text-gray-800 dark:text-white block mb-1"><?= __('settings.ds_rule3_title') ?></span>
+                    <span class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_rule3_desc') ?></span>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-100 dark:border-slate-800">
-                    <span class="font-bold text-gray-800 dark:text-white block mb-1">4. 100% Bilingual Parity</span>
-                    <span class="text-gray-500 dark:text-slate-400">คีย์ภาษาไทย (TH) และอังกฤษ (EN) ต้องตรงกัน 1:1 ครบทุกจุด 0 missing key</span>
+                    <span class="font-bold text-gray-800 dark:text-white block mb-1"><?= __('settings.ds_rule4_title') ?></span>
+                    <span class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_rule4_desc') ?></span>
                 </div>
             </div>
         </div>
@@ -171,7 +171,7 @@
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_tech') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Pure MVC Pipeline, Security Stack, Touchpoints & Real-Time Sync Layer</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_tech_sub') ?></p>
             </div>
         </div>
 
@@ -180,9 +180,9 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-gray-50 dark:bg-slate-900/80 text-gray-500 dark:text-slate-400 font-semibold border-b border-gray-100 dark:border-slate-800">
                     <tr>
-                        <th class="px-4 py-3">Layer (เลเยอร์)</th>
-                        <th class="px-4 py-3">Tech & Libraries (เทคโนโลยี)</th>
-                        <th class="px-4 py-3">Implementation & Scope (บทบาทและหน้าที่)</th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_layer') ?></th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_tech') ?></th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_scope') ?></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-slate-300">
@@ -235,36 +235,36 @@
         <!-- High-Level Flow Representation -->
         <div class="p-5 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800">
             <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-slate-400 mb-3 flex items-center gap-2">
-                <i class="ph ph-git-merge text-indigo-500 text-base"></i> High-Level Architecture Flowchart
+                <i class="ph ph-git-merge text-indigo-500 text-base"></i> <?= __('settings.ds_flow_title') ?>
             </h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-center text-xs">
                 <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs">
                     <span class="inline-block p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg mb-2">
                         <i class="ph ph-devices text-xl"></i>
                     </span>
-                    <h5 class="font-bold text-gray-900 dark:text-white">1. Client Touchpoints</h5>
-                    <p class="text-gray-500 dark:text-slate-400 mt-1">Web Desktop, Mobile Browser, Tablet, PWA & External API Consumers</p>
+                    <h5 class="font-bold text-gray-900 dark:text-white"><?= __('settings.ds_flow1_title') ?></h5>
+                    <p class="text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.ds_flow1_desc') ?></p>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs">
                     <span class="inline-block p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg mb-2">
                         <i class="ph ph-shield-check text-xl"></i>
                     </span>
-                    <h5 class="font-bold text-gray-900 dark:text-white">2. Security & Routing Layer</h5>
-                    <p class="text-gray-500 dark:text-slate-400 mt-1">.htaccess &rarr; Router &rarr; Auth, RBAC, RateLimit & CSRF Middlewares</p>
+                    <h5 class="font-bold text-gray-900 dark:text-white"><?= __('settings.ds_flow2_title') ?></h5>
+                    <p class="text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.ds_flow2_desc') ?></p>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs">
                     <span class="inline-block p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg mb-2">
                         <i class="ph ph-cpu text-xl"></i>
                     </span>
-                    <h5 class="font-bold text-gray-900 dark:text-white">3. Core Controllers & Services</h5>
-                    <p class="text-gray-500 dark:text-slate-400 mt-1">Auth, Users, Roles, Logs, Settings, Profile, Hashids & Lang Services</p>
+                    <h5 class="font-bold text-gray-900 dark:text-white"><?= __('settings.ds_flow3_title') ?></h5>
+                    <p class="text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.ds_flow3_desc') ?></p>
                 </div>
                 <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs">
                     <span class="inline-block p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg mb-2">
                         <i class="ph ph-database text-xl"></i>
                     </span>
-                    <h5 class="font-bold text-gray-900 dark:text-white">4. Persistence & Storage</h5>
-                    <p class="text-gray-500 dark:text-slate-400 mt-1">MySQL InnoDB (12 Tables) + Storage (Error Logs, Uploads)</p>
+                    <h5 class="font-bold text-gray-900 dark:text-white"><?= __('settings.ds_flow4_title') ?></h5>
+                    <p class="text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.ds_flow4_desc') ?></p>
                 </div>
             </div>
         </div>
@@ -280,7 +280,7 @@
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_dir') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Project Tree Structure & Coding Isolation Guidelines</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_dir_sub') ?></p>
             </div>
         </div>
 
@@ -292,10 +292,10 @@ php_ums/
 │   │   └── Api/                           <span class="text-indigo-400"># Stateless JWT API Endpoints (/api/v1/login, /api/v1/me)</span>
 │   ├── Core/                              <span class="text-emerald-400"># Config, Controller, Database, ErrorHandler, Lang, Logger, Model, RateLimiter, RBAC, Router, Security, Session, Settings, View</span>
 │   ├── Lang/                              <span class="text-amber-400"># 100% Bilingual Dictionary Files</span>
-│   │   ├── th/                            <span class="text-amber-400"># ภาษาไทย (auth, common, dashboard, logs, profile, roles, settings, users, ฯลฯ)</span>
+│   │   ├── th/                            <span class="text-amber-400"># Thai translations (auth, common, dashboard, logs, profile, roles, settings, users, etc.)</span>
 │   │   └── en/                            <span class="text-amber-400"># English (Symmetric 1:1 match with Thai, 0 missing key)</span>
 │   ├── Middlewares/                       <span class="text-purple-400"># AuthMiddleware, GuestMiddleware, PermissionMiddleware, RateLimitMiddleware, JwtMiddleware</span>
-│   ├── Models/                            <span class="text-blue-400"># Core Domain Models (User, Role, ActivityLog, AuditLog, Notification, ฯลฯ)</span>
+│   ├── Models/                            <span class="text-blue-400"># Core Domain Models (User, Role, ActivityLog, AuditLog, Notification, etc.)</span>
 │   ├── Views/                             <span class="text-indigo-400"># MVC View Templates</span>
 │   │   ├── auth/                          <span class="text-indigo-400"># Login, Register, 2FA, Forgot & Reset Password views</span>
 │   │   ├── dashboard/                     <span class="text-indigo-400"># Main Admin Dashboard with Realtime Analytics</span>
@@ -306,7 +306,7 @@ php_ums/
 │   │   ├── roles/                         <span class="text-indigo-400"># RBAC Roles & Module Permissions Matrix views</span>
 │   │   ├── settings/                      <span class="text-indigo-400"># System Settings (General, Login, Translations, Security, Social, Design Spec)</span>
 │   │   └── users/                         <span class="text-indigo-400"># User Management (CRUD tables, Hashids, Filters, SweetAlert2 Deletions)</span>
-│   └── helpers.php                        <span class="text-blue-400"># Global Helpers (__, formatDate, getSystemThemeConfig, ฯลฯ)</span>
+│   └── helpers.php                        <span class="text-blue-400"># Global Helpers (__, formatDate, getSystemThemeConfig, etc.)</span>
 ├── database/migrations/                   <span class="text-blue-400"># 16+ Database Migration Files (12 Core Tables Schema)</span>
 ├── public/                                <span class="text-amber-400"># Web Root (.htaccess, index.php, assets, uploads)</span>
 ├── storage/                               <span class="text-red-400"># Logs & Cache (storage/logs/error.log)</span>
@@ -326,63 +326,63 @@ php_ums/
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_db') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Relational Database Model: 12 Core UMS Tables & Integrity Specifications</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_db_sub') ?></p>
             </div>
         </div>
 
         <!-- Core Tables Grid -->
         <div>
             <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
-                <i class="ph ph-cube text-base"></i> <?= __('settings.ds_core_modules') ?>: 12 ตารางฐานข้อมูล
+                <i class="ph ph-cube text-base"></i> <?= __('settings.ds_core_modules') ?>: 12 <?= __('settings.ds_nav_db') ?>
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">roles</div>
-                    <p class="text-gray-500 dark:text-slate-400">กลุ่มบทบาทผู้ใช้ระบบ (Superadmin, Admin, Manager, Staff, User)</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_roles') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">permissions</div>
-                    <p class="text-gray-500 dark:text-slate-400">สิทธิ์การทำงานละเอียดระดับโมดูลและแอคชัน (<code class="font-mono">module:action</code>)</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_permissions') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">role_permissions</div>
-                    <p class="text-gray-500 dark:text-slate-400">ตารางความสัมพันธ์ Many-to-Many เชื่อมบทบาทเข้ากับสิทธิ์การใช้งาน</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_role_permissions') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">users</div>
-                    <p class="text-gray-500 dark:text-slate-400">บัญชีผู้ใช้ระบบ รหัสผ่านแฮช 2FA TOTP, OAuth โซเชียล และสถานะการเปิดใช้งาน</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_users') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">user_sessions</div>
-                    <p class="text-gray-500 dark:text-slate-400">ติดตามเซสชันที่กำลังออนไลน์ อุปกรณ์ IP, User-Agent และสั่งยกเลิกเซสชันทางไกล</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_user_sessions') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">password_resets</div>
-                    <p class="text-gray-500 dark:text-slate-400">โทเค็นสำหรับรีเซ็ตรหัสผ่านทางอีเมลพร้อมเวลาหมดอายุ (Token Expiration)</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_password_resets') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">activity_logs</div>
-                    <p class="text-gray-500 dark:text-slate-400">บันทึกพฤติกรรมและการเข้าใช้งานระบบทั่วไปของผู้ใช้ทุกคน</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_activity_logs') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">audit_logs</div>
-                    <p class="text-gray-500 dark:text-slate-400">บันทึกการเปลี่ยนแปลงระดับฟิลด์ JSON เปรียบเทียบ Old/New Values สด</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_audit_logs') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">system_settings</div>
-                    <p class="text-gray-500 dark:text-slate-400">ค่าคอนฟิกระบบแบบ Key-Value ทั้งข้อมูลเว็บ, ความปลอดภัย และโซเชียล OAuth</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_system_settings') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">translations</div>
-                    <p class="text-gray-500 dark:text-slate-400">พจนานุกรมคำแปลภาษาไทยและอังกฤษในฐานข้อมูล รองรับการแก้ไขแบบ Real-time</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_translations') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">notifications</div>
-                    <p class="text-gray-500 dark:text-slate-400">ระบบการแจ้งเตือนกระดิ่งด้านบน พร้อมสถานะอ่านแล้ว/ยังไม่ได้อ่าน</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_notifications') ?></p>
                 </div>
                 <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1">rate_limits</div>
-                    <p class="text-gray-500 dark:text-slate-400">บันทึกความถี่การส่งคำขอตาม IP & Endpoint ป้องกัน Brute-force และ DoS</p>
+                    <p class="text-gray-500 dark:text-slate-400"><?= __('settings.ds_table_rate_limits') ?></p>
                 </div>
             </div>
         </div>
@@ -390,7 +390,7 @@ php_ums/
         <!-- Relational Flow Diagram -->
         <div class="p-5 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800 space-y-3">
             <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-slate-400 flex items-center gap-2">
-                <i class="ph ph-git-fork text-indigo-500 text-base"></i> Core Entity Relationships (ความสัมพันธ์ระหว่างตาราง)
+                <i class="ph ph-git-fork text-indigo-500 text-base"></i> <?= __('settings.ds_entity_rel_title') ?>
             </h4>
             <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 font-mono text-xs text-gray-700 dark:text-slate-300 overflow-x-auto">
                 <div class="space-y-1.5 whitespace-nowrap">
@@ -416,7 +416,7 @@ php_ums/
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_security') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Hashids Masking, Two-Factor Authentication, Rate Limiting & Multi-channel CSRF</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_security_sub') ?></p>
             </div>
         </div>
 
@@ -425,10 +425,10 @@ php_ums/
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 space-y-2">
                 <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
                     <i class="ph ph-hash text-lg"></i>
-                    <span>5.1 Mandatory Hashids Masking</span>
+                    <span><?= __('settings.ds_sec_hashids_title') ?></span>
                 </div>
                 <p class="text-xs text-gray-600 dark:text-slate-400 leading-relaxed">
-                    ห้ามเปิดเผย Primary Key ตัวเลข (<code class="font-mono">id</code>) สู่ภายนอก ต้องใช้ <code class="text-indigo-500 font-mono">Security::encodeId()</code> เสมอ และใน Controller ต้องถอดรหัสด้วย <code class="text-indigo-500 font-mono">Security::decodeId()</code>
+                    <?= __('settings.ds_sec_hashids_desc') ?>
                 </p>
                 <div class="p-2.5 bg-gray-50 dark:bg-slate-800/80 rounded-xl font-mono text-[11px] text-gray-700 dark:text-slate-300">
                     <span class="text-emerald-500">GET</span> /users/<span class="text-indigo-500 font-bold">B3r9Q1zp</span>/edit<br>
@@ -440,10 +440,10 @@ php_ums/
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 space-y-2">
                 <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
                     <i class="ph ph-fingerprint text-lg"></i>
-                    <span>5.2 TOTP 2FA & Superadmin Protection</span>
+                    <span><?= __('settings.ds_sec_2fa_title') ?></span>
                 </div>
                 <p class="text-xs text-gray-600 dark:text-slate-400 leading-relaxed">
-                    รองรับ Google Authenticator และมีนโยบาย <code class="font-mono text-emerald-500">force_2fa_admin</code> พร้อมการป้องกันบัญชี <code class="font-mono">superadmin</code> ไม่ให้ผู้ใช้ระดับต่ำกว่าแก้ไขหรือลบ
+                    <?= __('settings.ds_sec_2fa_desc') ?>
                 </p>
                 <div class="p-2.5 bg-gray-50 dark:bg-slate-800/80 rounded-xl font-mono text-[11px] text-gray-700 dark:text-slate-300">
                     <span class="text-emerald-500">CSRF</span> Multi-channel check:<br>
@@ -455,10 +455,10 @@ php_ums/
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 space-y-2">
                 <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
                     <i class="ph ph-shield-warning text-lg"></i>
-                    <span>5.3 Sliding Window Rate Limiting</span>
+                    <span><?= __('settings.ds_sec_ratelimit_title') ?></span>
                 </div>
                 <p class="text-xs text-gray-600 dark:text-slate-400 leading-relaxed">
-                    คำนวณเวลาย้อนหลังเทียบกับ <code class="font-mono">updated_at</code> แบบ Sliding Window ป้องกันการสะสมความผิดพลาดข้ามวัน และ Reset ทันทีเมื่อล็อกอินสำเร็จ
+                    <?= __('settings.ds_sec_ratelimit_desc') ?>
                 </p>
                 <div class="p-2.5 bg-gray-50 dark:bg-slate-800/80 rounded-xl font-mono text-[11px] text-gray-700 dark:text-slate-300 space-y-1">
                     <div>Endpoint: <span class="text-amber-500">POST /login</span></div>
@@ -478,7 +478,7 @@ php_ums/
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_rbac') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Role-Based Access Control, Permission Middlewares & Protected Accounts</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_rbac_sub') ?></p>
             </div>
         </div>
 
@@ -486,27 +486,27 @@ php_ums/
             <!-- Role Hierarchy -->
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 space-y-3">
                 <h4 class="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2">
-                    <i class="ph ph-users-three text-indigo-500 text-lg"></i> ลำดับขั้นของบทบาท (Role Hierarchy)
+                    <i class="ph ph-users-three text-indigo-500 text-lg"></i> <?= __('settings.ds_role_hierarchy_title') ?>
                 </h4>
                 <div class="space-y-2 text-xs">
                     <div class="p-2.5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
                         <div>
                             <span class="font-bold text-indigo-700 dark:text-indigo-400">Superadmin</span>
-                            <p class="text-gray-500 dark:text-slate-400 text-[11px]">สิทธิ์สูงสุดของระบบ ข้ามการตรวจสอบสิทธิ์ทั้งหมด เข้าถึงทุกโมดูล</p>
+                            <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_role_superadmin_desc') ?></p>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">Protected</span>
                     </div>
                     <div class="p-2.5 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
                         <div>
                             <span class="font-bold text-blue-700 dark:text-blue-400">Admin</span>
-                            <p class="text-gray-500 dark:text-slate-400 text-[11px]">ผู้ดูแลระบบ จัดการผู้ใช้ สิทธิ์ และการตั้งค่าระบบตามที่ได้รับมอบหมาย</p>
+                            <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_role_admin_desc') ?></p>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">2FA Enforced</span>
                     </div>
                     <div class="p-2.5 bg-gray-50 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between">
                         <div>
                             <span class="font-bold text-gray-700 dark:text-slate-300">Manager / Staff / User</span>
-                            <p class="text-gray-500 dark:text-slate-400 text-[11px]">กลุ่มบทบาทปฏิบัติการ ถูกจำกัดการเข้าถึงตาม Permissions ในตาราง <code class="font-mono">role_permissions</code></p>
+                            <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_role_user_desc') ?></p>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300">RBAC Guard</span>
                     </div>
@@ -516,13 +516,13 @@ php_ums/
             <!-- Permission Syntax & Guard -->
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 space-y-3">
                 <h4 class="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2">
-                    <i class="ph ph-key text-emerald-500 text-lg"></i> รูปแบบสิทธิ์ & Middleware Guard
+                    <i class="ph ph-key text-emerald-500 text-lg"></i> <?= __('settings.ds_perm_syntax_title') ?>
                 </h4>
                 <p class="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
-                    สิทธิ์ถูกจัดเก็บในรูปแบบ <code class="font-mono font-bold text-emerald-600 dark:text-emerald-400">module:action</code> และบังคับใช้ผ่าน <code class="font-mono text-indigo-500">PermissionMiddleware</code> ในการลงทะเบียนเส้นทาง:
+                    <?= __('settings.ds_perm_syntax_desc') ?>
                 </p>
                 <div class="p-3 bg-gray-900 text-gray-200 rounded-xl font-mono text-[11px] space-y-1 overflow-x-auto">
-                    <div class="text-emerald-400">// ตัวอย่างการป้องกันเส้นทาง:</div>
+                    <div class="text-emerald-400">// Router Protection Example:</div>
                     <div>$router->get('/users', [UserController::class, 'index'], [</div>
                     <div class="pl-4">AuthMiddleware::class,</div>
                     <div class="pl-4">[PermissionMiddleware::class, <span class="text-amber-400">'users'</span>, <span class="text-amber-400">'view'</span>]</div>
@@ -530,7 +530,7 @@ php_ums/
                 </div>
                 <div class="text-[11px] text-gray-500 dark:text-slate-400 flex items-center gap-1.5 pt-1">
                     <i class="ph ph-shield-check text-emerald-500 text-sm"></i>
-                    <span>หากผู้ใช้ไม่มีสิทธิ์ ระบบจะแสดงหน้า <strong>403 Forbidden</strong> ทันที</span>
+                    <span><?= __('settings.ds_perm_403_notice') ?></span>
                 </div>
             </div>
         </div>
@@ -546,7 +546,7 @@ php_ums/
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_uiux') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Google Font Prompt, 5 Dynamic Theme Palettes, YouTube Progress Bar & Layout Standards</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_uiux_sub') ?></p>
             </div>
         </div>
 
@@ -554,45 +554,45 @@ php_ums/
             <!-- Theme Card 1 -->
             <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 space-y-1.5">
                 <span class="font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> 1. Default (Slate / Blue)
+                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> <?= __('settings.ds_theme_1_title') ?>
                 </span>
-                <p class="text-gray-500 dark:text-slate-400 text-[11px]">แถบด้านข้าง Slate 900 เน้นความน่าเชื่อถือ มินิมอล เรียบหรู เหมาะกับงานหลังบ้าน</p>
+                <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_theme_1_desc') ?></p>
             </div>
             <!-- Theme Card 2 -->
             <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 space-y-1.5">
                 <span class="font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 2. Modern Emerald
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> <?= __('settings.ds_theme_2_title') ?>
                 </span>
-                <p class="text-gray-500 dark:text-slate-400 text-[11px]">โทนเขียวมรกต สดใส สบายตา สะท้อนความสดใหม่และสถานะออนไลน์</p>
+                <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_theme_2_desc') ?></p>
             </div>
             <!-- Theme Card 3 -->
             <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 space-y-1.5">
                 <span class="font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> 3. Royal Purple
+                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> <?= __('settings.ds_theme_3_title') ?>
                 </span>
-                <p class="text-gray-500 dark:text-slate-400 text-[11px]">ม่วงหรูหรา สง่างาม เพิ่มความโดดเด่นและมิติระดับพรีเมียมให้กับหน้าจอ</p>
+                <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_theme_3_desc') ?></p>
             </div>
             <!-- Theme Card 4 -->
             <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 space-y-1.5">
                 <span class="font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> 4. Crimson Rose
+                    <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> <?= __('settings.ds_theme_4_title') ?>
                 </span>
-                <p class="text-gray-500 dark:text-slate-400 text-[11px]">โทนกุหลาบแดงชมพู มีชีวิตชีวา สะดุดตา และกระตุ้นความกระตือรือร้น</p>
+                <p class="text-gray-500 dark:text-slate-400 text-[11px]"><?= __('settings.ds_theme_4_desc') ?></p>
             </div>
         </div>
 
         <!-- Strict UI Conventions -->
         <div class="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 text-xs text-gray-700 dark:text-slate-300 space-y-2">
             <h4 class="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
-                <i class="ph ph-check-square-offset text-base"></i> ข้อกำหนดเฉพาะด้าน UI/UX (Strict UI Rules)
+                <i class="ph ph-check-square-offset text-base"></i> <?= __('settings.ds_ui_rules_title') ?>
             </h4>
             <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-slate-300">
-                <li><strong>ห้ามใช้สัญลักษณ์สกุลเงินบาท:</strong> ห้ามใช้สัญลักษณ์ <code>สัญลักษณ์เงินบาท (Baht Sign)</code> ทุกที่ ให้ใช้คำว่า "บาท" หรือ "THB" เสมอ</li>
-                <li><strong>ความโค้งของปุ่มและการ์ด:</strong> ใช้ความโค้งเหลี่ยมมนแบบมาตรฐาน (<code class="font-mono">rounded-md</code> สำหรับปุ่มและอินพุต, <code class="font-mono">rounded-2xl</code> สำหรับการ์ด)</li>
-                <li><strong>ปุ่มดำเนินการในตาราง (Table Actions):</strong> ใช้ปุ่มขนาดกะทัดรัด <code class="font-mono">p-1 rounded</code> พร้อมไอคอนขนาด <code class="font-mono">text-lg</code> (18px) ชิดขวาเสมอ</li>
-                <li><strong>ลบข้อมูลด้วย AJAX + SweetAlert2:</strong> ห้ามใช้ HTML form submit ในการลบข้อมูล ให้ใช้ <code class="font-mono">axios.post</code> ร่วมกับ <code class="font-mono">Swal.fire</code> เสมอ</li>
-                <li><strong>แถบนำทางด้านข้าง Sticky ตอนเลื่อนหน้า:</strong> ในหน้าจอตั้งค่าที่มีแท็บเมนู ต้องคงสถานะลอยติดด้านบน (<code class="font-mono">lg:sticky lg:top-6 self-start z-10</code>) ไม่เลื่อนหาย</li>
-                <li><strong>YouTube-Style Progress Bar:</strong> แถบโหลดสีน้ำเงิน-ม่วงบนสุดของหน้าจอ ไร้แสงฟุ้งสีขาว ไม่กระพริบ และรองรับ Chromium Paint-Holding</li>
+                <li><?= __('settings.ds_ui_rule_1') ?></li>
+                <li><?= __('settings.ds_ui_rule_2') ?></li>
+                <li><?= __('settings.ds_ui_rule_3') ?></li>
+                <li><?= __('settings.ds_ui_rule_4') ?></li>
+                <li><?= __('settings.ds_ui_rule_5') ?></li>
+                <li><?= __('settings.ds_ui_rule_6') ?></li>
             </ul>
         </div>
     </div>
@@ -607,7 +607,7 @@ php_ums/
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">
                     <?= __('settings.ds_nav_routes') ?>
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Complete URL Routing Map: Core UMS MVC & Stateless API Endpoints</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.ds_routes_sub') ?></p>
             </div>
         </div>
 
@@ -615,10 +615,10 @@ php_ums/
             <table class="w-full text-left text-xs">
                 <thead class="bg-gray-50 dark:bg-slate-900/80 text-gray-500 dark:text-slate-400 font-semibold border-b border-gray-100 dark:border-slate-800">
                     <tr>
-                        <th class="px-4 py-3">Module Group</th>
-                        <th class="px-4 py-3">HTTP Method & URI Pattern</th>
-                        <th class="px-4 py-3">Controller & Target</th>
-                        <th class="px-4 py-3">Security & Guard</th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_module_group') ?></th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_http_uri') ?></th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_controller') ?></th>
+                        <th class="px-4 py-3"><?= __('settings.ds_th_guard') ?></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-slate-300 font-mono text-[11px]">
@@ -773,7 +773,7 @@ php_ums/
 
                 <div class="p-3 bg-gray-50 dark:bg-slate-800/80 rounded-xl font-mono text-[11px] text-gray-700 dark:text-slate-300">
                     <span class="text-indigo-500 font-semibold">// Preloader Modal with Timer:</span><br>
-                    Swal.fire({ title: 'กำลังประมวลผล...', didOpen: () => Swal.showLoading() });
+                    Swal.fire({ title: '<?= addslashes(__('settings.ds_sample_preloader_title')) ?>', didOpen: () => Swal.showLoading() });
                 </div>
             </div>
 
@@ -885,10 +885,10 @@ function showDesignSpecToast() {
 function testToast(type) {
     if (typeof Swal !== 'undefined') {
         const samples = {
-            success: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-            error: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง',
-            warning: 'กรุณาตรวจสอบข้อมูลก่อนดำเนินการต่อ',
-            info: 'ระบบได้ทำการซิงค์ข้อมูลล่าสุดแล้ว'
+            success: '<?= addslashes(__('settings.ds_sample_toast_success')) ?>',
+            error: '<?= addslashes(__('settings.ds_sample_toast_error')) ?>',
+            warning: '<?= addslashes(__('settings.ds_sample_toast_warning')) ?>',
+            info: '<?= addslashes(__('settings.ds_sample_toast_info')) ?>'
         };
         Swal.fire({
             toast: true,
@@ -908,8 +908,8 @@ function testToast(type) {
 function testPreloader() {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'กำลังประมวลผลข้อมูล...',
-            text: 'ระบบกำลังบันทึกและประมวลผล กรุณารอสักครู่',
+            title: '<?= addslashes(__('settings.ds_sample_preloader_title')) ?>',
+            text: '<?= addslashes(__('settings.ds_sample_preloader_text')) ?>',
             allowOutsideClick: false,
             showConfirmButton: false,
             timer: 3000,
@@ -926,7 +926,7 @@ function testPreloader() {
 function testButtonLoadingDemo(btn) {
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base"></i><span>กำลังบันทึก...</span>';
+    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base"></i><span><?= addslashes(__('settings.ds_sample_button_saving')) ?></span>';
     setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = originalHtml;
@@ -937,7 +937,7 @@ function testButtonLoadingDemo(btn) {
 function testButtonLoadingCustomDemo(btn) {
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base"></i><span>กำลังซิงค์ข้อมูล...</span>';
+    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base"></i><span><?= addslashes(__('settings.ds_sample_button_syncing')) ?></span>';
     setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = originalHtml;

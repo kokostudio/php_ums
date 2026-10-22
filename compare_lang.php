@@ -1,5 +1,5 @@
 <?php
-$files = ['auth.php', 'common.php', 'dashboard.php', 'logs.php', 'profile.php', 'roles.php', 'settings.php', 'users.php'];
+$files = ['auth.php', 'common.php', 'dashboard.php', 'logs.php', 'messages.php', 'profile.php', 'roles.php', 'settings.php', 'users.php'];
 $result = [];
 foreach ($files as $file) {
     $en = require __DIR__ . '/app/Lang/en/' . $file;
