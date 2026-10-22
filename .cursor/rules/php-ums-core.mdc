@@ -7,18 +7,40 @@ globs: *
 
 You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidelines:
 
-1. **Architecture Document:** For comprehensive rules, ALWAYS read `rules.md` and `.agents/skills/php-ums-core-workflow/SKILL.md` before making architectural decisions.
-2. **Security First:** 
+1. **Rule 1: Always Read Rules First (อ่านกฎทุกครั้งก่อนเริ่มทำงาน):**
+   - For comprehensive rules, ALWAYS read `GEMINI.md`, `rules.md`, and `.agents/skills/php-ums-core-workflow/SKILL.md` before making architectural decisions or writing code.
+
+2. **100% Complete Bilingual Localization (ใส่ภาษาให้ครบทุกครั้งที่สร้างใหม่):**
+   - Never hardcode text strings in views, modals, forms, tables, controllers, or JS. Always use `<?= __('namespace.key') ?>` (or `addslashes(__('namespace.key'))` in JS).
+   - Every key added to `app/Lang/th/*.php` MUST be symmetrically added to `app/Lang/en/*.php` with 0 missing keys.
+   - Verify with `php compare_lang.php` (must return `[]`) and run `php sync_lang.php` to update MySQL `translations`.
+
+3. **Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม):**
+   - All action and submit buttons must be disabled on click/submit (`btn.disabled = true;`) to prevent duplicate submissions.
+   - Show an animated spinner icon (`<i class="ph ph-circle-notch animate-spin mr-2"></i>`) and localized loading text (e.g. `<?= __('common.saving') ?>`, `<?= __('common.please_wait') ?>`).
+   - Re-enable and restore button content upon completion or in `catch` / `finally`.
+
+4. **SweetAlert2 Toast Position: Top-Center (แจ้งเตือน SweetAlert2 Toast ตำแหน่งบนกลาง):**
+   - All SweetAlert2 Toast notifications MUST strictly use `position: 'top'` (center top / บนกลาง).
+   - Standard options: `toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true`.
+   - Never use `top-end`, `top-right`, or browser native `alert()` / `confirm()`.
+
+5. **Security & Hashids First:** 
    - Never expose raw database IDs. Always use `\App\Core\Security::encodeId($id)` for outbound data and `decodeId($hash)` for inbound data.
    - All POST/PUT/DELETE requests must include `csrf_token` and be validated with `\App\Core\Security::checkCsrf()`.
-   - For destructive actions (e.g. Delete, Revoke), NEVER use browser `confirm()`, use `Swal.fire`.
-3. **UI/UX & Tailwind:** 
+   - For destructive actions (e.g. Delete, Revoke), NEVER use browser `confirm()`, use `Swal.fire` with `axios.post`.
+
+6. **UI/UX, Styling & Rules:** 
+   - **No Baht Symbol (฿):** NEVER use the `฿` currency symbol anywhere. Always use 'บาท' or 'THB'.
    - Do not override base Tailwind colors (blue, gray, slate). Use `primary-*` for dynamic theme elements and `bg-sidebar` for primary action buttons.
-   - Use **Client-Side DataTables** (instant load via `<tbody>` generation in PHP) by default. Use server-side AJAX only for massive datasets (100k+ rows).
-   - Never hardcode text in views; always use `<?= __('module.key') ?>` for translations.
+   - Use **Client-Side DataTables** (instant load via `<tbody>` generation in PHP) by default.
    - Date format must strictly be `d/m/Y` (or `d/m/Y H:i:s`) using `formatDate()` helpers.
-4. **Null Safety (PHP 8.1+):**
+   - **YouTube Progress Bar:** Keep `progress_bar.php` preloader before `</body>` in layouts.
+   - **Sticky Navigation:** Multi-column settings tabs/sidebars must stay sticky on scroll (`lg:sticky lg:top-6 self-start z-10`).
+
+7. **Null Safety (PHP 8.1+):**
    - Variables fetched from the database that may be null MUST use the null coalescing operator (`$var ?? ''`) before being passed to string functions to prevent Fatal Errors.
-5. **Error Handling & Rate Limiting:**
+
+8. **Error Handling & Rate Limiting:**
    - Use `App\Core\ErrorHandler` for exceptions. Do not show raw errors in production.
-   - Protect sensitive endpoints against brute-force using the `rate_limits` table structure.
+   - Protect sensitive endpoints against brute-force using `RateLimiter` with sliding time window. Reset on successful login (`RateLimiter::reset('/login')`).

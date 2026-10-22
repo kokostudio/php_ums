@@ -1,5 +1,9 @@
 # Project Guidelines & Architecture (Standard Core System)
 
+> [!IMPORTANT]
+> **กฎข้อที่ 1: ต้องอ่านกฎทุกครั้งก่อนเริ่มทำงาน (MANDATORY RULES INSPECTION FIRST)**  
+> ก่อนเริ่มงาน วิเคราะห์ ออกแบบ เขียนโค้ด หรือปรับปรุงฟีเจอร์ใดๆ นักพัฒนาและ AI Agent **ต้องอ่านและตรวจสอบกฎในไฟล์ `rules.md` และ `GEMINI.md` ทุกครั้งโดยไม่มีข้อยกเว้น** ห้ามเริ่มงานหรือคาดเดาโครงสร้างเองโดยไม่อ่านกฎ เพื่อรักษามาตรฐานสถาปัตยกรรมและความปลอดภัยของระบบ 100%
+
 ## 1. System Overview & Core Philosophy
 ระบบนี้ออกแบบมาเพื่อเป็น **"ระบบแกนหลัก (Core System) มาตรฐาน"** สำหรับนำไปต่อยอดและเชื่อมต่อกับระบบอื่นๆ ในอนาคต
 - **Security First:** เน้นความปลอดภัยสูงสุดในทุกมิติของการพัฒนา
@@ -78,27 +82,53 @@
 - **Frontend / DataTables Standard:**
   - ใช้ฟังก์ชัน JavaScript `formatDate(dateStr, withTime, withSeconds)` ในการ render ข้อมูลคอลัมน์วันที่ใน DataTables เสมอ
 
-## 11. Multi-Language (i18n) Standards
+## 11. Multi-Language (i18n) Standards & 100% Parity
 - **Languages Supported:** ภาษาไทย (`th`) เป็นภาษาหลัก (Default) และภาษาอังกฤษ (`en`) เป็นภาษารอง
 - **Language Storage:** จัดเก็บตัวเลือกภาษาของผู้ใช้ใน Session `$_SESSION['app_locale']` (fallback เป็น `'th'`)
 - **Route Switch:** ใช้ Clean URL `GET /lang/{locale}` เพื่อสลับภาษาและ Redirect กลับหน้าเดิมอัตโนมัติ
 - **Database Storage:**
-  - ข้อมูลการแปลภาษาทั้งหมดถูกเก็บในตาราง `translations` ในฐานข้อมูล (แทนการใช้ไฟล์)
+  - ข้อมูลการแปลภาษาทั้งหมดถูกเก็บในตาราง `translations` ในฐานข้อมูล
   - ผู้ดูแลระบบสามารถเพิ่มหรือแก้ไขคำแปลได้ทันทีผ่าน UI หน้า Settings -> Translations โดยไม่ต้องแก้ไขโค้ด
-- **Translation Usage:**
-  - ห้าม Hardcode ข้อความ UI (Labels, Buttons, Breadcrumbs, Flash Messages, Descriptions) ใน Views
-  - ต้องเรียกใช้ผ่านฟังก์ชันสากล `__('module.key')` หรือ `__('common.key')` เสมอ
-  - รองรับ Parameter แทนที่ placeholder ด้วยเครื่องหมายโคลอน (:) เช่น `__('common.welcome', ['name' => 'Admin'])` จะแทนที่ `:name` ด้วย 'Admin'
+- **Complete Localization & Parity Rule (กฎการใส่ภาษาให้ครบ 100%):**
+  - **ห้าม Hardcode ข้อความ UI เด็ดขาด:** Labels, Buttons, Breadcrumbs, Flash Messages, Validations, Descriptions, Badges, หรือข้อความ Alert/Modal ใน JavaScript ต้องเรียกใช้ผ่าน `__('namespace.key')` (หรือ `addslashes(__('namespace.key'))` ใน JS)
+  - **ความสมมาตร 100% ระหว่าง TH และ EN:** เมื่อเพิ่มคีย์ใน `app/Lang/th/<namespace>.php` ต้องเพิ่มคีย์เดียวกันลงใน `app/Lang/en/<namespace>.php` พร้อมคำแปลภาษาอังกฤษที่ถูกต้องในขั้นตอนเดียวกันเสมอ ห้ามมี Missing Key แม้แต่คีย์เดียว
+  - **พฤติกรรมของ `Lang::trans()`:** หากหาคีย์ไม่พบ ฟังก์ชันจะแสดงชื่อคีย์ดิบ เช่น `'module.key'` ออกมาหน้าเว็บทันที ดังนั้นทุกคีย์ที่ถูกเรียกใช้ต้องมีคำแปลอยู่จริงทั้ง 2 ภาษา
+  - **การตรวจสอบและซิงค์ข้อมูล:** ก่อนส่งมอบงานทุกครั้ง ต้องรัน `php compare_lang.php` (ต้องได้ `[]`) และรัน `php sync_lang.php` เพื่ออัปเดตคำแปลเข้าสู่ตาราง `translations` ใน MySQL
 - **DataTables Global i18n & DOM:**
   - ห้ามใส่ property `language:` แยกต่างหากใน DataTables initialization ของแต่ละหน้า
   - ระบบมีการตั้งค่า Global Configuration ไว้แล้วใน `app/Views/layouts/app.php` ซึ่งครอบคลุมการแปลภาษา (Th/En) ของ DataTables แบบอัตโนมัติ
   - หากหน้าไหนมีการตั้งค่า DataTables ของตัวเอง (เช่น Custom Search) **ต้องใส่ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ** เพื่อดัน Length Menu (`l`), Info (`i`), และ Pagination (`p`) ไปอยู่ด้านล่างสุดของตารางให้เป็นมาตรฐานเดียวกันทั้งระบบ
 
-## 12. Dynamic Theme & Tailwind Conventions (UI/UX)
+## 12. Dynamic Theme, UI/UX, Button Preloading & SweetAlert2 Standards
 - **Dynamic Palette:** ระบบรองรับการเปลี่ยนธีมแบบ Dynamic โดย `layouts/app.php` จะดึงค่าสีธีมปัจจุบันส่งเข้าไปทับ `primary` ของ Tailwind เสมอ ดังนั้นให้ใช้ class กลุ่ม `primary-*` สำหรับลูกเล่นหรือจุดที่ต้องการเปลี่ยนสีตามธีม
 - **Primary Buttons:** ปุ่มกดหลักในแบบฟอร์ม (เช่น Save, Update, Create) **ต้องใช้ class `bg-sidebar` เสมอ** เพื่อให้ปุ่มมีสีตรงกับธีม Sidebar ปัจจุบันอย่างสมบูรณ์แบบ
 - **Destructive Buttons:** ปุ่มที่เป็นอันตราย เช่น ลบข้อมูล หรือปิดการใช้งาน (Disable) ให้ใช้สีแดง (เช่น `bg-red-500`) ตามมาตรฐานสากลเสมอ
-- **Confirmation Dialogs:** การยืนยันใน Actions ที่อันตราย (เช่น Revoke, Delete) **ห้ามใช้ Native `confirm()` ของเบราว์เซอร์** ให้เรียกใช้ **SweetAlert2 (`Swal.fire`)** เสมอ เพื่อความสวยงามและเป็นมาตรฐาน
+- **Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม):**
+  - ทุกปุ่มดำเนินการ (Action Button) และปุ่ม Submit ในแบบฟอร์ม (บันทึก, อัปเดต, ลบ, ซิงค์ข้อมูล, ส่งคำขอ AJAX) **ต้องมีสถานะ Preloading เสมอ**
+  - เมื่อผู้ใช้กดคลิก ต้อง Disable ปุ่มทันที (`btn.disabled = true;`) เพื่อป้องกัน Double Submission / Race Condition
+  - แสดงไอคอนหมุนอนิเมชัน (เช่น `<i class="ph ph-circle-notch animate-spin text-base mr-2"></i>`) พร้อมข้อความระหว่างโหลดที่แปลภาษาแล้ว เช่น `<?= __('common.saving') ?>` ("กำลังบันทึก..."), `<?= __('common.please_wait') ?>` ("กรุณารอสักครู่...")
+  - คืนสถานะปุ่ม (Re-enable) และข้อความเดิมเมื่อการทำงานเสร็จสิ้น หรือเมื่อเกิดข้อผิดพลาดในบล็อก `catch` / `finally`
+- **SweetAlert2 Toast Standard (ตำแหน่งบนกลาง `position: 'top'`):**
+  - ทุกการแจ้งเตือนแบบ Toast ด้วย SweetAlert2 (`Swal.fire({ toast: true, ... })` หรือ `window.Toast`):
+    - **ตำแหน่งบังคับ:** ต้องกำหนดตำแหน่งเป็น **บนกลาง (`position: 'top'`) เท่านั้น** ห้ามใช้ `top-end`, `top-right`, `bottom-right`, `center`, หรือตำแหน่งอื่น
+    - **ตัวเลือกมาตรฐาน:**
+      ```javascript
+      Swal.fire({
+          toast: true,
+          position: 'top',
+          icon: 'success', // 'error', 'warning', 'info'
+          title: message,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+              popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
+              title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
+          }
+      });
+      ```
+  - **Confirmation Dialogs:** การยืนยันใน Actions ที่อันตราย (เช่น Revoke, Delete) **ห้ามใช้ Native `confirm()` ของเบราว์เซอร์** ให้เรียกใช้ **SweetAlert2 (`Swal.fire`)** เสมอ
+  - **ห้ามใช้ Native Alerts:** ห้ามใช้ `alert()`, `confirm()`, หรือ `prompt()` ของเบราว์เซอร์เด็ดขาด
 - **Active & Hover States (Accents):** สถานะ Active ของแท็บเมนู (Tabs), แถวในตาราง, เมนูย่อย, หรือปุ่มรองต่างๆ ต้องใช้ `text-primary-*` และ `bg-primary-*` (เช่น `hover:bg-primary-50 dark:hover:bg-primary-900/20`) แทนการใช้สีเทา (`slate`) หรือสีฟ้า (`blue`) แบบเจาะจง เพื่อให้ความรู้สึกที่ตอบสนองกับธีมได้อย่างกลมกลืน (Premium Tint)
 - **Global Color Scope:** ห้าม Override สีหลักของ Tailwind (เช่น `blue`, `gray`, `slate`) ทั่วทั้งระบบ เพื่อหลีกเลี่ยงผลกระทบต่อ UI ส่วนที่ไม่เกี่ยวข้อง จะมีการแมปแบบ Dynamic เฉพาะสี `primary` และ `sidebar` เท่านั้น
 - **Ultra Dark Mode:** สำหรับโหมดกลางคืน (Dark Mode) ในส่วนของ Card หรือ Modal ให้ใช้ Background แบบโปร่งแสงที่ดูลึกและพรีเมียม เช่น `dark:bg-black/20 dark:backdrop-blur-md` หรือ `dark:bg-slate-950`
@@ -132,18 +162,24 @@
 ## 🎯 Quick Checklist สำหรับสร้างฟีเจอร์/โมดูลใหม่ (System Standards Checklist)
 เพื่อป้องกันการหลุดมาตรฐานของระบบ ทุกครั้งที่สร้างหน้าใหม่ ตารางใหม่ หรือปุ่มใหม่ ให้ตรวจสอบตามรายการต่อไปนี้อย่างเคร่งครัด:
 
+### 0. กฎข้อที่ 1: ตรวจสอบและอ่านกฎก่อนเริ่มงาน (Must Read Rules First)
+- [ ] **อ่านกฎทุกครั้ง:** อ่านข้อกำหนดใน `rules.md` และ `GEMINI.md` ก่อนเริ่มวิเคราะห์ ออกแบบ หรือเขียนโค้ดเสมอ
+
 ### 1. Routing & Controller (หลังบ้าน)
 - [ ] ใช้ **Clean URL** เสมอ (เช่น `/users/create`) ห้ามใช้ Query String เพื่อเปลี่ยนหน้า (เช่น `?page=create`)
 - [ ] ชื่อ Parameter ใน Route ต้อง **ตรงกับตัวแปรใน Controller** เสมอ (ป้องกัน PHP 8 Named Argument Error)
 - [ ] ป้องกัน CSRF เสมอเมื่อรับ POST (ใช้ `\App\Core\Security::checkCsrf()`)
 - [ ] ถอดรหัส ID (`decodeId`) ทันทีเมื่อรับค่าจากหน้าเว็บ และเข้ารหัส ID (`encodeId`) ก่อนส่งออกไปที่หน้าเว็บ
 
-### 2. View & UI (หน้าบ้าน)
-- [ ] **ห้าม Hardcode ข้อความภาษา** ให้ใช้ `<?= __('module.key') ?>` ตลอดทั้งหน้า
-- [ ] **ข้อความแจ้งเตือนทั้งหมด** ทั้งใน Controllers (ผ่าน `Session::setFlash()`) และใน Views (ผ่าน `Swal.fire()`) ต้องถูกแปลผ่าน `__()` เสมอ ห้ามใส่ String ดิบๆ ลงไป
+### 2. View, UI, Buttons & Notifications (หน้าบ้าน)
+- [ ] **ใส่ภาษาให้ครบ 100%:** ห้าม Hardcode ข้อความภาษาไทยหรืออังกฤษใน View, JS หรือ Controller — ต้องเรียกผ่าน `__('namespace.key')`
+- [ ] **ความสมมาตรของพจนานุกรม:** มีคีย์คำแปลตรงกัน 1:1 ครบทั้ง `app/Lang/th/` และ `app/Lang/en/` (รัน `php compare_lang.php` ต้องได้ `[]`) และรัน `php sync_lang.php` ซิงค์เข้า MySQL DB
+- [ ] **ปุ่มมีสถานะ Preloading:** ปุ่ม Submit และปุ่ม Action ทุกปุ่ม ต้องมีกลไก Disable (`btn.disabled = true;`) ป้องกันการกดซ้ำซ้อน พร้อมแสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความกำลังโหลดที่แปลภาษาแล้ว
+- [ ] **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุดต้องตั้งค่า `position: 'top'` (บนกลาง) เสมอ ห้ามใช้ `top-end`, `top-right` หรือ Native `alert()`
 - [ ] แสดงวันที่ต้องใช้ `formatDate($date)` (ฝั่งเซิร์ฟเวอร์) หรือ `formatDate(data)` (ฝั่ง JS) เท่านั้น (รูปแบบมาตรฐาน `d/m/Y`)
 - [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้)
 - [ ] **ปุ่มอันตราย** (ลบ, ระงับ) ต้องใช้ `bg-red-500` และต้องแสดงหน้าต่างยืนยันด้วย **SweetAlert2 (`Swal.fire`)** เท่านั้น ห้ามใช้ `confirm()` ปกติ
+- [ ] **ห้ามใช้สัญลักษณ์สกุลเงินบาท:** ห้ามใช้สัญลักษณ์ `฿` ทุกที่ ให้ใช้คำว่า 'บาท' หรือ 'THB' เท่านั้น
 - [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
 
 ### 3. DataTables (ตารางข้อมูล)

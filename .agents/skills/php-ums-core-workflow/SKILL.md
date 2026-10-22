@@ -30,6 +30,7 @@ root.
 
 ### 1. Adding a New Module / Feature
 
+0. **Inspect Rules First (CRITICAL)** — Always read and review all rules in `GEMINI.md` and `rules.md` before analyzing, planning, designing, or writing any code.
 1. **Plan first** — create or update `implementation_plan.md` artifact and get approval before writing code.
 2. **Create Controller** in `app/Controllers/` extending `App\Core\Controller`.
 3. **Register Routes** in `public/index.php` using clean URL pattern (see Rule: Clean URL).
@@ -345,6 +346,51 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - **The Solution:**
   1. Add `items-start` to the parent Grid container (e.g. `<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">`) to cancel CSS grid's default `stretch`.
   2. Add `lg:sticky lg:top-6 self-start z-10` to the sidebar/tab column so it locks comfortably 24px below the top navbar during scrolling on desktop (`lg:`), while stacking normally on mobile.
+
+### 25. Rule 1: Mandatory Rules Inspection First (อ่านกฎทุกครั้งก่อนเริ่มทำงาน)
+- **The Issue:** Modifying code or proposing architectural changes without reviewing existing standards leads to regression, broken patterns, inconsistent UX, or security holes.
+- **The Rule:** Before beginning ANY task — analyzing, designing, planning, or writing code — the AI agent and developers MUST inspect `rules.md` and `GEMINI.md` without exception.
+- **The Solution:** Always verify compliance with the project's core guidelines, quick checklist, encoding standards, and security requirements before and after modifying files.
+
+### 26. Complete Bilingual Localization (ใส่ภาษาให้ครบ 100% ทั้ง TH/EN)
+- **The Issue:** Hardcoding text strings or leaving one language translation missing results in broken UI, fallback errors, or inconsistent localization.
+- **The Rule:** Never hardcode text strings in views, templates, modals, buttons, table headers, JavaScript, flash messages, or controllers. All text must use `__('namespace.key')`.
+- **The Solution:**
+  1. Whenever creating any new feature or module, define translation keys in BOTH `app/Lang/th/{file}.php` and `app/Lang/en/{file}.php` simultaneously.
+  2. Enforce 1:1 symmetry (0 missing keys) between Thai and English dictionaries.
+  3. Run `php compare_lang.php` to verify parity (must return empty array `[]`).
+  4. Run `php sync_lang.php` to synchronize new keys into the database cache/system.
+
+### 27. Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม)
+- **The Issue:** Submitting forms or triggering AJAX actions without disabling buttons or providing immediate visual feedback leads to double submissions, duplicate database records, or user confusion.
+- **The Rule:** Every action and form submission button MUST have an immediate loading state upon click.
+- **The Solution:**
+  1. Immediately disable the button (`btn.disabled = true;`).
+  2. Add an animated spinning icon (`<i class="ph ph-circle-notch animate-spin mr-2"></i>` or `<i class="ph ph-spinner animate-spin mr-2"></i>`).
+  3. Display a localized loading message (e.g. `__('common.saving')`, `__('common.please_wait')`).
+  4. Restore normal button state on AJAX completion or error.
+
+### 28. SweetAlert2 Toast Notification Standard: Top-Center (แจ้งเตือน SweetAlert2 Toast ตำแหน่งบนกลาง)
+- **The Issue:** Inconsistent alert positions (e.g. bottom-right, top-end) or using native browser `alert()` disrupts the user experience and breaks dark mode styling.
+- **The Rule:** All lightweight Toast notifications must strictly be positioned at top-center (`position: 'top'`). Never use native browser dialogs (`alert()`, `confirm()`).
+- **The Solution:**
+  1. Configure SweetAlert2 toast with:
+     ```javascript
+     const Toast = Swal.mixin({
+         toast: true,
+         position: 'top',
+         showConfirmButton: false,
+         timer: 3000,
+         timerProgressBar: true,
+         didOpen: (toast) => {
+             toast.addEventListener('mouseenter', Swal.stopTimer);
+             toast.addEventListener('mouseleave', Swal.resumeTimer);
+         }
+     });
+     ```
+  2. Ensure dark mode styles (`background`, `color`) match the application theme.
+  3. Dangerous or irreversible actions (such as delete) must use standard centered modal dialogs (`Swal.fire({ icon: 'warning', showCancelButton: true, ... })`), never Toast.
+
 
 
 
