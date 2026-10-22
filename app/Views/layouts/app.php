@@ -72,6 +72,11 @@
             document.documentElement.classList.remove('dark')
         }
     </script>
+    <style>
+        /* Instant Background & FOUC Prevention (prevents white flash before Tailwind CDN compiles) */
+        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; }
+        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; }
+    </style>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -315,7 +320,6 @@
 </head>
 <body class="text-gray-800 dark:text-slate-200 antialiased h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
-    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
 
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
@@ -1130,5 +1134,6 @@
             </div>
         </div>
     </div>
+    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
 </body>
 </html>

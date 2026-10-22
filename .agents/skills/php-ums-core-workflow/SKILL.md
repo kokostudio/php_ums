@@ -335,9 +335,9 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - **The Issue:** In multi-page applications, clicking links or navigating between pages without immediate visual feedback makes the app feel sluggish or unresponsive.
 - **The Rule:** All layouts and page navigation flows MUST maintain the YouTube-style top preloader progress bar.
 - **The Solution:**
-  1. Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right after the opening `<body>` tag in all layout files (`app/Views/layouts/*.php`).
+  1. Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right before `</body>` in all layout files (`app/Views/layouts/*.php`) to avoid parser-blocking DOM execution.
   2. The component automatically intercepts internal `<a>` clicks, form submissions, and non-polling Axios AJAX calls.
-  3. Preserves state across navigation via `sessionStorage` for seamless transition across page unload/load boundaries.
+  3. Fully compliant with Chromium Paint-Holding: avoids `beforeunload` style changes to eliminate white screen flashes during navigation.
 
 ### 24. Sticky Side Navigation & Tabs on Scroll (LAYOUT CONVENTION)
 - **The Issue:** On long forms or multi-tab settings screens, scrolling down causes the navigation sidebar/tabs to disappear off-screen, forcing users to scroll all the way back to the top to switch tabs.

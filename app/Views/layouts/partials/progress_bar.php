@@ -2,6 +2,7 @@
 /**
  * YouTube-Style Top Preloader Progress Bar Component
  * Provides a sleek, animated top progress bar during page navigation and AJAX transitions.
+ * Engineered for Chromium Paint-Holding: zero white flash, zero parser-blocking FOUC.
  */
 ?>
 <!-- Top Loading Progress Bar (YouTube Style) -->
@@ -67,13 +68,13 @@ window.TopProgressBar = (function() {
     }
 
     function inc(amount) {
-        if (progress >= 95) return;
+        if (progress >= 92) return;
         if (typeof amount !== 'number') {
             if (progress < 25) amount = 15;
             else if (progress < 50) amount = 8;
             else if (progress < 70) amount = 5;
-            else if (progress < 85) amount = 2.5;
-            else amount = 1;
+            else if (progress < 85) amount = 2;
+            else amount = 0.5;
         }
         set(progress + amount);
     }
@@ -91,20 +92,20 @@ window.TopProgressBar = (function() {
         if (!bar) return;
 
         active = true;
-        bar.style.transition = 'width 200ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 200ms ease';
+        bar.style.transition = 'width 250ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 200ms ease';
         set(typeof initial === 'number' ? initial : 20);
 
         if (timer) clearInterval(timer);
         timer = setInterval(function() {
-            if (progress < 95) {
+            if (progress < 92) {
                 inc();
             }
         }, 200);
 
-        // Auto-complete safety fallback if page doesn't unload within 10s
+        // Fail-safe auto finish if navigation cancels or takes longer than 6 seconds
         safetyTimeout = setTimeout(function() {
             if (active) done();
-        }, 10000);
+        }, 6000);
     }
 
     function done() {
@@ -148,48 +149,21 @@ window.TopProgressBar = (function() {
 
 // Automatic Page Navigation & Load Handlers
 (function() {
-    // 1. Initial Page Load or Navigation Transition
-    const wasNavigating = (function() {
-        try {
-            const val = sessionStorage.getItem('yt_navigating');
-            sessionStorage.removeItem('yt_navigating');
-            return val === '1';
-        } catch(e) {
-            return false;
-        }
-    })();
-
-    if (wasNavigating) {
-        // Fast finish on incoming page
-        TopProgressBar.set(65);
-    } else {
-        TopProgressBar.start(25);
-    }
-
-    function finishLoad() {
-        TopProgressBar.done();
-    }
-
+    // 1. Finish progress bar once page completes loading or restored from BFCache
     if (document.readyState === 'complete') {
-        finishLoad();
+        TopProgressBar.done();
     } else {
-        window.addEventListener('load', finishLoad);
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (TopProgressBar.isActive()) {
-                    TopProgressBar.done();
-                }
-            }, 300);
+        window.addEventListener('load', function() {
+            TopProgressBar.done();
         });
     }
 
-    // 2. Back-Forward Cache (bfcache) Restoration
-    window.addEventListener('pageshow', function(e) {
-        try { sessionStorage.removeItem('yt_navigating'); } catch(err) {}
+    window.addEventListener('pageshow', function() {
         TopProgressBar.done();
     });
 
-    // 3. Link Click Interception (Page Navigation)
+    // 2. Link Click Interception (Page Navigation)
+    // Uses { passive: true } and avoids beforeunload DOM manipulation to preserve Chromium Paint Holding (preventing white flash)
     document.addEventListener('click', function(e) {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
             return;
@@ -204,7 +178,7 @@ window.TopProgressBar = (function() {
         if (anchor.getAttribute('data-no-progress') !== null) return;
 
         const href = anchor.getAttribute('href');
-        if (!href || href === '#' || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
             return;
         }
 
@@ -226,29 +200,21 @@ window.TopProgressBar = (function() {
                 return;
             }
 
-            try { sessionStorage.setItem('yt_navigating', '1'); } catch(err) {}
             TopProgressBar.start();
         } catch (err) {}
-    }, false);
+    }, { passive: true });
 
-    // 4. Form Submission Interception
+    // 3. Form Submission Interception
     document.addEventListener('submit', function(e) {
         if (e.defaultPrevented) return;
         const form = e.target;
         if (form.target && form.target !== '_self') return;
         if (form.getAttribute('data-no-progress') !== null) return;
 
-        try { sessionStorage.setItem('yt_navigating', '1'); } catch(err) {}
         TopProgressBar.start();
-    }, false);
+    }, { passive: true });
 
-    // 5. Browser BeforeUnload Backup
-    window.addEventListener('beforeunload', function() {
-        try { sessionStorage.setItem('yt_navigating', '1'); } catch(err) {}
-        TopProgressBar.start();
-    });
-
-    // 6. Axios Interceptor for AJAX Operations
+    // 4. Axios Interceptor for AJAX Operations (Delete, Toggle status, etc.)
     function setupAxiosInterceptors() {
         if (!window.axios || window._ytAxiosHooked) return;
         window._ytAxiosHooked = true;

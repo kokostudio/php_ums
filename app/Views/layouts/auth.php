@@ -29,6 +29,11 @@ $primaryHex = [
             document.documentElement.classList.remove('dark')
         }
     </script>
+    <style>
+        /* Instant Background & FOUC Prevention (prevents white flash before Tailwind CDN compiles) */
+        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; }
+        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; }
+    </style>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -79,7 +84,6 @@ $currentLocale = \App\Core\Lang::locale();
 ?>
 <body class="antialiased min-h-screen flex flex-col md:flex-row transition-colors duration-300">
 
-    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
 
     <!-- LEFT PANEL (BRANDING) -->
     <div class="w-full md:w-5/12 lg:w-1/2 relative flex flex-col justify-between p-8 md:p-16 order-2 md:order-1 min-h-[50vh] md:min-h-screen <?= $bgClass ?>" style="<?= $bgStyle ?>">
@@ -301,5 +305,6 @@ $currentLocale = \App\Core\Lang::locale();
             }
         });
     </script>
+    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
 </body>
 </html>
