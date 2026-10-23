@@ -219,7 +219,7 @@
                             <i class="ph ph-table text-cyan-500 text-base"></i> Data & UI Components
                         </td>
                         <td class="px-4 py-3 font-mono font-medium text-cyan-600 dark:text-cyan-400">DataTables, SweetAlert2, Axios</td>
-                        <td class="px-4 py-3">Client-Side DataTables (Instant Load & Zero FOUC), Custom Toast Alerts, AJAX Deletions, Global Form Spinners</td>
+                        <td class="px-4 py-3">Server-Side DataTables (Scalable AJAX Processing & Zero FOUC), Custom Toast Alerts, AJAX Deletions, Global Form Spinners</td>
                     </tr>
                     <tr>
                         <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white flex items-center gap-2">

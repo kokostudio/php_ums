@@ -41,10 +41,11 @@
 - ทุกครั้งที่เริ่ม Module หรือฟีเจอร์ใหม่ ให้วิเคราะห์และวางแผน Architecture (รวมถึงผลกระทบด้านความปลอดภัย) ส่งมาให้ตรวจก่อนเริ่มเขียนโค้ดจริง
 - **Changelog:** การปรับปรุงฟีเจอร์หลัก (Core Features) ต้องมีการอัปเดตบันทึกการเปลี่ยนแปลงลงในไฟล์ `CHANGELOG.md` เสมอ **(โดยให้บันทึกรายละเอียดเป็นภาษาไทยเท่านั้น)**
 
-## 6. Performance & Data Handling (ประสิทธิภาพและการจัดการข้อมูล)
-- **Instant Load & FOUC Prevention (DataTables):** ระบบเน้นการแสดงผลแบบทันที (Instant Load) โดยไม่มีอาการกระพริบ (FOUC) ตอนโหลดหน้าเว็บ
-  - ให้ใช้ **Client-Side DataTables** เป็นสถาปัตยกรรมหลัก (ดึงข้อมูลผ่าน PHP และวนลูปสร้าง `<tbody>` โดยตรงใน HTML) แทนการใช้ AJAX Server-Side Processing
-  - สำหรับข้อมูลที่มีขนาดใหญ่มาก (เช่น Logs) ให้ใช้ `LIMIT 1000` ใน SQL Query เพื่อจำกัดข้อมูลแทนการทำ Pagination ผ่าน AJAX เพื่อรักษาความเร็วในการโหลด
+## 6. Performance & Data Handling: Mandatory Server-Side DataTables (ประสิทธิภาพและการจัดการข้อมูลแบบ Server-Side)
+- **Mandatory Server-Side Processing (กฎการทำงานของ DataTable ต้องเป็นแบบ Server-Side เสมอ):** ทุกตารางข้อมูลในระบบ (Users, Roles, Activity Logs, Audit Logs, และโมดูลต่อขยายใหม่ทั้งหมด) **ต้องทำงานในรูปแบบ Server-Side Processing (`serverSide: true, processing: true`) เสมอ**
+  - **ความสามารถในการรองรับข้อมูลขนาดใหญ่ (Scalability):** เพื่อรองรับการเติบโตของข้อมูลระดับองค์กร ลดภาระหน่วยความจำบนเบราว์เซอร์ของผู้ใช้ และเพิ่มความเร็วในการตอบสนอง โดยการแบ่งหน้า (Pagination), การเรียงลำดับ (Sorting), และการค้นหา (Searching) ต้องถูกประมวลผลบนฐานข้อมูล MySQL โดยตรงผ่านคำสั่ง SQL ที่มีประสิทธิภาพ
+  - **การประมวลผลผ่าน `DataTableHelper`:** Controller ต้องมีเมธอด Endpoint สำหรับส่งข้อมูล JSON ให้ตาราง (เช่น `public function data()`) และเรียกใช้ `\App\Core\DataTableHelper::process()` พร้อม Prepared Statements ป้องกัน SQL Injection
+  - **ความปลอดภัยของ ID (Hashids):** ข้อมูลทุกแถวที่ส่งออกไปใน JSON จะต้องเข้ารหัส Primary Key เป็น Hash 8 หลักด้วย `\App\Core\Security::encodeId($id)` เสมอ (เช่น `$row['hash_id']`) ห้ามส่ง Sequential ID สดๆ ออกไปที่เบราว์เซอร์
 - **Client-Side Caching (LocalStorage):** 
   - ให้ประยุกต์ใช้ **LocalStorage / SessionStorage** ฝั่ง Frontend เพื่อลดภาระการโหลดข้อมูลซ้ำซ้อนจากฝั่ง Server สำหรับข้อมูลที่ไม่มีการเปลี่ยนแปลงบ่อย (Static/Reference Data)
   - ออกแบบกลไก Cache Invalidation ที่ชาญฉลาด (อัปเดต LocalStorage ใหม่ทันทีเมื่อมีการอัปเดตข้อมูลจาก API)
@@ -184,12 +185,12 @@
 - [ ] **การคัดลอกลงคลิปบอร์ด (Clipboard Feedback):** ทุกปุ่มคัดลอก (เช่น Callback URL, Token) ต้องเปลี่ยนไอคอนเป็นเครื่องหมายถูกสีเขียวชั่วคราว พร้อมแสดง **SweetAlert2 Toast บนกลาง (`position: 'top'`)** แจ้งเตือนข้อความที่แปลภาษาแล้ว และมี Fallback สำหรับ Context ที่ไม่ใช่ HTTPS
 - [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
 
-### 3. DataTables (ตารางข้อมูล)
-- [ ] **สถาปัตยกรรมหลัก:** ใช้ **Client-Side Processing** (วนลูปสร้าง `<tbody>` ด้วย PHP) เพื่อป้องกันการกระพริบ (FOUC) และการโหลดโครงร่างตาราง (Skeleton) ให้แสดงผลได้ทันที 100%
-- [ ] **ข้อมูลขนาดใหญ่:** ใส่ `LIMIT 1000` (หรือตัวเลขที่เหมาะสม) ใน SQL Query สำหรับตารางข้อมูลที่ใหญ่มาก (เช่น Activity Logs, Audit Logs) แทนการใช้ Server-Side AJAX
-- [ ] **Server-Side AJAX:** อนุญาตให้ใช้เฉพาะกรณีที่ข้อมูลมีขนาดใหญ่มหาศาล (100k+ rows) และการใช้ `LIMIT 1000` ไม่ตอบโจทย์ทางธุรกิจจริงๆ เท่านั้น
-- [ ] ห้ามใส่การตั้งค่าภาษา (`language`) ยิบย่อยลงไปเอง เพราะระบบจัดการให้ที่ไฟล์ Layout แล้ว
+### 3. DataTables (ตารางข้อมูลแบบ Server-Side)
+- [ ] **ทำงานแบบ Server-Side 100%:** กำหนด `serverSide: true` และ `processing: true` ในการสร้างตาราง DataTables ทุกหน้าจอ
+- [ ] **สร้าง AJAX Endpoint:** มีเมธอดรองรับการดึงข้อมูลแบบ AJAX ใน Controller (เช่น `public function data()`) และใช้ `\App\Core\DataTableHelper::process()` ในการ Query
+- [ ] **ความปลอดภัยของ ID (Hashids):** ข้อมูลที่ส่งกลับใน JSON ต้องแปลง `id` เป็น `hash_id` ด้วย `Security::encodeId()` เสมอ ห้ามส่ง Sequential ID ดิบ
 - [ ] **DOM Layout มาตรฐาน:** หากต้องตั้งค่าหน้าตาของ DataTable เอง (เช่น ซ่อน Search เริ่มต้น) ต้องใส่ `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` เสมอ เพื่อจัดระเบียบ Length, Info, Pagination ให้อยู่ด้านล่างสุดของตารางอย่างสวยงาม
+- [ ] **Global i18n:** ห้ามใส่ property `language:` แยกต่างหากใน DataTables initialization ของแต่ละหน้า ให้ใช้การแปลภาษาอัตโนมัติจาก `layouts/app.php`
 
 ### 4. Null Safety (PHP 8.1+)
 - [ ] ตัวแปรใดที่ดึงจากฐานข้อมูลและอาจมีโอกาสเป็น `null` ต้องครอบด้วย `?? ''` ก่อนนำไปใช้ร่วมกับฟังก์ชันจัดการ String เสมอ

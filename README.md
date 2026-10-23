@@ -13,7 +13,7 @@
 * **🌐 4-Provider Social Login & OAuth:** เข้าสู่ระบบและเชื่อมต่อบัญชีผ่าน Google, LINE, Facebook และ GitHub พร้อมแสดงโลโก้ด้วย Inline Vector SVG คมชัดทุกขนาดหน้าจอ ตัดปัญหา Hotlink ขาดหาย
 * **🛡️ Role-Based Access Control (RBAC):** กำหนดบทบาทและสิทธิ์อย่างละเอียดผ่าน Matrix พร้อมกลไก Superadmin Protection ปกป้องบัญชีแอดมินสูงสุด และเข้ารหัส Primary Key ด้วย Hashids 8 หลักทั้งระบบ
 * **🌍 100% Complete Bilingual Localization (i18n):** รองรับภาษาไทย (`th`) และภาษาอังกฤษ (`en`) แบบสมมาตร 1:1 ครบ 100% ทุกจุด (0 missing keys) สลับภาษาได้ทันที และมีระบบแก้ไขคำแปลผ่าน UI บันทึกลงฐานข้อมูล MySQL
-* **🎨 Modern UI/UX & Dynamic Theming:** พัฒนาด้วย Tailwind CSS, Google Font Prompt, Dark/Light Mode สมบูรณ์แบบ, สลับสีธีมได้ 5 เฉดสี (Primary Palettes), หลอดโหลดหน้าเว็บ YouTube-style Preloader ไร้แสงฟุ้ง, ตาราง DataTables โหลดทันทีแบบ Zero-FOUC, และ SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)
+* **🎨 Modern UI/UX & Dynamic Theming:** พัฒนาด้วย Tailwind CSS, Google Font Prompt, Dark/Light Mode สมบูรณ์แบบ, สลับสีธีมได้ 5 เฉดสี (Primary Palettes), หลอดโหลดหน้าเว็บ YouTube-style Preloader ไร้แสงฟุ้ง, ตาราง DataTables แบบ Server-Side Processing 100% ประมวลผลบนฐานข้อมูลรวดเร็วและปลอดภัย, และ SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)
 * **⚙️ System Settings & Design Spec Portal:** ปรับแต่งค่าระบบได้ละเอียด พร้อมหน้าจอ Design Specification Portal (`/settings/design_spec`) แสดงพิมพ์เขียวสถาปัตยกรรม โครงสร้างฐานข้อมูล 12 ตาราง และ UI Playground
 * **📊 Activity & Audit Logging:** บันทึกประวัติกิจกรรมผู้ใช้งาน (Activity Logs) และบันทึกประวัติการเปลี่ยนแปลงข้อมูลระดับลึกแบบ JSON Diff Viewer (Audit Logs)
 
@@ -182,7 +182,7 @@ php_ums/
 * **Destructive Buttons:** ปุ่มอันตราย (ลบ, ระงับการใช้งาน) ต้องใช้คลาส `bg-red-500` และต้องยืนยันผ่าน **SweetAlert2 (`Swal.fire`)** เสมอ
 * **Button Preloading & Double-Submit Prevention:** ทุกปุ่ม Action หรือ Submit ต้อง Disable ทันทีเมื่อคลิก (`btn.disabled = true;`) แสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความกำลังโหลดที่แปลภาษาแล้ว เช่น `__('common.saving')`
 * **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุด **ต้องตั้งค่า `position: 'top'` (บนกลาง) เท่านั้น**
-* **Instant Load DataTables:** ใช้ **Client-Side DataTables** วนลูปสร้าง `<tbody>` จาก PHP โดยตรงเพื่อโหลดทันทีโดยไม่กระพริบ (Zero-FOUC) หากข้อมูลมีขนาดใหญ่ (เช่น Logs) ให้ใช้ `LIMIT 1000` ในการ Query
+* **Mandatory Server-Side DataTables:** ตารางข้อมูลทุกหน้าจอต้องทำงานในรูปแบบ Server-Side Processing (`serverSide: true, processing: true`) ผ่าน AJAX Endpoint ที่ประมวลผลด้วย `DataTableHelper` เพื่อลดภาระหน่วยความจำบนเบราว์เซอร์ พร้อมซ่อน Primary Key ด้วย Hashids 8 หลักใน JSON เสมอ
 * **Inline Vector SVGs:** โลโก้แบรนด์ทุกตัว (Google, LINE, Facebook, GitHub) ต้องใช้ Inline SVG ฝังในไฟล์โดยตรง ห้ามใช้ External Hotlink
 * **Clipboard Copy UX:** ปุ่มคัดลอกต้องมี Dual Feedback คือเปลี่ยนไอคอนเป็น `ph-check text-green-500` ชั่วคราว 2 วินาที พร้อมแสดง SweetAlert2 Toast ตำแหน่งบนกลาง
 
@@ -221,12 +221,13 @@ php_ums/
 8. ❌ **ห้ามใช้ Query String ในการนำทางหลัก:** ห้ามใช้ `?page=...` หรือ `?tab=...` ต้องใช้ Clean URL เสมอ
 9. ❌ **ห้ามใช้ Form Submit แบบดั้งเดิมสำหรับการลบข้อมูล:** ต้องใช้ AJAX (`axios.post`) พร้อม SweetAlert2 Dialog ยืนยัน และมี Route GET Fallback เสมอ
 10. ❌ **ห้ามใช้ External Hotlink สำหรับรูปภาพและโลโก้แบรนด์:** ต้องใช้ Inline Vector SVG หรือ Asset ภายในระบบเท่านั้น
+11. ❌ **ห้ามใช้ Client-Side DataTables สำหรับตารางข้อมูลหลักของระบบ:** ตารางข้อมูลทุกหน้าจอต้องทำงานแบบ Server-Side Processing เท่านั้น
 
 ---
 
 ## ✅ 8. Done: เงื่อนไขที่ต้องผ่านก่อนส่งงาน (Definition of Done)
 
-ก่อนส่งมอบงานหรือ Commit & Push โค้ดขึ้น Repository ทุกครั้ง งานจะถือว่าเสร็จสมบูรณ์เมื่อผ่านเกณฑ์ตรวจสอบครบทั้ง 8 ข้อ:
+ก่อนส่งมอบงานหรือ Commit & Push โค้ดขึ้น Repository ทุกครั้ง งานจะถือว่าเสร็จสมบูรณ์เมื่อผ่านเกณฑ์ตรวจสอบครบทั้ง 9 ข้อ:
 
 - [ ] **1. กฎข้อที่ 1:** อ่านและตรวจสอบตามข้อกำหนดใน `rules.md` และ `GEMINI.md` อย่างครบถ้วน
 - [ ] **2. 100% Complete Localization:** รัน `php compare_lang.php` ได้ผลลัพธ์เป็น `[]` (ไม่มี Missing Keys คู่ภาษา TH/EN ตรงกัน 1:1)
@@ -234,8 +235,9 @@ php_ums/
 - [ ] **4. Zero Banned Currency Symbol:** ตรวจสอบไม่มีการใช้สัญลักษณ์สกุลเงินบาทในหน้าจอ โค้ด หรือคำแปล
 - [ ] **5. Button Preloading:** ปุ่ม Action และ Submit ทุกปุ่มมีกลไก Disable พร้อม Spinner และข้อความระหว่างโหลด
 - [ ] **6. SweetAlert2 Top-Center:** การแจ้งเตือน Toast ทุกจุดตั้งค่าตำแหน่ง `position: 'top'` (บนกลาง) เรียบร้อย
-- [ ] **7. Context Graph Sync:** รันคำสั่ง `graft build` เพื่ออัปเดตความสัมพันธ์ของโค้ดใน Context Graph
-- [ ] **8. Changelog Update:** บันทึกรายละเอียดการปรับปรุงฟีเจอร์ลงใน `CHANGELOG.md` เป็นภาษาไทยครบถ้วน
+- [ ] **7. Server-Side DataTables:** ตารางข้อมูลทำงานในรูปแบบ Server-Side Processing (`serverSide: true`) 100% พร้อมแปลง `hash_id` ใน JSON
+- [ ] **8. Context Graph Sync:** รันคำสั่ง `graft build` เพื่ออัปเดตความสัมพันธ์ของโค้ดใน Context Graph
+- [ ] **9. Changelog Update:** บันทึกรายละเอียดการปรับปรุงฟีเจอร์ลงใน `CHANGELOG.md` เป็นภาษาไทยครบถ้วน
 
 ---
 

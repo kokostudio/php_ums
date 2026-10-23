@@ -33,7 +33,7 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
 6. **UI/UX, Styling & Rules:** 
    - **No Baht Symbol (฿):** NEVER use the `฿` currency symbol anywhere. Always use 'บาท' or 'THB'.
    - Do not override base Tailwind colors (blue, gray, slate). Use `primary-*` for dynamic theme elements and `bg-sidebar` for primary action buttons.
-   - Use **Client-Side DataTables** (instant load via `<tbody>` generation in PHP) by default.
+   - **Server-Side DataTables Mandatory:** All DataTables MUST operate using Server-Side Processing (`serverSide: true, processing: true`) via dedicated AJAX endpoints and `\App\Core\DataTableHelper::process()`. Primary keys in AJAX JSON must be obfuscated with `Security::encodeId($id)`. Custom layouts must include standard bottom DOM controls.
    - Date format must strictly be `d/m/Y` (or `d/m/Y H:i:s`) using `formatDate()` helpers.
    - **YouTube Progress Bar:** Keep `progress_bar.php` preloader before `</body>` in layouts.
    - **Sticky Navigation:** Multi-column settings tabs/sidebars must stay sticky on scroll (`lg:sticky lg:top-6 self-start z-10`).

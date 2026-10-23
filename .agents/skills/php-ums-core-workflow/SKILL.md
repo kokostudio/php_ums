@@ -102,13 +102,67 @@ When a Settings-like page needs multiple sections:
 5. Form `action` uses clean URL: `/settings/general`
 6. After save, redirect to `/settings/{$tab}`
 
-### 5. DataTables (Instant Load / Client-Side Preferred)
+### 5. DataTables (Mandatory Server-Side Processing)
 
-- **Preferred Architecture:** Always use **Client-Side DataTables** (fetch data in PHP and render `<tbody>` directly in the HTML view) to prevent layout jumping, FOUC, and skeleton loaders. This ensures 100% instant loading (like `/roles`, `/users`, `/logs`).
-- **Large Datasets:** For logs or large datasets, use a `LIMIT 1000` (or similar) in the SQL query instead of Server-Side AJAX pagination, to maintain the instant load experience without crashing the browser.
-- **Server-Side AJAX:** Should ONLY be used if explicitly required for massive datasets (100k+ rows) where a 1000-row limit is unacceptable. If used, encode `hash_id` in the data endpoint and never expose raw `id`.
-- **Custom Filtering:** For Client-Side tables, use `$.fn.dataTable.ext.search.push()` to implement custom dropdown filters (like Role or Status) that trigger via `table.draw()`.
-- **DOM Layout Standard:** If defining a custom DataTable layout (e.g. hiding default search), always append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to maintain the standard positioning of length, info, and pagination at the bottom.
+- **Mandatory Architecture:** All DataTables across the system (Users, Roles, Logs, Modules) **MUST operate using Server-Side Processing (`serverSide: true, processing: true`)**.
+- **Backend AJAX Endpoint:** Each table must have a corresponding endpoint in its controller (e.g. `GET /resource/data`) utilizing `\App\Core\DataTableHelper::process()`:
+  ```php
+  public function data()
+  {
+      $db = Database::getInstance();
+      $baseQuery = "SELECT id, name, status, created_at FROM items";
+      $searchable = ['name', 'status'];
+      $orderable = [0 => 'id', 1 => 'name', 2 => 'status', 3 => 'created_at'];
+      
+      $result = DataTableHelper::process(
+          $db,
+          $_GET,
+          $baseQuery,
+          $searchable,
+          $orderable,
+          'id'
+      );
+      
+      foreach ($result['data'] as &$row) {
+          $row['hash_id'] = Security::encodeId((int)$row['id']);
+          unset($row['id']); // Hide raw sequential ID
+      }
+      
+      $this->json($result);
+  }
+  ```
+- **Frontend Initialization:**
+  ```javascript
+  $('#myTable').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: {
+          url: '/resource/data',
+          type: 'GET',
+          data: function(d) {
+              d.filter_status = $('#status_filter').val();
+          }
+      },
+      columns: [
+          { data: 'hash_id' },
+          { data: 'name' },
+          { data: 'status' },
+          { data: 'created_at', render: function(d) { return formatDate(d); } },
+          { 
+              data: null, 
+              orderable: false, 
+              render: function(data, type, row) {
+                  return `...action buttons using row.hash_id...`;
+              }
+          }
+      ],
+      dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',
+      order: [[0, 'desc']]
+  });
+  ```
+- **Security & ID Obfuscation:** Always encode IDs into `hash_id` with `\App\Core\Security::encodeId($id)` before returning JSON. Never expose raw database IDs.
+- **DOM Layout Standard:** Always append `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to position length menu, info, and pagination cleanly at the bottom.
+- **Global Localization:** Never add redundant `language:` options in individual views; language is automatically configured in `layouts/app.php`.
 
 ### 6. Form Conventions
 

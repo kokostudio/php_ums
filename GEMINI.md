@@ -83,4 +83,11 @@ no API key, $0).
 12. **SOCIAL LOGIN & VECTOR SVG STANDARDS (กฎมาตรฐาน Social Login และโลโก้ SVG)**: All brand logos and provider icons (Google, LINE, Facebook, GitHub, etc.) MUST use pure inline vector SVGs or verified local assets. NEVER use external hotlinks (such as Wikimedia Commons or external CDNs) which can fail offline or get blocked. All social OAuth flows must support clean callback URLs and state verification, while account disconnect flows must use SweetAlert2 confirmation dialogs (never browser native `confirm()`).
 
 13. **CLIPBOARD COPY UX & FEEDBACK (กฎมาตรฐานการคัดลอกลงคลิปบอร์ด)**: All copy-to-clipboard interactions (e.g. OAuth Redirect URIs, tokens, codes) must provide immediate dual feedback: temporary icon change to a green checkmark, accompanied by a SweetAlert2 Toast at `position: 'top'` with localized text (`__('settings.copied_to_clipboard')`), and include fallback execution for non-HTTPS/HTTP localhost contexts.
+
+14. **MANDATORY SERVER-SIDE DATATABLES PROCESSING (กฎการทำงานของ DataTable ต้องเป็นแบบ Server-Side เสมอ)**: All DataTables in the project (Users, Roles, Logs, Modules, etc.) MUST strictly operate using **Server-Side Processing (`serverSide: true, processing: true`)**.
+   - **Dedicated AJAX Endpoints:** Every table must have a dedicated AJAX endpoint (e.g. `GET /resource/data`) handled by its controller using `\App\Core\DataTableHelper::process()` with parameterized PDO queries.
+   - **Database-Level Operations:** Pagination (`LIMIT :start, :length`), multi-column search (`LIKE`), and sorting (`ORDER BY`) must be executed at the MySQL database layer for high scalability and minimal client memory overhead.
+   - **ID Obfuscation (Hashids):** Primary keys in server-side responses MUST be encoded using `\App\Core\Security::encodeId($id)` before returning JSON to the frontend. Never expose sequential integer IDs.
+   - **Standard DOM Layout:** Custom layouts must include `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to maintain uniform placement of Length, Info, and Pagination controls at the bottom of the table.
+   - **Global Localization:** Never define individual `language:` blocks per view; adhere to the global configuration in `layouts/app.php`.
 <!-- rules:end -->
