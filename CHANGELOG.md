@@ -56,6 +56,7 @@
 - ปรับปรุงหน้าโปรไฟล์ (`/profile`) ให้รองรับการเชื่อมต่อและตัดการเชื่อมต่อบัญชีโซเชียลครบทั้ง 4 แพลตฟอร์ม พร้อมยืนยันด้วย SweetAlert2 Dialog (ยกเลิก Native `confirm()`)
 - ปรับปรุงเอกสารโครงการและคู่มือนักพัฒนาใน `README.md` ตามโครงสร้างมาตรฐาน 8 เสาหลัก (Overview, Map, Setup, Test, Conventions, Logic, Never, Done)
 - กำหนดและบังคับใช้กฎสถาปัตยกรรมใหม่: ตารางข้อมูล DataTables ทั้งหมดของระบบต้องทำงานในรูปแบบ Server-Side Processing (`serverSide: true`) 100% ผ่าน `DataTableHelper` และ AJAX Endpoint พร้อมเข้ารหัส Hashids ในข้อมูล JSON เพื่อรองรับการขยายตัวของข้อมูลและประหยัดหน่วยความจำเบราว์เซอร์
+- กำหนดและบังคับใช้กฎสถาปัตยกรรม Modal: หน้าต่าง Modal ทุกตัวในระบบต้องจัดโครงสร้างแบบ Fixed Header และ Fixed Footer (`flex-shrink-0`) พร้อมส่วนเนื้อหากลางที่เลื่อนได้ (`flex-1 overflow-y-auto`) และจำกัดความสูงไม่เกิน `max-h-[85vh] md:max-h-[90vh]` เพื่อให้ปุ่ม Action และปุ่มปิดมองเห็นได้ตลอดเวลาโดยไม่ต้องเลื่อนหน้าจอ พร้อมปรับปรุง Modal ในหน้า Logs, Profile และ Settings ให้เป็นไปตามมาตรฐานนี้
 
 ### แก้ไข (Fixed)
 - แก้ไขข้อผิดพลาด `copyToClipboard is not defined` ในหน้าการตั้งค่าแท็บ Social จากการจำกัด Scope ฟังก์ชันผิดแท็บ

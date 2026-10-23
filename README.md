@@ -185,6 +185,7 @@ php_ums/
 * **Mandatory Server-Side DataTables:** ตารางข้อมูลทุกหน้าจอต้องทำงานในรูปแบบ Server-Side Processing (`serverSide: true, processing: true`) ผ่าน AJAX Endpoint ที่ประมวลผลด้วย `DataTableHelper` เพื่อลดภาระหน่วยความจำบนเบราว์เซอร์ พร้อมซ่อน Primary Key ด้วย Hashids 8 หลักใน JSON เสมอ
 * **Inline Vector SVGs:** โลโก้แบรนด์ทุกตัว (Google, LINE, Facebook, GitHub) ต้องใช้ Inline SVG ฝังในไฟล์โดยตรง ห้ามใช้ External Hotlink
 * **Clipboard Copy UX:** ปุ่มคัดลอกต้องมี Dual Feedback คือเปลี่ยนไอคอนเป็น `ph-check text-green-500` ชั่วคราว 2 วินาที พร้อมแสดง SweetAlert2 Toast ตำแหน่งบนกลาง
+* **Fixed Modal Header & Footer:** ทุกหน้าต่าง Modal ในระบบต้องใช้โครงสร้าง Flexbox จำกัดความสูงไม่เกิน `max-h-[85vh] md:max-h-[90vh]` โดย Header และ Footer ต้องมีคลาส `flex-shrink-0` อยู่กับที่เสมอ และมีเฉพาะส่วนเนื้อหากลางที่เลื่อนได้ (`flex-1 overflow-y-auto`) เพื่อให้ปุ่ม Action และปุ่มปิดมองเห็นได้ตลอดเวลาโดยไม่ต้องเลื่อนหา
 
 ---
 
@@ -222,12 +223,13 @@ php_ums/
 9. ❌ **ห้ามใช้ Form Submit แบบดั้งเดิมสำหรับการลบข้อมูล:** ต้องใช้ AJAX (`axios.post`) พร้อม SweetAlert2 Dialog ยืนยัน และมี Route GET Fallback เสมอ
 10. ❌ **ห้ามใช้ External Hotlink สำหรับรูปภาพและโลโก้แบรนด์:** ต้องใช้ Inline Vector SVG หรือ Asset ภายในระบบเท่านั้น
 11. ❌ **ห้ามใช้ Client-Side DataTables สำหรับตารางข้อมูลหลักของระบบ:** ตารางข้อมูลทุกหน้าจอต้องทำงานแบบ Server-Side Processing เท่านั้น
+12. ❌ **ห้ามสร้าง Modal ที่ Header หรือ Footer เลื่อนหายไปตามเนื้อหา:** ต้องใช้โครงสร้าง Fixed Header, Fixed Footer และ Scrollable Middle Body เสมอ
 
 ---
 
 ## ✅ 8. Done: เงื่อนไขที่ต้องผ่านก่อนส่งงาน (Definition of Done)
 
-ก่อนส่งมอบงานหรือ Commit & Push โค้ดขึ้น Repository ทุกครั้ง งานจะถือว่าเสร็จสมบูรณ์เมื่อผ่านเกณฑ์ตรวจสอบครบทั้ง 9 ข้อ:
+ก่อนส่งมอบงานหรือ Commit & Push โค้ดขึ้น Repository ทุกครั้ง งานจะถือว่าเสร็จสมบูรณ์เมื่อผ่านเกณฑ์ตรวจสอบครบทั้ง 10 ข้อ:
 
 - [ ] **1. กฎข้อที่ 1:** อ่านและตรวจสอบตามข้อกำหนดใน `rules.md` และ `GEMINI.md` อย่างครบถ้วน
 - [ ] **2. 100% Complete Localization:** รัน `php compare_lang.php` ได้ผลลัพธ์เป็น `[]` (ไม่มี Missing Keys คู่ภาษา TH/EN ตรงกัน 1:1)
@@ -236,8 +238,9 @@ php_ums/
 - [ ] **5. Button Preloading:** ปุ่ม Action และ Submit ทุกปุ่มมีกลไก Disable พร้อม Spinner และข้อความระหว่างโหลด
 - [ ] **6. SweetAlert2 Top-Center:** การแจ้งเตือน Toast ทุกจุดตั้งค่าตำแหน่ง `position: 'top'` (บนกลาง) เรียบร้อย
 - [ ] **7. Server-Side DataTables:** ตารางข้อมูลทำงานในรูปแบบ Server-Side Processing (`serverSide: true`) 100% พร้อมแปลง `hash_id` ใน JSON
-- [ ] **8. Context Graph Sync:** รันคำสั่ง `graft build` เพื่ออัปเดตความสัมพันธ์ของโค้ดใน Context Graph
-- [ ] **9. Changelog Update:** บันทึกรายละเอียดการปรับปรุงฟีเจอร์ลงใน `CHANGELOG.md` เป็นภาษาไทยครบถ้วน
+- [ ] **8. Fixed Modal Header/Footer:** หน้าต่าง Modal ทุกตัวจัดโครงสร้าง Header/Footer คงที่ และตรงกลางเลื่อนได้
+- [ ] **9. Context Graph Sync:** รันคำสั่ง `graft build` เพื่ออัปเดตความสัมพันธ์ของโค้ดใน Context Graph
+- [ ] **10. Changelog Update:** บันทึกรายละเอียดการปรับปรุงฟีเจอร์ลงใน `CHANGELOG.md` เป็นภาษาไทยครบถ้วน
 
 ---
 

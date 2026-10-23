@@ -48,3 +48,7 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
 9. **Social Login & Clipboard UX Standards:**
    - Use clean, self-contained inline vector SVGs for all brand icons (Google, LINE, Facebook, GitHub). Never use external hotlinks (e.g. Wikimedia) that can fail offline or get blocked.
    - Copy-to-clipboard interactions must trigger a temporary icon feedback and a SweetAlert2 Toast at `position: 'top'` with localized text. Account disconnect flows must use SweetAlert2 confirmation dialogs (never native `confirm()`).
+
+10. **Fixed Modal Header & Footer Architecture:**
+    - All modal dialogs MUST use a restricted flex container (`flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden`).
+    - The Modal Header must be fixed at the top (`flex-shrink-0`), the Modal Footer containing action buttons must be fixed at the bottom (`flex-shrink-0`), and only the middle Modal Body scrolls (`flex-1 overflow-y-auto p-6`). Action buttons must remain visible at all times without scrolling.

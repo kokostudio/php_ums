@@ -101,8 +101,9 @@
 
 <!-- Modal for JSON Diff Viewer -->
 <div id="diffModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
-        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800">
+    <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
+        <!-- Fixed Modal Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 bg-white dark:bg-slate-900/80">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center">
                 <i class="ph ph-file-code text-blue-500 dark:text-blue-400 mr-2 text-xl"></i> <?= __('logs.change_details') ?>
             </h3>
@@ -110,6 +111,7 @@
                 <i class="ph ph-x text-xl"></i>
             </button>
         </div>
+        <!-- Scrollable Modal Body -->
         <div class="p-6 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-950/50">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Old Values -->
@@ -128,7 +130,8 @@
                 </div>
             </div>
         </div>
-        <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-black/20 dark:backdrop-blur-md flex justify-end">
+        <!-- Fixed Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900/80 flex justify-end flex-shrink-0">
             <button onclick="closeDiffModal()" class="px-5 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
                 <?= __('common.close') ?>
             </button>

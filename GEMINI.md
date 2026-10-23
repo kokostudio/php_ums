@@ -90,4 +90,10 @@ no API key, $0).
    - **ID Obfuscation (Hashids):** Primary keys in server-side responses MUST be encoded using `\App\Core\Security::encodeId($id)` before returning JSON to the frontend. Never expose sequential integer IDs.
    - **Standard DOM Layout:** Custom layouts must include `dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-4"lip><"clear">',` to maintain uniform placement of Length, Info, and Pagination controls at the bottom of the table.
    - **Global Localization:** Never define individual `language:` blocks per view; adhere to the global configuration in `layouts/app.php`.
+
+15. **FIXED MODAL HEADER & FOOTER WITH SCROLLABLE BODY RULE (กฎโครงสร้าง Modal แบบ Fixed Header/Footer และเนื้อหากลางเลื่อนได้)**: All modal dialogs throughout the project MUST strictly follow the fixed header, scrollable middle body, and fixed footer flexbox architecture:
+   - **Height Restriction & Container:** The modal panel must use `flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden` (if a `<form>` wraps the contents, the form must also include `flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden`).
+   - **Fixed Header:** The top header must be `flex-shrink-0 border-b border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900` with title and close button. It must NEVER scroll out of view.
+   - **Scrollable Middle Body:** Content area in the middle must be `flex-1 overflow-y-auto p-6` (only the middle content scrolls when exceeding screen height).
+   - **Fixed Footer:** Action buttons (Save, Cancel, Submit) must remain pinned at the bottom using `flex-shrink-0 border-t border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900 flex justify-end gap-3`, ensuring action buttons are always immediately visible and clickable without scrolling.
 <!-- rules:end -->

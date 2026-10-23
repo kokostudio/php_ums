@@ -228,6 +228,13 @@
                         <td class="px-4 py-3 font-mono font-medium text-amber-600 dark:text-amber-400">YouTube-style Preloader</td>
                         <td class="px-4 py-3">Chromium Paint-Holding compliant, zero white screen flicker during page transitions, automatically tracks Axios requests</td>
                     </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="ph ph-browsers text-purple-500 text-base"></i> Modal Architecture
+                        </td>
+                        <td class="px-4 py-3 font-mono font-medium text-purple-600 dark:text-purple-400">Flexbox Layout Standard</td>
+                        <td class="px-4 py-3">Fixed Header & Footer (<code class="font-mono">flex-shrink-0</code>), Scrollable Middle Body (<code class="font-mono">flex-1 overflow-y-auto</code>), max height <code class="font-mono">max-h-[85vh] md:max-h-[90vh]</code></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

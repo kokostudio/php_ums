@@ -540,13 +540,14 @@
 
             <!-- Edit Translation Modal -->
             <div id="editTranslationModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-                <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-gray-100 dark:border-slate-800 transition-colors">
-                    <form id="editTranslationForm" onsubmit="saveTranslation(event)">
+                <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
+                    <form id="editTranslationForm" onsubmit="saveTranslation(event)" class="flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden">
                         <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                         <input type="hidden" id="edit_namespace" name="namespace">
                         <input type="hidden" id="edit_key" name="key_name">
 
-                        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800">
+                        <!-- Fixed Modal Header -->
+                        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 bg-white dark:bg-slate-900/80">
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center">
                                 <i class="ph ph-translate text-primary-500 dark:text-primary-400 mr-2 text-xl"></i> <?= __('settings.trans_edit') ?>
                             </h3>
@@ -554,7 +555,9 @@
                                 <i class="ph ph-x text-xl"></i>
                             </button>
                         </div>
-                        <div class="p-6 overflow-y-auto bg-slate-50 dark:bg-slate-950/50 space-y-4">
+
+                        <!-- Scrollable Modal Body -->
+                        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-950/50 space-y-4">
                             <div class="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-lg border border-primary-100 dark:border-primary-800/30 flex items-center mb-4">
                                 <i class="ph ph-info mr-2 text-primary-600 dark:text-primary-400"></i>
                                 <span class="text-sm text-primary-800 dark:text-primary-300 font-mono" id="display_key"></span>
@@ -570,7 +573,9 @@
                                 <textarea id="en_value" name="en_value" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"></textarea>
                             </div>
                         </div>
-                        <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-black/20 dark:backdrop-blur-md flex justify-end gap-3">
+
+                        <!-- Fixed Modal Footer -->
+                        <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900/80 flex justify-end gap-3 flex-shrink-0">
                             <button type="button" onclick="closeTranslationModal()" class="px-5 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-primary-900/30 transition-colors">
                                 <?= __('common.cancel') ?>
                             </button>

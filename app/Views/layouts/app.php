@@ -1030,7 +1030,7 @@
         <div class="flex min-h-full items-start justify-center p-4 pt-16 sm:p-6 sm:pt-24">
             <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-gray-100 dark:border-slate-800 transition-all duration-300 flex flex-col max-h-[70vh]">
                 <!-- Search Input Wrapper -->
-                <div class="relative flex items-center border-b border-gray-100 dark:border-slate-800 px-4">
+                <div class="relative flex items-center border-b border-gray-100 dark:border-slate-800 px-4 flex-shrink-0 bg-white dark:bg-slate-900">
                     <i class="ph ph-magnifying-glass text-slate-400 dark:text-slate-500 text-xl mr-3"></i>
                     <input type="text" id="globalSearchInput" placeholder="<?php echo __('common.search') ?>..." class="w-full bg-transparent border-0 py-4 text-gray-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-0 text-base" autocomplete="off">
                     <button onclick="closeSearchPalette()" class="text-slate-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs font-medium px-2 py-1 rounded-md border border-gray-200 dark:border-slate-800">ESC</button>

@@ -183,6 +183,7 @@
 - [ ] **ห้ามใช้สัญลักษณ์สกุลเงินบาท:** ห้ามใช้สัญลักษณ์ `฿` ทุกที่ ให้ใช้คำว่า 'บาท' หรือ 'THB' เท่านั้น
 - [ ] **โลโก้และไอคอนแบรนด์ (Social Logos):** ต้องใช้ **Inline Vector SVG** หรือไฟล์ Asset ภายในระบบเท่านั้น ห้ามดึงภาพจาก Hotlink ภายนอก (เช่น Wikimedia Commons หรือ CDN นอก) ที่อาจโหลดไม่ติดเมื่อออฟไลน์หรือถูกบล็อก
 - [ ] **การคัดลอกลงคลิปบอร์ด (Clipboard Feedback):** ทุกปุ่มคัดลอก (เช่น Callback URL, Token) ต้องเปลี่ยนไอคอนเป็นเครื่องหมายถูกสีเขียวชั่วคราว พร้อมแสดง **SweetAlert2 Toast บนกลาง (`position: 'top'`)** แจ้งเตือนข้อความที่แปลภาษาแล้ว และมี Fallback สำหรับ Context ที่ไม่ใช่ HTTPS
+- [ ] **โครงสร้าง Modal แบบ Fixed Header/Footer:** ทุก Modal Dialog ต้องมี Header และ Footer แบบคงที่ (`flex-shrink-0`) พร้อมส่วนเนื้อหากลางที่เลื่อนได้ (`flex-1 overflow-y-auto`) และจำกัดความสูงไม่เกิน `max-h-[85vh] md:max-h-[90vh]` เพื่อให้ปุ่มบันทึกและปิดมองเห็นได้ตลอดเวลา
 - [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
 
 ### 3. DataTables (ตารางข้อมูลแบบ Server-Side)
@@ -234,4 +235,12 @@
   1. ไอคอนปุ่มต้องเปลี่ยนเป็นเครื่องหมายถูกสีเขียว (`ph-check text-green-500`) เป็นเวลา 2 วินาที
   2. แสดงผลการแจ้งเตือน **SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)** พร้อมข้อความภาษาที่ถูกต้อง (`__('settings.copied_to_clipboard')`)
 - **HTTP/Localhost Compatibility:** ต้องมีกลไกตรวจสอบ `navigator.clipboard && window.isSecureContext` พร้อม Fallback ด้วย `document.execCommand('copy')` เพื่อให้สามารถใช้งานบน Localhost HTTP ได้อย่างราบรื่น
+
+## 23. Fixed Modal Header & Footer Architecture (สถาปัตยกรรม Modal แบบ Header/Footer คงที่ และตรงกลางเลื่อนได้)
+- **Flexbox Layout Standard:** ทุกหน้าต่าง Modal Dialog ในระบบ ต้องจัดโครงสร้างแบบ Flex Column ที่มีการกำหนดความสูงสูงสุดอย่างชัดเจน:
+  - **Container & Max Height:** กล่อง Modal Card ต้องมีคลาส `flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden` (หากมีแท็ก `<form>` ครอบเนื้อหาทั้งหมด ฟอร์มต้องมีคลาส `flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden` เช่นกัน)
+  - **Fixed Header:** แถบหัวเรื่องด้านบนต้องมีคลาส `flex-shrink-0 border-b border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900` พร้อมปุ่มปิด (`ph-x`) โดยแถบนี้ต้องอยู่กับที่เสมอ ห้ามเลื่อนหลุดสายตาเด็ดขาด
+  - **Scrollable Middle Body:** ส่วนเนื้อหาแบบฟอร์มตรงกลางต้องกำหนดคลาส `flex-1 overflow-y-auto p-6` (พร้อม custom scrollbar) เพื่อให้สามารถเลื่อนดูเนื้อหาภายในได้เฉพาะส่วนนี้เมื่อข้อมูลยาวเกินหน้าจอ
+  - **Fixed Footer:** แถบปุ่มดำเนินการด้านล่าง (เช่น บันทึก, ยกเลิก) ต้องมีคลาส `flex-shrink-0 border-t border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900 flex justify-end gap-3` เพื่อให้ปุ่ม Action สำคัญแสดงผลติดขอบล่างของ Modal ตลอดเวลา ผู้ใช้สามารถกดบันทึกหรือยกเลิกได้ทันทีโดยไม่ต้องเลื่อนหน้าจอลงไปล่างสุด
+
 

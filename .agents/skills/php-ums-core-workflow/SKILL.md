@@ -462,6 +462,47 @@ To ensure absolute compliance with the system architecture, always verify the fo
   2. Fire a SweetAlert2 Toast at `position: 'top'` with localized text (`__('settings.copied_to_clipboard')`).
   3. Support non-secure HTTP / Localhost contexts with graceful fallback (`document.execCommand('copy')`).
 
+### 31. Modal Architecture: Fixed Header & Footer with Scrollable Body (UI/UX STANDARD)
+- **The Issue:** Modals with long forms or overflowing content can cause the header or action buttons (Save, Cancel) to scroll out of view, forcing users to scroll all the way down just to find the submit button or lose visual context.
+- **The Rule:** ALL modal dialogs across the application MUST use a fixed header, a scrollable middle body, and a fixed footer pinned to the bottom.
+- **The HTML / Tailwind Architecture:**
+  ```html
+  <div id="exampleModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
+          <form id="exampleForm" class="flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden">
+              <!-- Fixed Header -->
+              <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 bg-white dark:bg-slate-900">
+                  <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center">
+                      <i class="ph ph-sliders text-primary-500 mr-2 text-xl"></i> Modal Title
+                  </h3>
+                  <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors p-1">
+                      <i class="ph ph-x text-xl"></i>
+                  </button>
+              </div>
+
+              <!-- Scrollable Middle Body -->
+              <div class="p-6 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-950/50 space-y-4">
+                  <!-- Form Fields / Long Content here -->
+              </div>
+
+              <!-- Fixed Footer -->
+              <div class="px-6 py-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end gap-3 flex-shrink-0">
+                  <button type="button" onclick="closeModal()" class="px-5 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 transition-colors">
+                      Cancel
+                  </button>
+                  <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-sidebar rounded-lg hover:opacity-90 transition-colors shadow-sm">
+                      Save
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
+  ```
+- **Key Rules:**
+  1. `flex-shrink-0` on Header and Footer prevents them from collapsing or scrolling.
+  2. `flex-1 overflow-y-auto` on Body allows only the content area to scroll.
+  3. `max-h-[85vh] md:max-h-[90vh]` on container ensures the modal fits comfortably on any screen.
+
 
 
 
