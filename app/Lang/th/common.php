@@ -3,6 +3,7 @@
 return [
     // Actions
     'save'          => 'บันทึก',
+    'saving'        => 'กำลังบันทึก...',
     'update'        => 'อัปเดต',
     'cancel'        => 'ยกเลิก',
     'delete'        => 'ลบ',

@@ -3,6 +3,7 @@
 return [
     // Actions
     'save'          => 'Save',
+    'saving'        => 'Saving...',
     'update'        => 'Update',
     'cancel'        => 'Cancel',
     'delete'        => 'Delete',

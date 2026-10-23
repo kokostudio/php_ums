@@ -242,6 +242,235 @@ class SocialAuthController extends Controller
     }
 
     // ==========================================
+    // FACEBOOK OAUTH
+    // ==========================================
+    public function redirectToFacebook()
+    {
+        if (Settings::get('enable_facebook_login') !== '1') {
+            Session::setFlash('error', __('messages.facebook_login_disabled'));
+            $this->redirect('/login');
+        }
+
+        $clientId = Settings::get('facebook_client_id') ?: getenv('FACEBOOK_CLIENT_ID');
+        $redirectUri = Settings::get('facebook_redirect_uri') ?: getenv('FACEBOOK_REDIRECT_URI');
+
+        $state = bin2hex(random_bytes(16));
+        Session::set('oauth_state', $state);
+
+        $params = [
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'state'         => $state,
+            'scope'         => 'email,public_profile',
+            'response_type' => 'code'
+        ];
+
+        $authUrl = 'https://www.facebook.com/v19.0/dialog/oauth?' . http_build_query($params);
+        header('Location: ' . $authUrl);
+        exit;
+    }
+
+    public function handleFacebookCallback()
+    {
+        if (Settings::get('enable_facebook_login') !== '1') {
+            Session::setFlash('error', __('messages.facebook_login_disabled'));
+            $this->redirect('/login');
+        }
+
+        $code = $_GET['code'] ?? null;
+        $state = $_GET['state'] ?? null;
+        $error = $_GET['error'] ?? null;
+        $savedState = Session::get('oauth_state');
+
+        if ($error || !$code || !$state || $state !== $savedState) {
+            Session::setFlash('error', __('messages.facebook_login_failed'));
+            $this->redirect('/login');
+        }
+
+        Session::remove('oauth_state');
+
+        $clientId = Settings::get('facebook_client_id') ?: getenv('FACEBOOK_CLIENT_ID');
+        $clientSecret = Settings::get('facebook_client_secret') ?: getenv('FACEBOOK_CLIENT_SECRET');
+        $redirectUri = Settings::get('facebook_redirect_uri') ?: getenv('FACEBOOK_REDIRECT_URI');
+
+        $tokenUrl = 'https://graph.facebook.com/v19.0/oauth/access_token?' . http_build_query([
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'redirect_uri'  => $redirectUri,
+            'code'          => $code
+        ]);
+
+        $ch = curl_init($tokenUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $tokenData = json_decode($response, true);
+        if (!isset($tokenData['access_token'])) {
+            Session::setFlash('error', __('messages.facebook_token_failed'));
+            $this->redirect('/login');
+        }
+
+        $accessToken = $tokenData['access_token'];
+
+        // Get user profile
+        $userUrl = 'https://graph.facebook.com/v19.0/me?fields=id,name,first_name,last_name,email,picture.type(large)&access_token=' . $accessToken;
+        $ch = curl_init($userUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $userResponse = curl_exec($ch);
+        curl_close($ch);
+
+        $userData = json_decode($userResponse, true);
+        if (!isset($userData['id'])) {
+            Session::setFlash('error', __('messages.facebook_data_failed'));
+            $this->redirect('/login');
+        }
+
+        $facebookId = $userData['id'];
+        $email = $userData['email'] ?? null;
+        $firstName = $userData['first_name'] ?? ($userData['name'] ?? 'Facebook');
+        $lastName = $userData['last_name'] ?? 'User';
+        $profileImage = $userData['picture']['data']['url'] ?? null;
+
+        if (!$email) {
+            $email = $facebookId . '@facebook.login';
+        }
+
+        $this->loginOrCreateUser('facebook', $facebookId, $email, $firstName, $lastName, $profileImage);
+    }
+
+    // ==========================================
+    // GITHUB OAUTH
+    // ==========================================
+    public function redirectToGithub()
+    {
+        if (Settings::get('enable_github_login') !== '1') {
+            Session::setFlash('error', __('messages.github_login_disabled'));
+            $this->redirect('/login');
+        }
+
+        $clientId = Settings::get('github_client_id') ?: getenv('GITHUB_CLIENT_ID');
+        $redirectUri = Settings::get('github_redirect_uri') ?: getenv('GITHUB_REDIRECT_URI');
+
+        $state = bin2hex(random_bytes(16));
+        Session::set('oauth_state', $state);
+
+        $params = [
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'state'         => $state,
+            'scope'         => 'read:user user:email'
+        ];
+
+        $authUrl = 'https://github.com/login/oauth/authorize?' . http_build_query($params);
+        header('Location: ' . $authUrl);
+        exit;
+    }
+
+    public function handleGithubCallback()
+    {
+        if (Settings::get('enable_github_login') !== '1') {
+            Session::setFlash('error', __('messages.github_login_disabled'));
+            $this->redirect('/login');
+        }
+
+        $code = $_GET['code'] ?? null;
+        $state = $_GET['state'] ?? null;
+        $savedState = Session::get('oauth_state');
+
+        if (!$code || !$state || $state !== $savedState) {
+            Session::setFlash('error', __('messages.github_login_failed'));
+            $this->redirect('/login');
+        }
+
+        Session::remove('oauth_state');
+
+        $clientId = Settings::get('github_client_id') ?: getenv('GITHUB_CLIENT_ID');
+        $clientSecret = Settings::get('github_client_secret') ?: getenv('GITHUB_CLIENT_SECRET');
+        $redirectUri = Settings::get('github_redirect_uri') ?: getenv('GITHUB_REDIRECT_URI');
+
+        // Exchange code for token
+        $tokenUrl = 'https://github.com/login/oauth/access_token';
+        $postData = [
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'code'          => $code,
+            'redirect_uri'  => $redirectUri
+        ];
+
+        $ch = curl_init($tokenUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json', 'User-Agent: PHP-UMS-App']);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $tokenData = json_decode($response, true);
+        if (!isset($tokenData['access_token'])) {
+            Session::setFlash('error', __('messages.github_token_failed'));
+            $this->redirect('/login');
+        }
+
+        $accessToken = $tokenData['access_token'];
+
+        // Get user profile
+        $userUrl = 'https://api.github.com/user';
+        $ch = curl_init($userUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'User-Agent: PHP-UMS-App',
+            'Accept: application/json'
+        ]);
+        $userResponse = curl_exec($ch);
+        curl_close($ch);
+
+        $userData = json_decode($userResponse, true);
+        if (!isset($userData['id'])) {
+            Session::setFlash('error', __('messages.github_data_failed'));
+            $this->redirect('/login');
+        }
+
+        $githubId = (string)$userData['id'];
+        $email = $userData['email'] ?? null;
+        $name = $userData['name'] ?? ($userData['login'] ?? 'GitHub User');
+        $profileImage = $userData['avatar_url'] ?? null;
+
+        // If email is private, fetch from /user/emails
+        if (!$email) {
+            $emailsUrl = 'https://api.github.com/user/emails';
+            $ch = curl_init($emailsUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $accessToken,
+                'User-Agent: PHP-UMS-App',
+                'Accept: application/json'
+            ]);
+            $emailsResponse = curl_exec($ch);
+            curl_close($ch);
+            $emails = json_decode($emailsResponse, true);
+            if (is_array($emails)) {
+                foreach ($emails as $emailItem) {
+                    if (!empty($emailItem['primary']) && !empty($emailItem['email'])) {
+                        $email = $emailItem['email'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$email) {
+            $email = ($userData['login'] ?? $githubId) . '@github.login';
+        }
+
+        $nameParts = explode(' ', $name, 2);
+        $firstName = $nameParts[0];
+        $lastName = $nameParts[1] ?? '';
+
+        $this->loginOrCreateUser('github', $githubId, $email, $firstName, $lastName, $profileImage);
+    }
+
+    // ==========================================
     // CORE LOGIN/REGISTRATION LOGIC
     // ==========================================
     private function loginOrCreateUser($provider, $providerId, $email, $firstName, $lastName, $profileImage)

@@ -265,39 +265,8 @@
                     });
                 });
 
-                // Copy to clipboard helper
-                function copyToClipboard(inputId, btnElement) {
-                    var copyText = document.getElementById(inputId);
-                    
-                    if (!copyText) return;
-                    
-                    // Select and copy
-                    copyText.select();
-                    copyText.setSelectionRange(0, 99999); /* For mobile devices */
-                    
-                    try {
-                        navigator.clipboard.writeText(copyText.value).then(function() {
-                            // Visual feedback
-                            var icon = $(btnElement).find('i');
-                            icon.removeClass('ph-copy').addClass('ph-check text-green-500 dark:text-green-400');
-                            
-                            setTimeout(function() {
-                                icon.removeClass('ph-check text-green-500 dark:text-green-400').addClass('ph-copy');
-                            }, 2000);
-                        });
-                    } catch (err) {
-                        // Fallback
-                        document.execCommand('copy');
-                        var icon = $(btnElement).find('i');
-                        icon.removeClass('ph-copy').addClass('ph-check text-green-500 dark:text-green-400');
-                        setTimeout(function() {
-                            icon.removeClass('ph-check text-green-500 dark:text-green-400').addClass('ph-copy');
-                        }, 2000);
-                    }
-                }
             </script>
-</body>
-</html>            <?php elseif ($tab === 'login'): ?>
+            <?php elseif ($tab === 'login'): ?>
             <!-- ===== LOGIN PAGE TAB ===== -->
             <form action="/settings/login" method="POST" enctype="multipart/form-data" id="loginSettingsForm">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
@@ -786,92 +755,196 @@
             <?php if ($tab === 'social'): ?>
             <form action="/settings/social" method="POST" id="socialSettingsForm">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-                        <i class="ph ph-share-network mr-2"></i><?= __('settings.social_login') ?? 'Social Login' ?>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+                        <i class="ph ph-share-network mr-2 text-primary-600 dark:text-primary-400"></i><?= __('settings.social_login') ?>
                     </h3>
-                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm flex items-center">
-                        <i class="ph ph-check-circle mr-2 text-lg"></i> <?= __('settings.save_settings') ?>
+                    <button type="submit" id="saveSocialBtn" class="px-5 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm flex items-center">
+                        <i class="ph ph-check-circle mr-2 text-lg"></i>
+                        <span><?= __('settings.save_settings') ?></span>
                     </button>
                 </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                    <!-- Google Settings -->
+                    <!-- 1. Google Settings -->
                     <div class="bg-white dark:bg-slate-800/80 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                        <!-- Decorative accent -->
-                        <div class="absolute top-0 left-0 w-1 h-full bg-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         
                         <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-700/50 pb-4">
                             <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-5 h-5 mr-2">
-                                <?= __('settings.google_login') ?? 'Google Login' ?>
+                                <div class="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 flex items-center justify-center mr-3 shadow-xs shrink-0">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                </div>
+                                <?= __('settings.google_login') ?>
                             </h4>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" name="enable_google_login" value="1" class="sr-only peer" <?= ($settings['enable_google_login'] ?? '0') === '1' ? 'checked' : '' ?>>
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_google_login') ?? 'Enable Google Login' ?></span>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_google_login') ?></span>
                             </label>
                         </div>
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_client_id') ?? 'Client ID' ?></label>
-                                <input type="text" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id'] ?? '') ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_client_id') ?></label>
+                                <input type="text" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id'] ?? '') ?>" placeholder="e.g. 123456789-abcdef.apps.googleusercontent.com" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_client_secret') ?? 'Client Secret' ?></label>
-                                <input type="text" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret'] ?? '') ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_client_secret') ?></label>
+                                <input type="text" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret'] ?? '') ?>" placeholder="e.g. GOCSPX-xxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_redirect_uri') ?? 'Redirect URI' ?></label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_redirect_uri') ?></label>
                                 <div class="flex items-center gap-2">
                                     <input type="text" id="google_redirect_uri_input" name="google_redirect_uri" value="<?= htmlspecialchars($settings['google_redirect_uri'] ?? \App\Core\Config::get('APP_URL') . '/auth/google/callback') ?>" class="w-full px-4 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-500 dark:text-slate-400 focus:outline-none" readonly>
-                                    <button type="button" onclick="copyToClipboard('google_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="Copy to clipboard">
+                                    <button type="button" onclick="copyToClipboard('google_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="<?= __('settings.copied_to_clipboard') ?>">
                                         <i class="ph ph-copy text-lg"></i>
                                     </button>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2"><i class="ph ph-info mr-1"></i>Copy this URI to your Google Cloud Console authorized redirect URIs.</p>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 flex items-center gap-1.5">
+                                    <i class="ph ph-info text-sm text-primary-500"></i>
+                                    <?= __('settings.google_redirect_hint') ?>
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- LINE Settings -->
+                    <!-- 2. LINE Settings -->
                     <div class="bg-white dark:bg-slate-800/80 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                        <!-- Decorative accent -->
-                        <div class="absolute top-0 left-0 w-1 h-full bg-[#00B900] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#06C755] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         
                         <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-700/50 pb-4">
                             <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-[#00B900]" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.963 8.89 9.382 9.615.366.079.866.242 1.002.553.121.282.079.722.037 1.011-.044.29-.205 1.229-.247 1.489-.053.318-.242.977.854.514 1.096-.461 5.922-3.488 8.169-6.028 2.062-2.316 2.803-4.706 2.803-7.154zm-14.717 3.393h-2.613c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285.158 0 .285.128.285.285v4.978h2.328c.157 0 .285.128.285.285s-.128.285-.285.285zm3.433 0h-.569c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285.158 0 .285.128.285.285v5.263c0 .156-.127.285-.285.285zm4.846-5.548v5.263c0 .156-.128.285-.285.285h-.569c-.046 0-.091-.011-.131-.031-.038-.022-.07-.052-.093-.089l-2.607-3.791v3.626c0 .156-.128.285-.285.285h-.569c-.157 0-.285-.129-.285-.285v-5.263c0-.157.128-.285.285-.285h.569c.046 0 .092.012.131.032.038.021.07.051.093.088l2.607 3.792v-3.627c0-.157.128-.285.285-.285h.569c.158 0 .285.128.285.285z"/>
-                                </svg>
-                                <?= __('settings.line_login') ?? 'LINE Login' ?>
+                                <div class="w-8 h-8 rounded-lg bg-[#06C755] flex items-center justify-center mr-3 shadow-xs shrink-0">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                        <path fill="#FFFFFF" d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.77.038 1.08-.058.42-.27 1.62-.27 1.62s-.135.81.48.442c.615-.368 6.502-3.834 8.88-6.559C22.425 14.737 24 12.637 24 10.314"/>
+                                    </svg>
+                                </div>
+                                <?= __('settings.line_login') ?>
                             </h4>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" name="enable_line_login" value="1" class="sr-only peer" <?= ($settings['enable_line_login'] ?? '0') === '1' ? 'checked' : '' ?>>
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_line_login') ?? 'Enable LINE Login' ?></span>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_line_login') ?></span>
                             </label>
                         </div>
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_client_id') ?? 'Channel ID' ?></label>
-                                <input type="text" name="line_client_id" value="<?= htmlspecialchars($settings['line_client_id'] ?? '') ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_client_id') ?></label>
+                                <input type="text" name="line_client_id" value="<?= htmlspecialchars($settings['line_client_id'] ?? '') ?>" placeholder="e.g. 165xxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_client_secret') ?? 'Channel Secret' ?></label>
-                                <input type="text" name="line_client_secret" value="<?= htmlspecialchars($settings['line_client_secret'] ?? '') ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_client_secret') ?></label>
+                                <input type="text" name="line_client_secret" value="<?= htmlspecialchars($settings['line_client_secret'] ?? '') ?>" placeholder="e.g. 84xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_redirect_uri') ?? 'Callback URL' ?></label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_redirect_uri') ?></label>
                                 <div class="flex items-center gap-2">
                                     <input type="text" id="line_redirect_uri_input" name="line_redirect_uri" value="<?= htmlspecialchars($settings['line_redirect_uri'] ?? \App\Core\Config::get('APP_URL') . '/auth/line/callback') ?>" class="w-full px-4 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-500 dark:text-slate-400 focus:outline-none" readonly>
-                                    <button type="button" onclick="copyToClipboard('line_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="Copy to clipboard">
+                                    <button type="button" onclick="copyToClipboard('line_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="<?= __('settings.copied_to_clipboard') ?>">
                                         <i class="ph ph-copy text-lg"></i>
                                     </button>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2"><i class="ph ph-info mr-1"></i>Copy this URI to your LINE Developers Console callback URLs.</p>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 flex items-center gap-1.5">
+                                    <i class="ph ph-info text-sm text-primary-500"></i>
+                                    <?= __('settings.line_redirect_hint') ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Facebook Settings -->
+                    <div class="bg-white dark:bg-slate-800/80 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#1877F2] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-700/50 pb-4">
+                            <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-[#1877F2] flex items-center justify-center mr-3 shadow-xs shrink-0">
+                                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                    </svg>
+                                </div>
+                                <?= __('settings.facebook_login') ?>
+                            </h4>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="enable_facebook_login" value="1" class="sr-only peer" <?= ($settings['enable_facebook_login'] ?? '0') === '1' ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_facebook_login') ?></span>
+                            </label>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.facebook_client_id') ?></label>
+                                <input type="text" name="facebook_client_id" value="<?= htmlspecialchars($settings['facebook_client_id'] ?? '') ?>" placeholder="e.g. 10xxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.facebook_client_secret') ?></label>
+                                <input type="text" name="facebook_client_secret" value="<?= htmlspecialchars($settings['facebook_client_secret'] ?? '') ?>" placeholder="e.g. a1b2c3d4e5f6xxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.facebook_redirect_uri') ?></label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="facebook_redirect_uri_input" name="facebook_redirect_uri" value="<?= htmlspecialchars($settings['facebook_redirect_uri'] ?? \App\Core\Config::get('APP_URL') . '/auth/facebook/callback') ?>" class="w-full px-4 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-500 dark:text-slate-400 focus:outline-none" readonly>
+                                    <button type="button" onclick="copyToClipboard('facebook_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="<?= __('settings.copied_to_clipboard') ?>">
+                                        <i class="ph ph-copy text-lg"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 flex items-center gap-1.5">
+                                    <i class="ph ph-info text-sm text-primary-500"></i>
+                                    <?= __('settings.facebook_redirect_hint') ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. GitHub Settings -->
+                    <div class="bg-white dark:bg-slate-800/80 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#24292F] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-700/50 pb-4">
+                            <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-[#24292F] dark:bg-white flex items-center justify-center mr-3 shadow-xs shrink-0">
+                                    <svg class="w-5 h-5 fill-white dark:fill-[#24292F]" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                                    </svg>
+                                </div>
+                                <?= __('settings.github_login') ?>
+                            </h4>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="enable_github_login" value="1" class="sr-only peer" <?= ($settings['enable_github_login'] ?? '0') === '1' ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_github_login') ?></span>
+                            </label>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.github_client_id') ?></label>
+                                <input type="text" name="github_client_id" value="<?= htmlspecialchars($settings['github_client_id'] ?? '') ?>" placeholder="e.g. Ov23lixxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.github_client_secret') ?></label>
+                                <input type="text" name="github_client_secret" value="<?= htmlspecialchars($settings['github_client_secret'] ?? '') ?>" placeholder="e.g. 5bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.github_redirect_uri') ?></label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="github_redirect_uri_input" name="github_redirect_uri" value="<?= htmlspecialchars($settings['github_redirect_uri'] ?? \App\Core\Config::get('APP_URL') . '/auth/github/callback') ?>" class="w-full px-4 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-500 dark:text-slate-400 focus:outline-none" readonly>
+                                    <button type="button" onclick="copyToClipboard('github_redirect_uri_input', this)" class="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 rounded-lg transition-colors border border-gray-200 dark:border-slate-600" title="<?= __('settings.copied_to_clipboard') ?>">
+                                        <i class="ph ph-copy text-lg"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 flex items-center gap-1.5">
+                                    <i class="ph ph-info text-sm text-primary-500"></i>
+                                    <?= __('settings.github_redirect_hint') ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -909,5 +982,56 @@
                 $('html').removeClass('text-[14px] text-[16px] text-[18px]').addClass($(this).val());
             }
         });
+
+        // Button preloading & double-submit prevention (Rule 4)
+        $('#socialSettingsForm').on('submit', function() {
+            var $btn = $(this).find('button[type="submit"]');
+            $btn.prop('disabled', true).addClass('opacity-75 cursor-not-allowed');
+            $btn.html('<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> <span><?= addslashes(__('common.saving')) ?></span>');
+        });
     });
+
+    // Global copy to clipboard helper with SweetAlert2 top-center Toast
+    function copyToClipboard(inputId, btnElement) {
+        var copyText = document.getElementById(inputId);
+        if (!copyText) return;
+        
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        
+        function showFeedback() {
+            var $icon = $(btnElement).find('i');
+            $icon.removeClass('ph-copy').addClass('ph-check text-green-500 dark:text-green-400');
+            setTimeout(function() {
+                $icon.removeClass('ph-check text-green-500 dark:text-green-400').addClass('ph-copy');
+            }, 2000);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
+                        title: 'text-[13px] font-medium font-sans'
+                    }
+                }).fire({
+                    icon: 'success',
+                    title: '<?= addslashes(__('settings.copied_to_clipboard')) ?>'
+                });
+            }
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(copyText.value).then(showFeedback).catch(function() {
+                document.execCommand('copy');
+                showFeedback();
+            });
+        } else {
+            document.execCommand('copy');
+            showFeedback();
+        }
+    }
 </script>

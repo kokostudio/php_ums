@@ -49,6 +49,10 @@ $router->get('/auth/google', [\App\Controllers\SocialAuthController::class, 'red
 $router->get('/auth/google/callback', [\App\Controllers\SocialAuthController::class, 'handleGoogleCallback']);
 $router->get('/auth/line', [\App\Controllers\SocialAuthController::class, 'redirectToLine']);
 $router->get('/auth/line/callback', [\App\Controllers\SocialAuthController::class, 'handleLineCallback']);
+$router->get('/auth/facebook', [\App\Controllers\SocialAuthController::class, 'redirectToFacebook']);
+$router->get('/auth/facebook/callback', [\App\Controllers\SocialAuthController::class, 'handleFacebookCallback']);
+$router->get('/auth/github', [\App\Controllers\SocialAuthController::class, 'redirectToGithub']);
+$router->get('/auth/github/callback', [\App\Controllers\SocialAuthController::class, 'handleGithubCallback']);
 
 // Forgot/Reset Password
 $router->get('/forgot-password', [\App\Controllers\AuthController::class, 'forgotPassword']);

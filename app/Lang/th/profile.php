@@ -63,6 +63,8 @@ return [
     'connect'                => 'เชื่อมต่อ',
     'disconnect_confirm_google' => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ Google?',
     'disconnect_confirm_line'   => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ LINE?',
+    'disconnect_confirm_facebook' => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ Facebook?',
+    'disconnect_confirm_github' => 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเชื่อมต่อ GitHub?',
 
     // Cropper
     'crop_profile_picture'   => 'ครอบตัดรูปโปรไฟล์',

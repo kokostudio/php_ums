@@ -63,6 +63,8 @@ return [
     'connect'                => 'Connect',
     'disconnect_confirm_google' => 'Are you sure you want to disconnect Google?',
     'disconnect_confirm_line'   => 'Are you sure you want to disconnect LINE?',
+    'disconnect_confirm_facebook' => 'Are you sure you want to disconnect Facebook?',
+    'disconnect_confirm_github' => 'Are you sure you want to disconnect GitHub?',
 
     // Cropper
     'crop_profile_picture'   => 'Crop Profile Picture',

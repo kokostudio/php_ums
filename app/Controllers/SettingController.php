@@ -65,7 +65,9 @@ class SettingController extends Controller
             'security' => ['password_min_length', 'login_max_attempts', 'login_lockout_time', 'session_lifetime', 'require_email_verification'],
             'social'   => [
                 'google_client_id', 'google_client_secret', 'google_redirect_uri',
-                'line_client_id', 'line_client_secret', 'line_redirect_uri'
+                'line_client_id', 'line_client_secret', 'line_redirect_uri',
+                'facebook_client_id', 'facebook_client_secret', 'facebook_redirect_uri',
+                'github_client_id', 'github_client_secret', 'github_redirect_uri'
             ],
         ];
         $fileKeysByTab = [
@@ -98,6 +100,8 @@ class SettingController extends Controller
             if ($tab === 'social') {
                 Settings::set('enable_google_login', !empty($_POST['enable_google_login']) ? '1' : '0');
                 Settings::set('enable_line_login', !empty($_POST['enable_line_login']) ? '1' : '0');
+                Settings::set('enable_facebook_login', !empty($_POST['enable_facebook_login']) ? '1' : '0');
+                Settings::set('enable_github_login', !empty($_POST['enable_github_login']) ? '1' : '0');
             }
             if ($tab === 'translations') {
                 Settings::set('enable_language_switcher', !empty($_POST['enable_language_switcher']) ? '1' : '0');
