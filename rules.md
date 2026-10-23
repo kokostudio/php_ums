@@ -180,6 +180,8 @@
 - [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้)
 - [ ] **ปุ่มอันตราย** (ลบ, ระงับ) ต้องใช้ `bg-red-500` และต้องแสดงหน้าต่างยืนยันด้วย **SweetAlert2 (`Swal.fire`)** เท่านั้น ห้ามใช้ `confirm()` ปกติ
 - [ ] **ห้ามใช้สัญลักษณ์สกุลเงินบาท:** ห้ามใช้สัญลักษณ์ `฿` ทุกที่ ให้ใช้คำว่า 'บาท' หรือ 'THB' เท่านั้น
+- [ ] **โลโก้และไอคอนแบรนด์ (Social Logos):** ต้องใช้ **Inline Vector SVG** หรือไฟล์ Asset ภายในระบบเท่านั้น ห้ามดึงภาพจาก Hotlink ภายนอก (เช่น Wikimedia Commons หรือ CDN นอก) ที่อาจโหลดไม่ติดเมื่อออฟไลน์หรือถูกบล็อก
+- [ ] **การคัดลอกลงคลิปบอร์ด (Clipboard Feedback):** ทุกปุ่มคัดลอก (เช่น Callback URL, Token) ต้องเปลี่ยนไอคอนเป็นเครื่องหมายถูกสีเขียวชั่วคราว พร้อมแสดง **SweetAlert2 Toast บนกลาง (`position: 'top'`)** แจ้งเตือนข้อความที่แปลภาษาแล้ว และมี Fallback สำหรับ Context ที่ไม่ใช่ HTTPS
 - [ ] สี Active / Hover ของเมนูหรือแท็บ ให้ใช้กลุ่มสี `primary-*` เท่านั้น (ห้ามใช้สี blue หรือ slate คงที่)
 
 ### 3. DataTables (ตารางข้อมูล)
@@ -219,3 +221,16 @@
 
 ## 20. Rate Limiting (Security)
 - **Brute Force Protection:** ระบบมีตาราง `rate_limits` (`ip_address`, `endpoint`, `attempts`, `lockout_time`) เพื่อป้องกันการโจมตีแบบ Brute Force หรือสแปม Request ในจุดสำคัญ เช่น หน้า Login, OTP หรือการร้องขอรีเซ็ตรหัสผ่าน
+
+## 21. Social Login & OAuth Architecture (Google, LINE, Facebook, GitHub)
+- **Multi-Provider Support:** ระบบรองรับ Social Login มาตรฐาน 4 ผู้ให้บริการหลัก ได้แก่ Google, LINE, Facebook และ GitHub ผ่าน `SocialAuthController`
+- **Inline Vector SVGs:** โลโก้และไอคอนแบรนด์ทุกตัวต้องใช้เป็น Inline Vector SVG คุณภาพสูงภายในไฟล์โดยตรง ห้ามใช้ `<img>` ชี้ไปยัง CDN หรือ Hotlink ภายนอก (เช่น Wikimedia) เพื่อป้องกันปัญหาภาพไม่โหลดตอนออฟไลน์ หรือข้อผิดพลาด SSL Revocation
+- **Data Schema:** ข้อมูลผู้ใช้ผูกเข้ากับคอลัมน์ `google_id`, `line_id`, `facebook_id`, `github_id` ในตาราง `users`
+- **Confirmation on Disconnect:** การยกเลิกการผูกบัญชีโซเชียลในหน้าโปรไฟล์ (`/profile`) ต้องใช้ **SweetAlert2 Dialog (`Swal.fire`)** เสมอ ห้ามใช้ Native `confirm()` ของเบราว์เซอร์
+
+## 22. Clipboard Copy Standard & Top-Center Toast Feedback
+- **Dual Visual Feedback:** ทุกครั้งที่มีปุ่มกดคัดลอก (เช่น OAuth Callback URL ในหน้า Settings หรือ Token ต่างๆ):
+  1. ไอคอนปุ่มต้องเปลี่ยนเป็นเครื่องหมายถูกสีเขียว (`ph-check text-green-500`) เป็นเวลา 2 วินาที
+  2. แสดงผลการแจ้งเตือน **SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)** พร้อมข้อความภาษาที่ถูกต้อง (`__('settings.copied_to_clipboard')`)
+- **HTTP/Localhost Compatibility:** ต้องมีกลไกตรวจสอบ `navigator.clipboard && window.isSecureContext` พร้อม Fallback ด้วย `document.execCommand('copy')` เพื่อให้สามารถใช้งานบน Localhost HTTP ได้อย่างราบรื่น
+

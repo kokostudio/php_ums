@@ -391,6 +391,24 @@ To ensure absolute compliance with the system architecture, always verify the fo
   2. Ensure dark mode styles (`background`, `color`) match the application theme.
   3. Dangerous or irreversible actions (such as delete) must use standard centered modal dialogs (`Swal.fire({ icon: 'warning', showCancelButton: true, ... })`), never Toast.
 
+### 29. Social Login & Inline Vector SVGs (CRITICAL UI & ASSET STANDARD)
+- **The Issue:** Relying on external image hotlinks (such as Wikimedia Commons or remote CDNs) for brand logos can lead to broken images, SSL revocation errors (e.g. `CRYPT_E_REVOCATION_OFFLINE`), slow loading, or adblocker restrictions.
+- **The Rule:** NEVER load brand logos (Google, LINE, Facebook, GitHub, etc.) from external hotlinks. Always embed clean inline vector SVGs or serve verified local assets.
+- **The Architecture:**
+  1. The system natively supports 4 social providers: Google, LINE, Facebook, and GitHub.
+  2. Provider credentials (Client ID, Secret, Redirect URI, Enabled toggle) are configured in `/settings/social` and managed in `system_settings`.
+  3. OAuth callback URLs follow clean convention: `/auth/{provider}/callback`.
+  4. Account linking/unlinking in `/profile` must prompt confirmation using SweetAlert2 dialogs, never native browser `confirm()`.
+
+### 30. Copy to Clipboard Standard & Top-Center Feedback (UX CONVENTION)
+- **The Issue:** Copying text/tokens without clear visual and toast feedback confuses users and leaves them unsure if the copy succeeded.
+- **The Rule:** All copy-to-clipboard interactions must provide dual feedback (visual icon feedback + top-center SweetAlert2 toast).
+- **The Solution:**
+  1. Temporarily replace the copy icon with a green checkmark (`ph-check text-green-500`) for 2 seconds.
+  2. Fire a SweetAlert2 Toast at `position: 'top'` with localized text (`__('settings.copied_to_clipboard')`).
+  3. Support non-secure HTTP / Localhost contexts with graceful fallback (`document.execCommand('copy')`).
+
+
 
 
 

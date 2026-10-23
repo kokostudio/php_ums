@@ -48,8 +48,16 @@
 - พัฒนาระบบรองรับหลายภาษา (**Multi-Language / i18n**) เริ่มต้นด้วยภาษาไทยเป็นภาษาหลัก (`th`) และภาษาอังกฤษ (`en`) รองรับการสลับภาษาผ่าน `GET /lang/{locale}` พร้อมปุ่มสลับภาษาใน Topbar และแปลข้อความทั้งระบบผ่านฟังก์ชัน `__()`
 - พัฒนาระบบ **เมนูโปรด (Pinned Sidebar Menus)** ที่บันทึกผ่าน LocalStorage ช่วยให้ผู้ใช้ปักหมุดเมนูที่ใช้บ่อยไว้ด้านบนสุดของ Sidebar ได้อย่างง่ายดาย
 - เพิ่มหน้าจอ **ข้อกำหนดการออกแบบ (Design Specification)** เข้าสู่ระบบการตั้งค่า (`/settings/design_spec`) พร้อมเมนูนำทางในแท็บ Settings, รองรับการค้นหาผ่าน Ctrl+K, มีระบบคัดลอก Markdown, พิมพ์เอกสาร, รายละเอียดสถาปัตยกรรม 12 ตารางฐานข้อมูล, ความปลอดภัย (Hashids, 2FA, Rate Limiting, CSRF), มาตรฐาน UI/UX และชุดทดสอบการแจ้งเตือน (Notifications & Preloader Playground)
+- กำหนดและบังคับใช้ **กฎเหล็กมาตรฐานแกนหลัก 4 ข้อ** (กฎข้อที่ 1 ต้องอ่านกฎใน `rules.md` และ `GEMINI.md` ทุกครั้งก่อนเริ่มงาน, กฎใส่ภาษาครบ 100% ทั้ง TH/EN แบบสมมาตร 1:1, กฎสถานะ Preloading ของปุ่มและการป้องกัน Double-Submit, กฎการแจ้งเตือน SweetAlert2 Toast ตำแหน่งบนกลาง `position: 'top'`)
+- พัฒนาระบบ **Social Login & OAuth 4 ผู้ให้บริการหลัก** (Google, LINE, Facebook, GitHub) ในหน้าตั้งค่า `/settings/social` และหน้าล็อกอิน `/login`
+- ปรับเปลี่ยนโลโก้แบรนด์ Social Login ทุกตัวเป็น **Inline Vector SVG** คุณภาพสูง ตัดปัญหาภาพโหลดไม่ขึ้นหรือบั๊ก SSL Revocation จาก Wikimedia Commons
+- เพิ่มคอลัมน์ `facebook_id` และ `github_id` ในตาราง `users` รองรับการผูกบัญชีและเข้าสู่ระบบด้วย Facebook และ GitHub
+- เพิ่มระบบคัดลอกลงคลิปบอร์ดแบบ Dual Feedback (เปลี่ยนไอคอนเป็นเครื่องหมายถูกสีเขียว 2 วินาที + SweetAlert2 Toast บนกลาง) พร้อมรองรับ Fallback สำหรับ Localhost HTTP
+- ปรับปรุงหน้าโปรไฟล์ (`/profile`) ให้รองรับการเชื่อมต่อและตัดการเชื่อมต่อบัญชีโซเชียลครบทั้ง 4 แพลตฟอร์ม พร้อมยืนยันด้วย SweetAlert2 Dialog (ยกเลิก Native `confirm()`)
 
 ### แก้ไข (Fixed)
+- แก้ไขข้อผิดพลาด `copyToClipboard is not defined` ในหน้าการตั้งค่าแท็บ Social จากการจำกัด Scope ฟังก์ชันผิดแท็บ
+- นำแท็กปิด `</body></html>` ที่ตกค้างผิดตำแหน่งใน `app/Views/settings/index.php` ออก
 - แก้ไขข้อผิดพลาดของฐานข้อมูลโดยเพิ่มตาราง `system_settings` ที่ตกหล่น เพื่อให้ระบบตั้งค่าสามารถจัดเก็บข้อมูลได้สมบูรณ์
 - ปรับแก้คลาสสำหรับ Dark Mode ในตาราง Audit Logs (DataTables) ให้แสดงผลได้อย่างถูกต้องในทุกโหมดสี
 - แก้ไขปัญหาข้อผิดพลาด 500 Internal Server Error ในหน้า Audit Logs ที่เกิดจาก Column `ip_address` หายไป

@@ -1,70 +1,125 @@
-﻿# Standard Core System (PHP UMS Boilerplate)
+# Standard Core System (PHP UMS Boilerplate)
 
-ระบบจัดการผู้ใช้ (User Management System) แบบพร้อมใช้งานทันที เหมาะสำหรับนำไปเป็น **"ฐานราก (Boilerplate)"** ในการพัฒนาต่อยอดเป็นระบบอื่นๆ เช่น ERP, CRM, POS หรือระบบจัดการสต็อกสินค้า โดยไม่ต้องเสียเวลาเขียนระบบ Login, ระบบจัดการสิทธิ์, หรือระบบตั้งค่าพื้นฐานใหม่
+ระบบแกนหลักและฐานรากมาตรฐานสำหรับการพัฒนาเว็บแอปพลิเคชัน (**Pure PHP 8.4+ MVC Boilerplate & Manager Hub**) ออกแบบมาเพื่อเป็นศูนย์กลางการบริหารจัดการผู้ใช้ สิทธิ์การใช้งาน และการตั้งค่าระบบ พร้อมต่อยอดเชื่อมต่อกับระบบธุรกิจอื่นๆ ได้ทันที เช่น ERP, CRM, POS, สต็อกสินค้า หรือระบบจัดการคำสั่งซื้อ โดยไม่ต้องเริ่มต้นสร้างระบบพื้นฐานใหม่
 
-## ✨ ฟีเจอร์ที่มีให้ในตัว
-* **Authentication:** ระบบ Login, สมัครสมาชิก, ยืนยันอีเมล, ลืมรหัสผ่าน
-* **Social Login:** รองรับการเข้าสู่ระบบผ่าน Google และ LINE
-* **Security:** 2FA (Two-Factor Auth), Rate Limiting, CSRF Protection
-* **RBAC:** ระบบจัดการบทบาทและสิทธิ์ผู้ใช้งาน (Roles & Permissions)
-* **Multi-language:** ระบบเปลี่ยนภาษา (ไทย/อังกฤษ) โหลดคำแปลจากฐานข้อมูล
-* **Audit & Activity Logs:** ระบบบันทึกประวัติการใช้งานและประวัติระบบ
-* **UI/UX:** หน้าจอ Dashboard ธีมสวยงามด้วย Tailwind CSS, Phosphor Icons, SweetAlert2 และ DataTables
+---
+
+## ✨ ฟีเจอร์หลักของระบบ (Core Features)
+
+* **🔐 Authentication & User Management:**
+  * ระบบเข้าสู่ระบบ (Login), สมัครสมาชิก (Register), ยืนยันอีเมล, ขอลิงก์รีเซ็ตรหัสผ่าน (Forgot Password)
+  * ระบบเปลี่ยนรหัสผ่าน พร้อมการตรวจสอบนโยบายความปลอดภัย (Password Complexity Policy)
+  * การรักษาความปลอดภัยด้วย Two-Factor Authentication (2FA - Google Authenticator) พร้อมนโยบายบังคับสำหรับแอดมิน (`force_2fa_admin`)
+  * ป้องกันการสแปมและการโจมตีแบบ Brute-Force ด้วย `RateLimiter` แบบ Sliding Time Window
+* **🌐 4-Provider Social Login & OAuth:**
+  * รองรับการเข้าสู่ระบบและเชื่อมต่อบัญชีผ่าน **Google, LINE, Facebook และ GitHub**
+  * โลโก้แบรนด์ทุกตัวแสดงผลด้วย **Inline Vector SVG** คุณภาพสูง คมชัดทุกขนาดหน้าจอ ตัดการพึ่งพา Hotlink ภายนอก หมดปัญหาภาพแตกหรือข้อผิดพลาด SSL Revocation
+  * ระบบเชื่อมต่อและตัดการเชื่อมต่อบัญชีโซเชียลในหน้าโปรไฟล์ พร้อมหน้าต่างยืนยันด้วย SweetAlert2
+* **🛡️ Role-Based Access Control (RBAC):**
+  * จัดการบทบาท (Roles) และกำหนดสิทธิ์ (Permissions) อย่างละเอียดผ่านหน้าจอ Matrix
+  * การป้องกันสิทธิ์ระดับสูงสุด (Superadmin Protection) ป้องกันการแก้ไขหรือลบบัญชีแอดมินหลัก
+  * การป้องกันช่องโหว่ IDOR ด้วยการเข้ารหัส ID 8 หลัก (**Hashids**) ซ่อน Primary Key ทั้งระบบ
+* **🌍 100% Complete Bilingual Localization (i18n):**
+  * รองรับภาษาไทย (`th`) และภาษาอังกฤษ (`en`) แบบสมมาตร 1:1 ครบทุกจุด (0 missing keys)
+  * สลับภาษาได้ทันทีผ่าน Topbar Dropdown
+  * มีสคริปต์ตรวจสอบความสมบูรณ์ `php compare_lang.php` และซิงค์คำแปลเข้าฐานข้อมูล `php sync_lang.php`
+* **🎨 Modern UI/UX & Dynamic Theming:**
+  * ออกแบบด้วย Tailwind CSS, Google Font **Prompt** (รองรับทั้งภาษาไทยและอังกฤษ) และ Phosphor Icons
+  * รองรับ **Dark / Light Mode** เต็มรูปแบบ พร้อมสลับชุดสีธีมได้ 5 เฉดสี (Primary Color Palettes)
+  * ตารางข้อมูล **Client-Side DataTables** โหลดข้อมูลทันทีแบบ Zero-FOUC โดยไม่มีการกระพริบของหน้าเว็บ
+  * แถบแสดงความคืบหน้าด้านบนสไตล์ YouTube (**YouTube-style Top Preloader**) ไร้แสงฟุ้ง ไม่ทำให้หน้าจอขาวตอนเปลี่ยนหน้า
+  * เมนูด้านข้างและแท็บหน้าจอตั้งค่าแบบ **Sticky Navigation** ล็อกตำแหน่งสะดวกต่อการใช้งาน
+  * ระบบแจ้งเตือน **SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)** สวยงาม เรียบหรู
+* **⚙️ System Settings & Design Specification:**
+  * ตั้งค่าชื่อเว็บไซต์, โลโก้, Favicon, พื้นหลัง, ข้อความหน้า Login, โหมดปิดปรับปรุง (Maintenance Mode)
+  * หน้าจอ **Design Specification Portal** (`/settings/design_spec`) แสดงเอกสารสถาปัตยกรรมระบบ โครงสร้าง 12 ตารางฐานข้อมูล นโยบายความปลอดภัย และ Playground ทดสอบ UI
+* **📊 Activity & Audit Logging:**
+  * บันทึกประวัติกิจกรรมผู้ใช้งาน (Activity Logs) และบันทึกการเปลี่ยนแปลงข้อมูลระดับลึกพร้อม JSON Diff Viewer (Audit Logs)
+
+---
+
+## 🛠️ สถาปัตยกรรมและเทคโนโลยี (Tech Stack)
+
+* **Backend:** PHP 8.4+ (Pure PHP MVC, PSR-4 Autoloading)
+* **Database:** MySQL / MariaDB (PDO พร้อม Prepared Statements ป้องกัน SQL Injection 100%)
+* **Frontend:** Tailwind CSS (CDN), Phosphor Icons, SweetAlert2, DataTables, Axios, Chart.js
+* **Security Stack:** Hashids, Google2FA, CSRF Token Protection, Rate Limiter, ErrorHandler
 
 ---
 
 ## 🚀 คู่มือการติดตั้งสำหรับโปรเจกต์ใหม่ (Installation Guide)
 
-### สิ่งที่ต้องมี (Prerequisites)
-* PHP 8.1 หรือสูงกว่า
-* MySQL หรือ MariaDB
+### สิ่งที่ต้องเตรียม (Prerequisites)
+* PHP 8.2 หรือสูงกว่า (แนะนำ PHP 8.4+)
+* MySQL 8.0+ หรือ MariaDB 10.5+
 * Composer
+* Web Server (Apache พร้อมเปิดใช้งาน `mod_rewrite` หรือ Nginx หรือ Laragon)
 
 ### ขั้นตอนการติดตั้ง
-1. **Clone โปรเจกต์ลงมาที่เครื่องหรือเซิร์ฟเวอร์:**
-   `ash
-   git clone https://github.com/kokostudio/php_ums.git new_project_name
-   cd new_project_name
-   `
+1. **Clone โปรเจกต์ลงมาที่เครื่อง:**
+   ```bash
+   git clone https://github.com/kokostudio/php_ums.git my_project
+   cd my_project
+   ```
 
-2. **ติดตั้ง Dependencies:**
-   `ash
+2. **ติดตั้ง Dependencies ผ่าน Composer:**
+   ```bash
    composer install
-   `
+   ```
 
 3. **ตั้งค่า Environment (.env):**
-   คัดลอกไฟล์ .env.example เป็น .env (หากมี) หรือสร้างไฟล์ .env ใหม่และใส่ค่าเชื่อมต่อฐานข้อมูล
-   `ash
+   คัดลอกไฟล์ `.env.example` เป็น `.env`:
+   ```bash
    cp .env.example .env
-   `
-   *จากนั้นเปิดไฟล์ .env และแก้ไข DB_DATABASE, DB_USERNAME, DB_PASSWORD ให้ตรงกับฐานข้อมูลก้อนใหม่ของคุณ*
+   ```
+   จากนั้นแก้ไขค่าการเชื่อมต่อฐานข้อมูลใน `.env`:
+   ```ini
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=php_ums
+   DB_USERNAME=root
+   DB_PASSWORD=
+   APP_URL=http://php_ums.localhost
+   ```
 
-4. **สร้างตารางและข้อมูลตั้งต้น (Migration & Seeder):**
-   โปรเจกต์นี้ใช้ Phinx ในการจัดการฐานข้อมูล ให้รันคำสั่งต่อไปนี้เพื่อสร้างโครงสร้างตารางและข้อมูลเริ่มต้น (คำแปล, บทบาท, แอดมิน):
-   `ash
+4. **สร้างโครงสร้างตารางและข้อมูลเริ่มต้น (Migration & Seeds):**
+   ```bash
    vendor/bin/phinx migrate
    vendor/bin/phinx seed:run
-   `
+   ```
 
-5. **การเข้าสู่ระบบครั้งแรก:**
-   * **Username:** superadmin
-   * **Password:** password
-   *(แนะนำให้เปลี่ยนรหัสผ่านทันทีหลังเข้าสู่ระบบครั้งแรก)*
+5. **ซิงค์พจนานุกรมภาษาเข้าสู่ฐานข้อมูล:**
+   ```bash
+   php sync_lang.php
+   ```
+
+6. **ข้อมูลเข้าสู่ระบบเริ่มต้น (Default Superadmin):**
+   * **URL:** `http://php_ums.localhost/login`
+   * **Username:** `superadmin`
+   * **Password:** `password`
+   *(แนะนำให้เปลี่ยนรหัสผ่านทันทีหลังเข้าสู่ระบบครั้งแรกในหน้า My Profile)*
 
 ---
 
-## 🛠 วิธีการต่อยอดและสร้างระบบใหม่ (For Developers & AI)
+## 📋 กฎเหล็กและมาตรฐานการพัฒนา (Mandatory Standards)
 
-โครงสร้างระบบเป็นแบบ **Custom MVC**. เมื่อต้องการสร้างโมดูลใหม่ (เช่น Product) ให้ทำตามสแตนดาร์ดที่กำหนดไว้ในโฟลเดอร์ .agents/skills/php-ums-core-workflow/SKILL.md เสมอ เพื่อให้ระบบทำงานประสานกับ Core เดิมได้อย่างไร้รอยต่อ
+สำหรับนักพัฒนาและ AI Agent ทุกครั้งที่ทำงาน สร้าง หรือปรับปรุงโมดูลใหม่ **ต้องยึดถือมาตรฐานต่อไปนี้อย่างเคร่งครัด**:
 
-### โครงสร้างที่แนะนำเมื่อเพิ่มโมดูลใหม่:
-1. **Database:** สร้างไฟล์ Migration (ด้วย Phinx) เพื่อสร้างตารางใหม่
-2. **Permission:** นำชื่อสิทธิ์ (เช่น products.view) ไปลงทะเบียนใน Database เพื่อให้ระบบ Role เดิมสามารถจัดการสิทธิ์โมดูลใหม่ได้
-3. **Routing:** เพิ่ม Route ใน public/index.php โดยครอบด้วย AuthMiddleware และ PermissionMiddleware
-4. **Controller/View:** ใช้ฟังก์ชัน __() ในการแสดงผลข้อความเสมอ และใช้ UI Components เดียวกับระบบผู้ใช้งาน
+1. 📖 **กฎข้อที่ 1: ต้องอ่านกฎใน `rules.md` และ `GEMINI.md` ทุกครั้งก่อนเริ่มงาน** เพื่อรักษามาตรฐานสถาปัตยกรรมและความปลอดภัย 100%
+2. 🌐 **ใส่ภาษาให้ครบ 100% ทุกครั้งที่สร้างสิ่งใหม่:** ห้าม Hardcode ข้อความใน View หรือ JS เด็ดขาด ต้องเรียกผ่าน `__('namespace.key')` โดยมีคำแปลสมมาตร 1:1 ทั้งใน `app/Lang/th/` และ `app/Lang/en/` เสมอ (ตรวจสอบด้วย `php compare_lang.php` ต้องได้ผลลัพธ์ `[]`)
+3. ⏳ **สถานะ Preloading ของปุ่มและการป้องกัน Double-Submit:** ทุกปุ่ม Action หรือ Submit ต้อง Disable ทันทีเมื่อคลิก พร้อมแสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความสถานะกำลังโหลด
+4. 🔔 **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุดต้องตั้งค่า `position: 'top'` (บนกลาง) เสมอ และห้ามใช้ Native `alert()`, `confirm()` ของเบราว์เซอร์
+5. 🚫 **ห้ามใช้สัญลักษณ์สกุลเงินบาท:** ห้ามใช้สัญลักษณ์ `฿` ทุกที่ ให้ใช้คำว่า 'บาท' หรือ 'THB' เท่านั้น
+6. 🔒 **ความปลอดภัยของ ID:** ใช้ Clean URL เสมอ และต้องถอดรหัส ID (`decodeId`) ทันทีที่รับค่า และเข้ารหัส ID (`encodeId`) ก่อนส่งออกไปที่หน้าบ้าน
+7. 🖼️ **โลโก้และไอคอน:** ใช้ Inline Vector SVG หรือ Asset ภายในระบบเท่านั้น ห้ามใช้ Hotlink รูปภาพภายนอกที่อาจโหลดไม่ขึ้น
 
-### 🤖 คำสั่งแนะนำเมื่อใช้ AI ช่วยเขียนโค้ด
-ให้ก๊อปปี้ข้อความด้านล่างนี้ไปสั่ง AI เพื่อให้สร้างโมดูลใหม่ที่เข้ากับระบบได้อย่างสมบูรณ์:
+---
 
-> *"ฉันต้องการสร้างโมดูลใหม่ชื่อ **[ชื่อระบบ เช่น จัดการสินค้า]** โปรดอ่านสแตนดาร์ดการเขียนโค้ดและ UI ของโปรเจกต์จากไฟล์ .agents/skills/php-ums-core-workflow/SKILL.md และสร้าง Controller, View, Route พร้อมกับการเชื่อมต่อระบบสิทธิ์ (RBAC) ให้สอดคล้องกับระบบ UMS เดิม"*
+## 🤖 ตัวอย่างคำสั่งสำหรับสั่งงาน AI Assistant
 
+```text
+"ฉันต้องการสร้างโมดูลใหม่ชื่อ [ชื่อโมดูล เช่น Inventory] 
+โปรดอ่านกฎและมาตรฐานทั้งหมดจาก rules.md และ .agents/skills/php-ums-core-workflow/SKILL.md 
+และสร้าง Controller, Model, View, Route พร้อมระบบสิทธิ์ RBAC 
+โดยต้องใส่ภาษาครบทั้ง TH/EN 100% ป้องกัน Double-Submit ที่ปุ่ม และใช้ SweetAlert2 Toast ตำแหน่งบนกลาง"
+```
