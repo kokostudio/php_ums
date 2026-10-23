@@ -54,6 +54,7 @@
 - เพิ่มคอลัมน์ `facebook_id` และ `github_id` ในตาราง `users` รองรับการผูกบัญชีและเข้าสู่ระบบด้วย Facebook และ GitHub
 - เพิ่มระบบคัดลอกลงคลิปบอร์ดแบบ Dual Feedback (เปลี่ยนไอคอนเป็นเครื่องหมายถูกสีเขียว 2 วินาที + SweetAlert2 Toast บนกลาง) พร้อมรองรับ Fallback สำหรับ Localhost HTTP
 - ปรับปรุงหน้าโปรไฟล์ (`/profile`) ให้รองรับการเชื่อมต่อและตัดการเชื่อมต่อบัญชีโซเชียลครบทั้ง 4 แพลตฟอร์ม พร้อมยืนยันด้วย SweetAlert2 Dialog (ยกเลิก Native `confirm()`)
+- ปรับปรุงเอกสารโครงการและคู่มือนักพัฒนาใน `README.md` ตามโครงสร้างมาตรฐาน 8 เสาหลัก (Overview, Map, Setup, Test, Conventions, Logic, Never, Done)
 
 ### แก้ไข (Fixed)
 - แก้ไขข้อผิดพลาด `copyToClipboard is not defined` ในหน้าการตั้งค่าแท็บ Social จากการจำกัด Scope ฟังก์ชันผิดแท็บ
