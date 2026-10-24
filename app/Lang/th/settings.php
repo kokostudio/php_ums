@@ -58,7 +58,18 @@ return [
 
     // Appearance & Themes
     'sidebar_theme'      => 'ธีมแถบเมนูด้านข้าง',
-    'sidebar_theme_desc' => 'เลือกโทนสีของแถบเมนูนำทางหลัก',
+    'sidebar_theme_desc' => 'เลือกธีมสำเร็จรูป หรือเลือกสีได้อิสระสำหรับแถบเมนูนำทางหลัก',
+    'preset_slate'       => 'สแลตเข้ม',
+    'preset_black'       => 'มิดไนต์',
+    'preset_indigo'      => 'อินดิโกเข้ม',
+    'preset_emerald'     => 'อีเมอรัลด์',
+    'preset_rose'        => 'โรสคริมซัน',
+    'preset_custom'      => 'กำหนดสีเอง',
+    'sidebar_color_picker'      => 'เลือกสีแถบเมนู',
+    'sidebar_color_picker_desc' => 'เลือกสีได้อิสระ ระบบจะสร้างชุดสี Primary ให้โดยอัตโนมัติ',
+    'sidebar_color_preview'     => 'ตัวอย่างสีแบบเรียลไทม์',
+    'sidebar_color_reset'       => 'คืนค่าเป็นสีเริ่มต้น',
+    'sidebar_color_invalid'     => 'รหัสสีไม่ถูกต้อง กรุณาใช้รูปแบบ HEX (เช่น #1E1B4B)',
     'base_font_size'     => 'ขนาดตัวอักษรพื้นฐาน',
     'base_font_size_desc'=> 'ปรับขนาดตัวอักษรทั้งหมดของระบบให้พอดีกับหน้าจอ',
 

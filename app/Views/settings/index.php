@@ -1,4 +1,10 @@
-<?php $tab = $tab ?? 'general'; ?>
+<?php
+    use App\Core\Settings;
+    use App\Core\Theme;
+    use App\Core\ThemeColor;
+
+    $tab = $tab ?? 'general';
+?>
 <div class="mb-6 flex items-center justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-white"><?= __('settings.title') ?></h1>
@@ -119,55 +125,83 @@
                     </div>
 
                     <div class="pt-6 border-t border-gray-50 dark:border-slate-800">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.sidebar_theme') ?? 'ธีมสีของแถบข้าง (Sidebar Color Theme)' ?></label>
-                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3"><?= __('settings.sidebar_theme_desc') ?? 'ปรับเปลี่ยนเฉดสีสำหรับแผงเมนูด้านซ้ายของระบบควบคุมหลัก' ?></p>
-                        
-                        <?php $currentTheme = $settings['sidebar_theme'] ?? 'slate'; ?>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-2xl">
-                            <!-- Slate Dark -->
-                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'slate' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
-                                <input type="radio" name="sidebar_theme" value="slate" class="sr-only" <?= $currentTheme === 'slate' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-md bg-slate-900 border border-slate-700 shadow-inner mb-2.5 flex items-center justify-center">
-                                    <?php if ($currentTheme === 'slate'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
-                                </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Slate Dark</span>
-                            </label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.sidebar_theme') ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3"><?= __('settings.sidebar_theme_desc') ?></p>
 
-                            <!-- Midnight Black -->
-                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'black' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
-                                <input type="radio" name="sidebar_theme" value="black" class="sr-only" <?= $currentTheme === 'black' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-md bg-zinc-950 border border-zinc-800 shadow-inner mb-2.5 flex items-center justify-center">
-                                    <?php if ($currentTheme === 'black'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
-                                </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Midnight</span>
-                            </label>
+                        <?php
+                            $currentTheme = $settings['sidebar_theme'] ?? 'slate';
+                            $customColor = $settings['sidebar_custom_color'] ?? Theme::DEFAULT_CUSTOM_COLOR;
+                            $customColor = ThemeColor::normalize($customColor) ?? Theme::DEFAULT_CUSTOM_COLOR;
+                            $isCustom = $currentTheme === 'custom';
+                        ?>
 
-                            <!-- Deep Indigo -->
-                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'indigo' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
-                                <input type="radio" name="sidebar_theme" value="indigo" class="sr-only" <?= $currentTheme === 'indigo' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-md bg-indigo-950 border border-indigo-900/50 shadow-inner mb-2.5 flex items-center justify-center">
-                                    <?php if ($currentTheme === 'indigo'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
-                                </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Deep Indigo</span>
-                            </label>
+                        <!-- Preset swatches -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 max-w-3xl">
+                            <?php foreach (Theme::PRESETS as $presetKey => $preset): ?>
+                                <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 theme-preset-label <?= $currentTheme === $presetKey ? 'is-active border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                    <input type="radio" name="sidebar_theme" value="<?= htmlspecialchars($presetKey) ?>" class="sr-only" <?= $currentTheme === $presetKey ? 'checked' : '' ?>>
+                                    <div class="w-8 h-8 rounded-md border shadow-inner mb-2.5 flex items-center justify-center theme-swatch" style="background-color: <?= htmlspecialchars($preset['background']) ?>; border-color: <?= htmlspecialchars($preset['border']) ?>;">
+                                        <i class="ph ph-check text-white text-xs theme-check-icon <?= $currentTheme === $presetKey ? '' : 'hidden' ?>"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold text-gray-800 dark:text-slate-200 text-center leading-tight"><?= htmlspecialchars(__('settings.preset_' . $presetKey)) ?></span>
+                                </label>
+                            <?php endforeach; ?>
 
-                            <!-- Emerald Forest -->
-                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'emerald' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
-                                <input type="radio" name="sidebar_theme" value="emerald" class="sr-only" <?= $currentTheme === 'emerald' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-md bg-emerald-950 border border-emerald-900/50 shadow-inner mb-2.5 flex items-center justify-center">
-                                    <?php if ($currentTheme === 'emerald'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                            <!-- Custom color option -->
+                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 theme-preset-label <?= $isCustom ? 'is-active border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
+                                <input type="radio" name="sidebar_theme" value="custom" class="sr-only" <?= $isCustom ? 'checked' : '' ?>>
+                                <div class="w-8 h-8 rounded-md border border-gray-300 dark:border-slate-700 shadow-inner mb-2.5 flex items-center justify-center theme-swatch" style="background-color: <?= htmlspecialchars($customColor) ?>;">
+                                    <i class="ph ph-check text-white text-xs theme-check-icon <?= $isCustom ? '' : 'hidden' ?>"></i>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Emerald</span>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200 text-center leading-tight"><?= __('settings.preset_custom') ?></span>
                             </label>
+                        </div>
 
-                            <!-- Rose Crimson -->
-                            <label class="relative flex flex-col items-center p-3.5 rounded-xl border cursor-pointer transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 dark:hover:text-primary-300/40 <?= $currentTheme === 'rose' ? 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10' : 'border-gray-200 dark:border-slate-800' ?>">
-                                <input type="radio" name="sidebar_theme" value="rose" class="sr-only" <?= $currentTheme === 'rose' ? 'checked' : '' ?>>
-                                <div class="w-8 h-8 rounded-md bg-rose-950 border border-rose-900/50 shadow-inner mb-2.5 flex items-center justify-center">
-                                    <?php if ($currentTheme === 'rose'): ?><i class="ph ph-check text-white text-xs"></i><?php endif; ?>
+                        <!-- Custom Color Picker -->
+                        <div id="sidebarColorPicker" class="mt-5 <?= $isCustom ? '' : 'hidden' ?>">
+                            <div class="max-w-3xl rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-black/20 p-4 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                    <!-- Native color input -->
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="sidebarColorInput" name="sidebar_custom_color"
+                                               value="<?= htmlspecialchars($customColor) ?>"
+                                               class="w-14 h-14 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer p-1 shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.sidebar_color_picker') ?></p>
+                                            <p class="text-xs text-gray-500 dark:text-slate-400"><?= __('settings.sidebar_color_picker_desc') ?></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- HEX text input -->
+                                    <div class="flex items-center gap-2 sm:ml-auto">
+                                        <label for="sidebarColorHex" class="text-xs font-medium text-gray-600 dark:text-slate-400">HEX</label>
+                                        <input type="text" id="sidebarColorHex" value="<?= htmlspecialchars($customColor) ?>" maxlength="7"
+                                               inputmode="text" autocomplete="off" spellcheck="false"
+                                               class="w-28 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white font-mono text-sm uppercase focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                        <button type="button" id="sidebarColorReset" title="<?= __('settings.sidebar_color_reset') ?>"
+                                                class="px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 border border-gray-300 dark:border-slate-700 rounded-lg transition-colors">
+                                            <i class="ph ph-arrow-counter-clockwise text-lg"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-800 dark:text-slate-200">Rose Crimson</span>
-                            </label>
+
+                                <!-- Validation message -->
+                                <p id="sidebarColorError" class="hidden mt-2 text-xs text-red-500"></p>
+
+                                <!-- Live preview -->
+                                <div class="mt-4">
+                                    <p class="text-xs font-medium text-gray-600 dark:text-slate-400 mb-2"><?= __('settings.sidebar_color_preview') ?></p>
+                                    <div class="flex items-center gap-3">
+                                        <div id="sidebarPreviewSwatch" class="w-12 h-12 rounded-lg border shadow-inner flex items-center justify-center flex-shrink-0" style="background-color: <?= htmlspecialchars($customColor) ?>; border-color: rgba(255,255,255,0.15);">
+                                            <i class="ph ph-sidebar-simple text-lg" id="sidebarPreviewIcon" style="color: <?= htmlspecialchars(ThemeColor::contrastColor($customColor)) ?>;"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 dark:text-slate-200 truncate"><?= htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></p>
+                                            <p class="text-xs text-gray-500 dark:text-slate-400 truncate" id="sidebarPreviewHex"><?= htmlspecialchars(strtoupper($customColor)) ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -235,36 +269,143 @@
 
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const themeRadios = document.querySelectorAll('input[name="sidebar_theme"]');
-                    const activeClasses = ['border-primary-600', 'dark:border-primary-500', 'bg-primary-50/20', 'dark:bg-primary-900/10', 'ring-2', 'ring-primary-500/10'];
-                    const inactiveClasses = ['border-gray-200', 'dark:border-slate-800'];
-                    
+                    // ── Sidebar Theme: Preset + Custom Color Picker ──
+                    const themeRadios      = document.querySelectorAll('input[name="sidebar_theme"]');
+                    const colorPickerWrap  = document.getElementById('sidebarColorPicker');
+                    const colorInput       = document.getElementById('sidebarColorInput');
+                    const colorHexInput    = document.getElementById('sidebarColorHex');
+                    const colorResetBtn    = document.getElementById('sidebarColorReset');
+                    const colorError       = document.getElementById('sidebarColorError');
+                    const previewSwatch    = document.getElementById('sidebarPreviewSwatch');
+                    const previewIcon      = document.getElementById('sidebarPreviewIcon');
+                    const previewHex       = document.getElementById('sidebarPreviewHex');
+                    const defaultColor     = '<?= htmlspecialchars(Theme::DEFAULT_CUSTOM_COLOR) ?>';
+
+                    const ACTIVE   = ['border-primary-600', 'dark:border-primary-500', 'bg-primary-50/20', 'dark:bg-primary-900/10', 'ring-2', 'ring-primary-500/10'];
+                    const INACTIVE = ['border-gray-200', 'dark:border-slate-800'];
+
+                    /** ตรวจสอบความถูกต้องของค่า HEX */
+                    const isValidHex = (value) => /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(value).trim());
+
+                    /** แปลง HEX ให้อยู่ในรูปแบบ #rrggbb */
+                    const normalizeHex = (value) => {
+                        let hex = String(value).trim().replace(/^#/, '');
+                        if (!isValidHex(hex)) return null;
+                        if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+                        return '#' + hex.toLowerCase();
+                    };
+
+                    /** เลือกสีตัวอักษรที่อ่านได้ชัดบนพื้นหลัง */
+                    const contrastColor = (hex) => {
+                        const n = parseInt(hex.slice(1), 16);
+                        const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+                        const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                        return l > 0.58 ? '#0f172a' : '#ffffff';
+                    };
+
+                    /** อัปเดตตัวอย่างสีแบบเรียลไทม์ */
+                    const updatePreview = (hex) => {
+                        if (!hex) return;
+                        previewSwatch.style.backgroundColor = hex;
+                        previewIcon.style.color = contrastColor(hex);
+                        previewHex.textContent = hex.toUpperCase();
+                    };
+
+                    /** แสดง/ซ่อนข้อความแจ้งเตือน */
+                    const showError = (message) => {
+                        if (!message) {
+                            colorError.classList.add('hidden');
+                            colorError.textContent = '';
+                            return;
+                        }
+                        colorError.textContent = message;
+                        colorError.classList.remove('hidden');
+                    };
+
+                    /** เปิด/ปิด Color Picker ตามโหมดที่เลือก */
+                    const togglePicker = (isCustom) => {
+                        if (colorPickerWrap) {
+                            colorPickerWrap.classList.toggle('hidden', !isCustom);
+                        }
+                    };
+
+                    /** ซิงค์ค่าสีระหว่าง Color Input กับช่อง HEX */
+                    const syncColor = (hex, source) => {
+                        if (!hex) return;
+                        colorInput.value = hex;
+                        if (source !== 'hex') colorHexInput.value = hex.toUpperCase();
+                        updatePreview(hex);
+                        showError('');
+                    };
+
                     themeRadios.forEach(radio => {
                         radio.addEventListener('change', function() {
-                            // Reset all labels
+                            // รีเซ็ต label ทั้งหมด
                             themeRadios.forEach(r => {
                                 const label = r.closest('label');
-                                label.classList.remove(...activeClasses);
-                                label.classList.add(...inactiveClasses);
-                                const icon = label.querySelector('.ph-check');
-                                if (icon) icon.remove();
+                                if (!label) return;
+                                label.classList.remove(...ACTIVE);
+                                label.classList.add(...INACTIVE);
+                                const icon = label.querySelector('.theme-check-icon');
+                                if (icon) icon.classList.add('hidden');
                             });
-                            
-                            // Set active label
-                            if (this.checked) {
-                                const activeLabel = this.closest('label');
-                                activeLabel.classList.remove(...inactiveClasses);
-                                activeLabel.classList.add(...activeClasses);
-                                
-                                const iconContainer = activeLabel.querySelector('div.w-8.h-8');
-                                if (iconContainer && !activeLabel.querySelector('.ph-check')) {
-                                    iconContainer.insertAdjacentHTML('beforeend', '<i class="ph ph-check text-white text-xs"></i>');
-                                }
+
+                            // ตั้งค่า label ที่เลือก
+                            const activeLabel = this.closest('label');
+                            if (activeLabel) {
+                                activeLabel.classList.remove(...INACTIVE);
+                                activeLabel.classList.add(...ACTIVE);
+                                const activeIcon = activeLabel.querySelector('.theme-check-icon');
+                                if (activeIcon) activeIcon.classList.remove('hidden');
                             }
+
+                            togglePicker(this.value === 'custom');
                         });
                     });
-                });
 
+                    // Native color picker
+                    if (colorInput) {
+                        colorInput.addEventListener('input', function() {
+                            syncColor(this.value, 'picker');
+                        });
+                    }
+
+                    // ช่องกรอก HEX
+                    if (colorHexInput) {
+                        colorHexInput.addEventListener('input', function() {
+                            const raw = this.value.trim();
+                            if (raw === '') {
+                                showError('');
+                                return;
+                            }
+                            const normalized = normalizeHex(raw);
+                            if (!normalized) {
+                                showError('<?= addslashes(__('settings.sidebar_color_invalid')) ?>');
+                                return;
+                            }
+                            syncColor(normalized, 'hex');
+                        });
+
+                        colorHexInput.addEventListener('blur', function() {
+                            const normalized = normalizeHex(this.value);
+                            if (normalized) {
+                                this.value = normalized.toUpperCase();
+                                showError('');
+                            }
+                        });
+                    }
+
+                    // ปุ่มรีเซ็ตกลับเป็นสีเริ่มต้น
+                    if (colorResetBtn) {
+                        colorResetBtn.addEventListener('click', function() {
+                            syncColor(defaultColor, 'reset');
+                        });
+                    }
+
+                    // เริ่มต้น: ถ้าเป็นโหมด custom ให้แสดง picker
+                    const customRadio = document.querySelector('input[name="sidebar_theme"][value="custom"]');
+                    togglePicker(!!(customRadio && customRadio.checked));
+                });
             </script>
             <?php elseif ($tab === 'login'): ?>
             <!-- ===== LOGIN PAGE TAB ===== -->
@@ -965,7 +1106,8 @@
 <script>
     $(document).ready(function() {
         // Toggle active visual state for setting cards
-        $('input[type="radio"]').on('change', function() {
+        // หมายเหตุ: sidebar_theme ถูกจัดการโดย script เฉพาะของ Color Picker อยู่แล้ว
+        $('input[type="radio"]').not('input[name="sidebar_theme"]').on('change', function() {
             var groupName = $(this).attr('name');
             var activeClasses = 'border-primary-600 dark:border-primary-500 bg-primary-50/20 dark:bg-primary-900/10 ring-2 ring-primary-500/10';
             var inactiveClasses = 'border-gray-200 dark:border-slate-800';
@@ -976,12 +1118,6 @@
             // Add active classes to the checked one
             $(this).closest('label').removeClass(inactiveClasses).addClass(activeClasses);
 
-            // Special case for check icon in sidebar theme
-            if(groupName === 'sidebar_theme') {
-                $('input[name="sidebar_theme"]').siblings('div').find('i.ph-check').remove();
-                $(this).siblings('div').append('<i class="ph ph-check text-white text-xs"></i>');
-            }
-            
             // Special case for instant font size preview
             if(groupName === 'base_font_size') {
                 $('html').removeClass('text-[14px] text-[16px] text-[18px]').addClass($(this).val());

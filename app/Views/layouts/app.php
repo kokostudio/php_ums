@@ -1,58 +1,13 @@
 <?php
     use App\Core\Session;
     use App\Core\Settings;
+    use App\Core\Theme;
+    use App\Core\ThemeColor;
 
-    $sidebarTheme = Settings::get('sidebar_theme', 'slate');
-    $themes       = [
-    'slate'   => [
-        'bg'     => 'bg-slate-900',
-        'border' => 'border-slate-800',
-        'footer' => 'bg-slate-950',
-    ],
-    'black'   => [
-        'bg'     => 'bg-neutral-950',
-        'border' => 'border-neutral-900',
-        'footer' => 'bg-black/40',
-    ],
-    'indigo'  => [
-        'bg'     => 'bg-indigo-950',
-        'border' => 'border-indigo-900',
-        'footer' => 'bg-indigo-950/60',
-    ],
-    'emerald' => [
-        'bg'     => 'bg-emerald-950',
-        'border' => 'border-emerald-900',
-        'footer' => 'bg-emerald-950/60',
-    ],
-    'rose'    => [
-        'bg'     => 'bg-rose-950',
-        'border' => 'border-rose-900',
-        'footer' => 'bg-rose-950/60',
-    ],
-    ];
-    $theme         = $themes[$sidebarTheme] ?? $themes['slate'];
-    $themePalettes = [
-    'slate'   => "{ 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' }",
-    'black'   => "{ 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040', 800: '#262626', 900: '#171717', 950: '#0a0a0a' }",
-    'indigo'  => "{ 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b' }",
-    'emerald' => "{ 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }",
-    'rose'    => "{ 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' }",
-    ];
-    $palette    = $themePalettes[$sidebarTheme] ?? $themePalettes['slate'];
-    $sidebarHex = [
-    'slate'   => '#0f172a',
-    'black'   => '#0a0a0a',
-    'indigo'  => '#1e1b4b',
-    'emerald' => '#022c22',
-    'rose'    => '#4c0519',
-    ][$sidebarTheme] ?? '#0f172a';
-    $primaryHex = [
-    'slate'   => '#64748b',
-    'black'   => '#737373',
-    'indigo'  => '#6366f1',
-    'emerald' => '#10b981',
-    'rose'    => '#f43f5e',
-    ][$sidebarTheme] ?? '#64748b';
+    // ── Dynamic Theme (Preset หรือ Custom Color Picker) ──
+    $theme       = Theme::resolve();
+    $sidebarHex  = $theme['background'];
+    $paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?> bg-slate-50 dark:bg-slate-900">
@@ -76,6 +31,14 @@
         /* Instant Background & FOUC Prevention (prevents white flash before Tailwind CDN compiles) */
         html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; }
         html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; }
+
+        /* ── Dynamic Theme Variables (Custom Color Picker) ── */
+        <?= \App\Core\Theme::cssVariables($theme) ?>
+
+        /* Sidebar surfaces driven by the active theme (รองรับสีอิสระจาก Color Picker) */
+        .sidebar-surface { background-color: var(--sidebar-bg); }
+        .sidebar-surface .sidebar-header { border-color: var(--sidebar-border); }
+        .sidebar-surface .sidebar-footer { border-color: var(--sidebar-border); background-color: var(--sidebar-footer); }
     </style>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -86,7 +49,7 @@
                 extend: {
                     colors: {
                         sidebar: '<?php echo $sidebarHex ?>',
-                        primary: <?php echo $palette ?>,
+                        primary: <?php echo $paletteJson ?>,
                         secondary: '#64748b',
                     },
                     fontFamily: {
@@ -174,41 +137,61 @@
         html.sidebar-collapsed #sidebar .p-4 img, html.sidebar-collapsed #sidebar .p-4 .bg-gradient-to-tr { margin: 0 auto; }
         html.sidebar-collapsed #sidebar .p-4 .ml-3, html.sidebar-collapsed #sidebar .p-4 > i { display: none; }
 
-        /* ── Custom Scrollbar ── */
+        /* ── Custom Scrollbar (สีตามธีม Sidebar) ── */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: transparent;
+            background: var(--scrollbar-track, transparent);
         }
         ::-webkit-scrollbar-thumb {
-            background: <?= $primaryHex ?>80;
+            background: var(--scrollbar-thumb);
             border-radius: 9999px;
             transition: background 0.2s;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: <?= $primaryHex ?>;
+            background: var(--scrollbar-thumb-hover);
         }
         ::-webkit-scrollbar-corner {
             background: transparent;
         }
 
+        /* Scrollbar ภายใน Sidebar → ใช้สีเดียวกับพื้นหลัง Sidebar ที่ผู้ใช้เลือก */
+        #sidebar ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-sidebar-thumb);
+        }
+        #sidebar ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-sidebar-hover);
+        }
+
         /* Dark mode scrollbar */
         .dark ::-webkit-scrollbar-thumb {
-            background: <?= $primaryHex ?>66;
+            background: var(--scrollbar-thumb-dark);
         }
         .dark ::-webkit-scrollbar-thumb:hover {
-            background: <?= $primaryHex ?>;
+            background: var(--scrollbar-thumb-dark-hover);
+        }
+        .dark #sidebar ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-sidebar-thumb);
+        }
+        .dark #sidebar ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-sidebar-hover);
         }
 
         /* Firefox scrollbar */
         * {
             scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 transparent;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track, transparent);
         }
         .dark * {
-            scrollbar-color: #334155 transparent;
+            scrollbar-color: var(--scrollbar-thumb-dark) var(--scrollbar-track, transparent);
+        }
+        #sidebar {
+            scrollbar-color: var(--scrollbar-sidebar-thumb) var(--scrollbar-track, transparent);
+        }
+        #sidebar * {
+            scrollbar-color: var(--scrollbar-sidebar-thumb) var(--scrollbar-track, transparent);
         }
 
         /* ── Premium SweetAlert2 Styling ── */
@@ -325,8 +308,8 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 <?php echo $theme['bg'] ?> text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-all duration-300 shadow-xl flex">
-        <div class="h-16 flex items-center px-6 border-b <?php echo $theme['border'] ?> font-bold text-lg tracking-wider justify-between">
+    <aside id="sidebar" class="w-64 sidebar-surface text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-all duration-300 shadow-xl flex">
+        <div class="h-16 sidebar-header flex items-center px-6 border-b font-bold text-lg tracking-wider justify-between">
             <div class="flex items-center overflow-hidden">
                 <?php $logo = Settings::get('site_logo');if ($logo): ?>
                     <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
@@ -387,7 +370,7 @@
             </nav>
         </div>
 
-        <div class="p-4 border-t <?php echo $theme['border'] ?> <?php echo $theme['footer'] ?> relative group cursor-pointer">
+        <div class="p-4 sidebar-footer border-t relative group cursor-pointer">
             <a href="/profile" class="flex items-center hover:opacity-80 transition-opacity">
                 <?php $profileImg = Session::get('profile_image');if ($profileImg): ?>
                     <img src="<?php echo htmlspecialchars($profileImg) ?>" alt="Profile" class="w-9 h-9 rounded-full object-cover shadow-inner border border-slate-700">

@@ -8,6 +8,8 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\Settings;
 use App\Core\Logger;
+use App\Core\Theme;
+use App\Core\ThemeColor;
 
 class SettingController extends Controller
 {
@@ -54,7 +56,7 @@ class SettingController extends Controller
 
         // Keys allowed per tab
         $textKeysByTab = [
-            'general' => ['site_name', 'site_footer', 'sidebar_theme', 'base_font_size'],
+            'general' => ['site_name', 'site_footer', 'base_font_size'],
             'login'   => [
                 'login_title', 'login_subtitle', 'login_edition', 'login_features_enabled',
                 'login_feature1_icon', 'login_feature1_text',
@@ -89,6 +91,23 @@ class SettingController extends Controller
             if ($tab === 'general') {
                 Settings::set('maintenance_mode', !empty($_POST['maintenance_mode']) ? '1' : '0');
                 Settings::set('enable_registration', !empty($_POST['enable_registration']) ? '1' : '0');
+
+                // ── Sidebar Theme (Preset + Custom Color Picker) ──
+                $themeKey = (string) ($_POST['sidebar_theme'] ?? 'slate');
+                if (!in_array($themeKey, Theme::allowedThemeKeys(), true)) {
+                    $themeKey = 'slate';
+                }
+
+                // สีที่ผู้ใช้เลือกเอง (ต้องเป็น HEX #RRGGBB เท่านั้น)
+                // หากส่งค่าไม่ถูกต้อง ให้คงค่าเดิมที่บันทึกไว้แทนการรีเซ็ต
+                $customColor = ThemeColor::normalize((string) ($_POST['sidebar_custom_color'] ?? ''));
+                if ($customColor !== null) {
+                    Settings::set('sidebar_custom_color', $customColor);
+                } elseif (!Settings::get('sidebar_custom_color')) {
+                    Settings::set('sidebar_custom_color', Theme::DEFAULT_CUSTOM_COLOR);
+                }
+
+                Settings::set('sidebar_theme', $themeKey);
             }
             if ($tab === 'security') {
                 Settings::set('pwd_require_upper', !empty($_POST['pwd_require_upper']) ? '1' : '0');

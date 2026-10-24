@@ -19,7 +19,7 @@
                         <i class="ph ph-user text-lg" id="username-icon"></i>
                     </div>
                     <input type="text" id="username" name="username" required autofocus autocomplete="username"
-                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="ชื่อผู้ใช้งาน"
                         oninput="clearError('username')">
                 </div>
@@ -33,7 +33,7 @@
                         <i class="ph ph-envelope-simple text-lg" id="email-icon"></i>
                     </div>
                     <input type="email" id="email" name="email" required autocomplete="email"
-                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="name@example.com"
                         oninput="clearError('email')">
                 </div>
@@ -47,7 +47,7 @@
                         <i class="ph ph-lock-key text-lg" id="password-icon"></i>
                     </div>
                     <input type="password" id="password" name="password" required autocomplete="new-password"
-                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="••••••••"
                         oninput="clearError('password')">
                 </div>
@@ -61,7 +61,7 @@
                         <i class="ph ph-lock-key text-lg" id="confirm_password-icon"></i>
                     </div>
                     <input type="password" id="confirm_password" name="confirm_password" required autocomplete="new-password"
-                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="••••••••"
                         oninput="clearError('confirm_password')">
                 </div>
@@ -69,7 +69,7 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-900/20 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl shadow-lg shadow-primary-500/30 text-sm font-medium text-white bg-sidebar hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all">
                     <i class="ph ph-user-plus mr-2 text-lg"></i> สมัครสมาชิก
                 </button>
             </div>
@@ -89,7 +89,7 @@ function showError(fieldId, message) {
     const errorMsg = document.getElementById(fieldId + '-error');
     const icon = document.getElementById(fieldId + '-icon');
 
-    input.classList.remove('border-gray-300', 'dark:border-slate-700', 'focus:border-blue-500', 'focus:ring-blue-500');
+    input.classList.remove('border-gray-300', 'dark:border-slate-700', 'focus:border-primary-500', 'focus:ring-primary-500');
     input.classList.add('border-red-500', 'dark:border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
 
     if(icon) {
@@ -111,7 +111,7 @@ function clearError(fieldId) {
     const errorMsg = document.getElementById(fieldId + '-error');
     const icon = document.getElementById(fieldId + '-icon');
 
-    input.classList.add('border-gray-300', 'dark:border-slate-700', 'focus:border-blue-500', 'focus:ring-blue-500');
+    input.classList.add('border-gray-300', 'dark:border-slate-700', 'focus:border-primary-500', 'focus:ring-primary-500');
     input.classList.remove('border-red-500', 'dark:border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
 
     if(icon) {

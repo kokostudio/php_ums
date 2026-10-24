@@ -69,7 +69,7 @@
   - Tailwind config: `fontFamily: { sans: ['Prompt', 'sans-serif'] }`
   - CSS: `body { font-family: 'Prompt', sans-serif; }`
 - **Dark Mode:** ใช้ class-based (`darkMode: 'class'`) เก็บ preference ใน `localStorage.theme` ทุก view ต้องมี `dark:` variant ครบถ้วน
-- **Scrollbar:** Custom thin scrollbar (6px) ใช้ `slate-300` / `slate-700` ตาม mode, hover เป็น `blue-500`
+- **Scrollbar:** Custom thin scrollbar (6px) สีต้องผูกกับธีม Sidebar แบบ Dynamic (ใช้ CSS Variables `--scrollbar-*` ที่ generate จาก `Theme::cssVariables()`) — ห้าม hardcode สี เพราะผู้ใช้เลือกสี Sidebar เองได้ ต้องรองรับทั้ง WebKit (`::-webkit-scrollbar-thumb`) และ Firefox (`scrollbar-color`) และแยกสีตามพื้นผิว (โหมดสว่าง/โหมดมืด/ภายใน Sidebar)
 - **Icons:** Phosphor Icons (`https://unpkg.com/@phosphor-icons/web`) — ใช้ class `ph ph-{name}` (outline) และ `ph-fill ph-{name}` (filled)
 - **Color System:** Primary `#3b82f6` (blue-500), Secondary `#64748b` (slate-500) — ห้ามใช้สีจากนอก palette โดยไม่มีเหตุผล
 - **Form Submit Loading:** ระบบมี Global Loading State อัตโนมัติเมื่อกด Submit ฟอร์ม (ปุ่มจะถูก Disable พร้อมแสดงไอคอนหมุน) หากฟอร์มใดไม่ต้องการเอฟเฟกต์นี้ (เช่น Search Form) ต้องใส่ Attribute `data-no-loading` ไว้ที่แท็ก `<form>` เสมอ

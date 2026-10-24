@@ -58,7 +58,18 @@ return [
 
     // Appearance & Themes
     'sidebar_theme'      => 'Sidebar Theme',
-    'sidebar_theme_desc' => 'Select color palette for the main navigation sidebar',
+    'sidebar_theme_desc' => 'Choose a preset or pick any color for the main navigation sidebar',
+    'preset_slate'       => 'Slate Dark',
+    'preset_black'       => 'Midnight',
+    'preset_indigo'      => 'Deep Indigo',
+    'preset_emerald'     => 'Emerald',
+    'preset_rose'        => 'Rose Crimson',
+    'preset_custom'      => 'Custom Color',
+    'sidebar_color_picker'      => 'Sidebar Color Picker',
+    'sidebar_color_picker_desc' => 'Pick any color you like. The primary palette is generated automatically.',
+    'sidebar_color_preview'     => 'Live Preview',
+    'sidebar_color_reset'       => 'Reset to default color',
+    'sidebar_color_invalid'     => 'Invalid color code. Please use HEX format (e.g. #1E1B4B).',
     'base_font_size'     => 'Base Font Size',
     'base_font_size_desc'=> 'Adjust overall typography scaling across the application',
 

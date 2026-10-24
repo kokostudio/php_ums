@@ -1,6 +1,9 @@
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 graft/
 
+# AutoCode agent memory — local session state, not committed.
+.autocode/
+
 # PHP
 vendor/
 .env

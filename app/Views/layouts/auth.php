@@ -1,15 +1,11 @@
 <?php
 use App\Core\Settings;
 use App\Core\Session;
+use App\Core\Theme;
 
-$sidebarTheme = Settings::get('sidebar_theme', 'slate');
-$primaryHex = [
-    'slate'   => '#64748b',
-    'black'   => '#737373',
-    'indigo'  => '#6366f1',
-    'emerald' => '#10b981',
-    'rose'    => '#f43f5e',
-][$sidebarTheme] ?? '#64748b';
+// ── Dynamic Theme (Preset หรือ Custom Color Picker) — ต้องตรงกับ Layout หลัก ──
+$theme       = Theme::resolve();
+$paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
 ?>
 <!DOCTYPE html>
 <html lang="<?= \App\Core\Lang::locale() ?>" class="dark bg-slate-50 dark:bg-[#0f172a] <?= htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>"> <!-- Added dark as default fallback if needed, but script will override -->
@@ -42,8 +38,8 @@ $primaryHex = [
             theme: {
                 extend: {
                     colors: {
-                        sidebar: '#0f172a',
-                        primary: '#3b82f6',
+                        sidebar: '<?php echo $theme['background'] ?>',
+                        primary: <?php echo $paletteJson ?>,
                         secondary: '#64748b',
                     },
                     fontFamily: {
@@ -61,19 +57,22 @@ $primaryHex = [
     <style>
         body { font-family: 'Prompt', sans-serif; }
 
-        /* ── Custom Scrollbar ── */
+        /* ── Dynamic Theme Variables (Custom Color Picker) ── */
+        <?= \App\Core\Theme::cssVariables($theme) ?>
+
+        /* ── Custom Scrollbar (สีตามธีม Sidebar) ── */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track, transparent); }
         ::-webkit-scrollbar-thumb {
-            background: <?= $primaryHex ?>80;
+            background: var(--scrollbar-thumb);
             border-radius: 9999px;
             transition: background 0.2s;
         }
-        ::-webkit-scrollbar-thumb:hover { background: <?= $primaryHex ?>; }
-        .dark ::-webkit-scrollbar-thumb { background: <?= $primaryHex ?>66; }
-        .dark ::-webkit-scrollbar-thumb:hover { background: <?= $primaryHex ?>; }
-        * { scrollbar-width: thin; scrollbar-color: <?= $primaryHex ?>80 transparent; }
-        .dark * { scrollbar-color: <?= $primaryHex ?>66 transparent; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+        .dark ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-dark); }
+        .dark ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-dark-hover); }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track, transparent); }
+        .dark * { scrollbar-color: var(--scrollbar-thumb-dark) var(--scrollbar-track, transparent); }
     </style>
 </head>
 <?php 
@@ -100,18 +99,18 @@ $currentLocale = \App\Core\Lang::locale();
                 if ($logo): ?>
                     <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="<?= $logoSizeClass ?> w-auto drop-shadow-md transition-all duration-300">
                 <?php else: ?>
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-900/20">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-sidebar text-white shadow-lg shadow-primary-900/20">
                         <i class="ph-fill ph-cube text-2xl"></i>
                     </div>
                 <?php endif; ?>
                 <div>
                     <h1 class="<?= htmlspecialchars(Settings::get('login_site_name_size', 'text-xl')) ?> font-bold text-white tracking-wide"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></h1>
-                    <p class="text-[10px] text-blue-300 uppercase font-bold tracking-widest"><?= htmlspecialchars(Settings::get('login_edition', 'ERP EDITION')) ?></p>
+                    <p class="text-[10px] text-primary-300 uppercase font-bold tracking-widest"><?= htmlspecialchars(Settings::get('login_edition', 'ERP EDITION')) ?></p>
                 </div>
             </div>
             
-            <h2 class="<?= htmlspecialchars(Settings::get('login_title_size', 'text-4xl md:text-5xl')) ?> font-extrabold text-white mb-2 leading-tight"><?= htmlspecialchars(Settings::get('login_title', 'จัดการร้านค้า')) ?><br><span class="text-blue-400"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></span></h2>
-            <p class="text-blue-200/80 mb-12 text-sm"><?= htmlspecialchars(Settings::get('login_subtitle', 'เข้าสู่ระบบศูนย์กลาง ' . Settings::get('site_name', 'WorkPOS'))) ?></p>
+            <h2 class="<?= htmlspecialchars(Settings::get('login_title_size', 'text-4xl md:text-5xl')) ?> font-extrabold text-white mb-2 leading-tight"><?= htmlspecialchars(Settings::get('login_title', 'จัดการร้านค้า')) ?><br><span class="text-primary-400"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></span></h2>
+            <p class="text-primary-200/80 mb-12 text-sm"><?= htmlspecialchars(Settings::get('login_subtitle', 'เข้าสู่ระบบศูนย์กลาง ' . Settings::get('site_name', 'WorkPOS'))) ?></p>
             
             <?php if (Settings::get('login_features_enabled', '1') == '1'): ?>
             <!-- Features -->

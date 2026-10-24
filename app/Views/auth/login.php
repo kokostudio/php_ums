@@ -3,7 +3,7 @@
         <!-- Form Header -->
         <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <i class="ph ph-sign-in text-blue-600 dark:text-blue-500 mr-2"></i>
+                <i class="ph ph-sign-in text-primary-600 dark:text-primary-400 mr-2"></i>
                 เข้าสู่ระบบ
             </h2>
             <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">เข้าสู่ระบบศูนย์กลาง <?php echo htmlspecialchars(\App\Core\Settings::get('site_name', 'WorkPOS')) ?></p>
@@ -20,7 +20,7 @@
                     </div>
                     <?php $oldUser = \App\Core\Session::getFlash('old_username') ?? ''; ?>
                     <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($oldUser) ?>" required autofocus autocomplete="username"
-                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="name@example.com หรือ username"
                         oninput="clearError('username')">
                 </div>
@@ -34,7 +34,7 @@
                         <i class="ph ph-lock-key text-lg" id="password-icon"></i>
                     </div>
                     <input type="password" id="password" name="password" required autocomplete="current-password"
-                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                        class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                         placeholder="••••••••"
                         oninput="clearError('password')">
                     <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
@@ -46,7 +46,7 @@
 
             <div class="flex items-center justify-between pt-1">
                 <div class="flex items-center">
-                    <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-700 rounded dark:bg-[#0f172a]">
+                    <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-slate-700 rounded dark:bg-[#0f172a]">
                     <label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-slate-300"><?php echo __('auth.remember_me') ?></label>
                 </div>
                 <div class="text-sm">
@@ -55,7 +55,7 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-900/20 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl shadow-lg shadow-primary-500/30 text-sm font-medium text-white bg-sidebar hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all">
                     <i class="ph ph-sign-in mr-2 text-lg"></i> <?php echo __('auth.sign_in') ?>
                 </button>
             </div>
@@ -164,7 +164,7 @@ function showError(fieldId, message) {
     const errorMsg = document.getElementById(fieldId + '-error');
     const icon = document.getElementById(fieldId + '-icon');
 
-    input.classList.remove('border-gray-300', 'dark:border-slate-700', 'focus:border-blue-500', 'focus:ring-blue-500');
+    input.classList.remove('border-gray-300', 'dark:border-slate-700', 'focus:border-primary-500', 'focus:ring-primary-500');
     input.classList.add('border-red-500', 'dark:border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
 
     icon.parentElement.classList.remove('text-gray-400', 'dark:text-slate-500');
@@ -185,7 +185,7 @@ function clearError(fieldId) {
     const errorMsg = document.getElementById(fieldId + '-error');
     const icon = document.getElementById(fieldId + '-icon');
 
-    input.classList.add('border-gray-300', 'dark:border-slate-700', 'focus:border-blue-500', 'focus:ring-blue-500');
+    input.classList.add('border-gray-300', 'dark:border-slate-700', 'focus:border-primary-500', 'focus:ring-primary-500');
     input.classList.remove('border-red-500', 'dark:border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
 
     icon.parentElement.classList.add('text-gray-400', 'dark:text-slate-500');
