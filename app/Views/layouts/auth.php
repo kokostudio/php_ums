@@ -18,9 +18,7 @@ $isDark = isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark') : true;
     <meta name="color-scheme" content="light dark">
     <title><?= htmlspecialchars(Settings::get('site_name', 'System')) ?> - <?= $pageTitle ?? __('auth.login_title') ?></title>
     
-    <?php $favicon = Settings::get('site_favicon'); if ($favicon): ?>
-        <link rel="icon" href="<?= htmlspecialchars($favicon) ?>">
-    <?php endif; ?>
+    <link rel="icon" href="<?= htmlspecialchars(\App\Core\BrandIcon::getFaviconUrl()) ?>">
     <!-- Dark Mode Init Script (Instant Theme Sync & FOUC Prevention) -->
     <script>
         (function() {
@@ -118,16 +116,7 @@ $currentLocale = \App\Core\Lang::locale();
         <div class="relative z-10 flex-1 flex flex-col justify-center">
             <!-- Logo -->
             <div class="flex items-center space-x-3 mb-10">
-                <?php 
-                $logo = Settings::get('login_logo') ?: Settings::get('site_logo'); 
-                $logoSizeClass = Settings::get('login_logo_size', 'h-12');
-                if ($logo): ?>
-                    <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" class="<?= $logoSizeClass ?> w-auto drop-shadow-md transition-all duration-300">
-                <?php else: ?>
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-sidebar text-white shadow-lg shadow-primary-900/20">
-                        <i class="ph-fill ph-cube text-2xl"></i>
-                    </div>
-                <?php endif; ?>
+                <?= \App\Core\BrandIcon::renderAuthLogoHtml() ?>
                 <div>
                     <h1 class="<?= htmlspecialchars(Settings::get('login_site_name_size', 'text-xl')) ?> font-bold text-white tracking-wide"><?= htmlspecialchars(Settings::get('site_name', 'WorkPOS')) ?></h1>
                     <p class="text-[10px] text-primary-300 uppercase font-bold tracking-widest"><?= htmlspecialchars(Settings::get('login_edition', 'ERP EDITION')) ?></p>

@@ -56,7 +56,12 @@ class SettingController extends Controller
 
         // Keys allowed per tab
         $textKeysByTab = [
-            'general' => ['site_name', 'site_footer', 'base_font_size'],
+            'general' => [
+                'site_name', 'site_footer', 'base_font_size',
+                'logo_type', 'logo_icon', 'logo_icon_color', 'logo_icon_size',
+                'favicon_type', 'favicon_icon', 'favicon_icon_color', 'favicon_icon_size', 'favicon_bg_color',
+                'favicon_sync_logo'
+            ],
             'login'   => [
                 'login_title', 'login_subtitle', 'login_edition', 'login_features_enabled',
                 'login_feature1_icon', 'login_feature1_text',
@@ -108,6 +113,45 @@ class SettingController extends Controller
                 }
 
                 Settings::set('sidebar_theme', $themeKey);
+
+                // ── Brand Icon & Logo Customization ──
+                $logoType = (string) ($_POST['logo_type'] ?? 'icon');
+                Settings::set('logo_type', in_array($logoType, ['icon', 'image'], true) ? $logoType : 'icon');
+
+                $allIcons = array_keys(\App\Core\BrandIcon::all());
+                $logoIcon = (string) ($_POST['logo_icon'] ?? \App\Core\BrandIcon::DEFAULT_ICON);
+                Settings::set('logo_icon', in_array($logoIcon, $allIcons, true) ? $logoIcon : \App\Core\BrandIcon::DEFAULT_ICON);
+
+                $logoColor = \App\Core\ThemeColor::normalize((string) ($_POST['logo_icon_color'] ?? ''));
+                Settings::set('logo_icon_color', $logoColor ?? \App\Core\BrandIcon::DEFAULT_COLOR);
+
+                $logoSize = (int) ($_POST['logo_icon_size'] ?? \App\Core\BrandIcon::DEFAULT_SIZE);
+                $logoSize = max(20, min(64, $logoSize));
+                Settings::set('logo_icon_size', (string) $logoSize);
+
+                // ── Favicon Customization ──
+                $faviconSync = !empty($_POST['favicon_sync_logo']) ? '1' : '0';
+                Settings::set('favicon_sync_logo', $faviconSync);
+
+                $faviconType = (string) ($_POST['favicon_type'] ?? 'icon');
+                Settings::set('favicon_type', in_array($faviconType, ['icon', 'image'], true) ? $faviconType : 'icon');
+
+                if ($faviconSync === '1') {
+                    Settings::set('favicon_icon', in_array($logoIcon, $allIcons, true) ? $logoIcon : \App\Core\BrandIcon::DEFAULT_ICON);
+                    Settings::set('favicon_icon_color', $logoColor ?? \App\Core\BrandIcon::DEFAULT_COLOR);
+                } else {
+                    $favIcon = (string) ($_POST['favicon_icon'] ?? $logoIcon);
+                    Settings::set('favicon_icon', in_array($favIcon, $allIcons, true) ? $favIcon : \App\Core\BrandIcon::DEFAULT_ICON);
+
+                    $favColor = \App\Core\ThemeColor::normalize((string) ($_POST['favicon_icon_color'] ?? ''));
+                    Settings::set('favicon_icon_color', $favColor ?? \App\Core\BrandIcon::DEFAULT_COLOR);
+                }
+
+                $favBg = (string) ($_POST['favicon_bg_color'] ?? 'transparent');
+                if ($favBg !== 'transparent') {
+                    $favBg = \App\Core\ThemeColor::normalize($favBg) ?? 'transparent';
+                }
+                Settings::set('favicon_bg_color', $favBg);
             }
             if ($tab === 'security') {
                 Settings::set('pwd_require_upper', !empty($_POST['pwd_require_upper']) ? '1' : '0');
@@ -151,6 +195,11 @@ class SettingController extends Controller
                         $destination = $uploadDir . $safeName;
                         if (move_uploaded_file($tmpName, $destination)) {
                             Settings::set($fileKey, '/uploads/settings/' . $safeName);
+                            if ($fileKey === 'site_logo') {
+                                Settings::set('logo_type', 'image');
+                            } elseif ($fileKey === 'site_favicon') {
+                                Settings::set('favicon_type', 'image');
+                            }
                         }
                     } else {
                         throw new \Exception("File uploaded for {$fileKey} is not a valid image.");

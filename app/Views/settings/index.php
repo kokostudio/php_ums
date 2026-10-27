@@ -86,27 +86,262 @@
                             placeholder="<?= __('settings.ph_footer') ?? 'e.g. &copy; 2026 My Company' ?>">
                     </div>
 
-                    <div class="pt-4 border-t border-gray-50 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                        <div>
-                            <label for="site_logo" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.site_logo') ?></label>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_logo_hint') ?></p>
-                            <?php if (!empty($settings['site_logo'])): ?>
-                                <div class="mb-3">
-                                    <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="Logo" class="h-12 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded">
-                                </div>
-                            <?php endif; ?>
-                            <input type="file" id="site_logo" name="site_logo" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
+                    <!-- Brand Icon & Logo / Favicon Customization System -->
+                    <?php
+                        $logoType      = $settings['logo_type'] ?? 'icon';
+                        $selectedIcon  = $settings['logo_icon'] ?? \App\Core\BrandIcon::DEFAULT_ICON;
+                        $selectedColor = $settings['logo_icon_color'] ?? \App\Core\BrandIcon::DEFAULT_COLOR;
+                        $selectedColor = \App\Core\ThemeColor::normalize($selectedColor) ?? \App\Core\BrandIcon::DEFAULT_COLOR;
+                        $selectedSize  = (int) ($settings['logo_icon_size'] ?? \App\Core\BrandIcon::DEFAULT_SIZE);
+                        $selectedSize  = max(20, min(64, $selectedSize));
+
+                        $faviconSync   = ($settings['favicon_sync_logo'] ?? '1') === '1';
+                        $faviconType   = $settings['favicon_type'] ?? 'icon';
+                        $favBg         = $settings['favicon_bg_color'] ?? 'transparent';
+
+                        $allBrandIcons = \App\Core\BrandIcon::all();
+                        $quickColors   = [
+                            ['#3b82f6', 'Blue'],
+                            ['#6366f1', 'Indigo'],
+                            ['#8b5cf6', 'Purple'],
+                            ['#10b981', 'Emerald'],
+                            ['#f59e0b', 'Amber'],
+                            ['#f43f5e', 'Rose'],
+                            ['#0ea5e9', 'Sky'],
+                            ['#64748b', 'Slate'],
+                        ];
+                        $sizePresets   = [
+                            24 => __('settings.size_small') ?? 'เล็ก (24px)',
+                            32 => __('settings.size_default') ?? 'มาตรฐาน (32px)',
+                            40 => __('settings.size_medium') ?? 'กลาง (40px)',
+                            48 => __('settings.size_large') ?? 'ใหญ่ (48px)',
+                        ];
+                    ?>
+                    <div class="pt-6 border-t border-gray-100 dark:border-slate-800">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
+                                    <i class="ph ph-cube-transparent text-primary-500 mr-2 text-xl"></i>
+                                    <?= __('settings.brand_icon_title') ?>
+                                </h4>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                                    <?= __('settings.brand_icon_desc') ?>
+                                </p>
+                            </div>
+
+                            <!-- Mode Switcher: Vector Icon vs Custom Image -->
+                            <div class="inline-flex p-1 bg-gray-100 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 self-start sm:self-auto">
+                                <button type="button" id="btnModeIcon" onclick="switchBrandMode('icon')"
+                                    class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 <?= $logoType === 'icon' ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white' ?>">
+                                    <i class="ph ph-shapes text-sm"></i>
+                                    <?= __('settings.mode_vector_icon') ?>
+                                </button>
+                                <button type="button" id="btnModeImage" onclick="switchBrandMode('image')"
+                                    class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 <?= $logoType === 'image' ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white' ?>">
+                                    <i class="ph ph-image text-sm"></i>
+                                    <?= __('settings.mode_custom_image') ?>
+                                </button>
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="site_favicon" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.site_favicon') ?></label>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_favicon_hint') ?></p>
-                            <?php if (!empty($settings['site_favicon'])): ?>
-                                <div class="mb-3">
-                                    <img src="<?= htmlspecialchars($settings['site_favicon']) ?>" alt="Favicon" class="h-8 w-8 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded">
+                        <!-- Hidden state inputs -->
+                        <input type="hidden" name="logo_type" id="logo_type" value="<?= htmlspecialchars($logoType) ?>">
+                        <input type="hidden" name="logo_icon" id="logo_icon" value="<?= htmlspecialchars($selectedIcon) ?>">
+                        <input type="hidden" name="favicon_type" id="favicon_type" value="<?= htmlspecialchars($faviconType) ?>">
+
+                        <!-- SECTION A: Vector Icon Selector & Customization -->
+                        <div id="brandIconSection" class="<?= $logoType === 'image' ? 'hidden' : '' ?> space-y-6">
+
+                            <!-- Dual Live Preview Card -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700/80 shadow-inner text-white">
+                                <!-- Preview 1: Sidebar Header Preview -->
+                                <div class="flex flex-col justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-700/50 backdrop-blur-sm">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                            <i class="ph ph-sidebar-simple text-sm"></i>
+                                            <?= __('settings.preview_sidebar_title') ?>
+                                        </span>
+                                        <span class="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Live</span>
+                                    </div>
+                                    <div class="h-14 flex items-center px-4 rounded-lg bg-slate-900/90 border border-slate-700/40">
+                                        <div id="liveSidebarIcon" class="shrink-0 mr-3 flex items-center justify-center transition-all duration-200">
+                                            <!-- SVG dynamically rendered -->
+                                        </div>
+                                        <span id="liveSidebarTitle" class="font-bold text-white text-base tracking-wider truncate">
+                                            <?= htmlspecialchars($settings['site_name'] ?? 'CORE SYSTEM') ?>
+                                        </span>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
-                            <input type="file" id="site_favicon" name="site_favicon" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
+
+                                <!-- Preview 2: Browser Tab Favicon Preview -->
+                                <div class="flex flex-col justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-700/50 backdrop-blur-sm">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                            <i class="ph ph-browsers text-sm"></i>
+                                            <?= __('settings.preview_tab_title') ?>
+                                        </span>
+                                        <span class="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">SVG Favicon</span>
+                                    </div>
+                                    <div class="h-14 flex items-end">
+                                        <div class="w-full max-w-[280px] bg-slate-800/90 border border-slate-700/50 border-b-0 rounded-t-xl px-3 py-2 flex items-center justify-between shadow-sm">
+                                            <div class="flex items-center gap-2 overflow-hidden">
+                                                <div id="liveFaviconIcon" class="w-5 h-5 shrink-0 flex items-center justify-center rounded transition-all p-0.5" style="background-color: <?= htmlspecialchars($favBg === 'transparent' ? 'transparent' : $favBg) ?>;">
+                                                    <!-- SVG dynamically rendered -->
+                                                </div>
+                                                <span id="liveTabTitle" class="text-xs text-slate-200 truncate font-medium">
+                                                    <?= htmlspecialchars($settings['site_name'] ?? 'System') ?>
+                                                </span>
+                                            </div>
+                                            <i class="ph ph-x text-xs text-slate-400 ml-2 hover:text-white shrink-0"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 20 Icons Selection Grid -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">
+                                        <?= __('settings.select_icon_label') ?>
+                                    </label>
+                                    <span class="text-xs text-gray-500 dark:text-slate-400 font-mono">20 Phosphor Icons</span>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[300px] overflow-y-auto p-1.5 rounded-2xl border border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50" id="iconPickerGrid">
+                                    <?php foreach ($allBrandIcons as $k => $iconData): 
+                                        $isSelected = ($k === $selectedIcon);
+                                    ?>
+                                    <button type="button" onclick="selectBrandIcon('<?= htmlspecialchars($k) ?>')"
+                                        data-icon-key="<?= htmlspecialchars($k) ?>"
+                                        class="brand-icon-btn group relative flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all <?= $isSelected ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 ring-2 ring-primary-500/30 font-semibold shadow-sm' : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-slate-700/50' ?>">
+                                        <span class="brand-icon-check absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center text-[10px] <?= $isSelected ? '' : 'hidden' ?>">
+                                            <i class="ph ph-check"></i>
+                                        </span>
+                                        <div class="w-8 h-8 flex items-center justify-center mb-1.5 icon-glyph shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="28" height="28" class="transition-transform group-hover:scale-110">
+                                                <?php foreach ($iconData['paths'] as $p): ?>
+                                                    <path fill="currentColor" d="<?= htmlspecialchars($p) ?>"/>
+                                                <?php endforeach; ?>
+                                            </svg>
+                                        </div>
+                                        <span class="text-[11px] truncate w-full px-1"><?= __('settings.icon_' . $k) ?></span>
+                                    </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- Color & Size Controls in 2 columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                <!-- Column 1: Color Picker & Palette -->
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">
+                                        <?= __('settings.logo_icon_color') ?>
+                                    </label>
+                                    
+                                    <div class="flex items-center gap-3">
+                                        <div class="relative w-11 h-11 shrink-0 rounded-xl overflow-hidden border border-gray-300 dark:border-slate-700 shadow-sm cursor-pointer">
+                                            <input type="color" id="logo_icon_color_picker" value="<?= htmlspecialchars($selectedColor) ?>"
+                                                class="absolute -top-3 -left-3 w-16 h-16 cursor-pointer border-0 p-0">
+                                        </div>
+                                        <div class="relative flex-1">
+                                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 font-mono text-sm">#</span>
+                                            <input type="text" id="logo_icon_color" name="logo_icon_color" maxlength="7"
+                                                value="<?= htmlspecialchars($selectedColor) ?>"
+                                                class="w-full pl-7 pr-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white font-mono text-sm uppercase focus:ring-2 focus:ring-primary-500 outline-none"
+                                                placeholder="#3B82F6">
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Swatches -->
+                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                        <?php foreach ($quickColors as [$hex, $colorName]): ?>
+                                        <button type="button" onclick="setBrandColor('<?= $hex ?>')" title="<?= $colorName ?>"
+                                            class="w-7 h-7 rounded-lg border border-black/10 dark:border-white/10 hover:scale-110 active:scale-95 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                            style="background-color: <?= $hex ?>;"></button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: Size Slider & Presets -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <label for="logo_icon_size" class="text-sm font-medium text-gray-700 dark:text-slate-300">
+                                            <?= __('settings.logo_icon_size') ?>
+                                        </label>
+                                        <span id="logo_icon_size_badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800">
+                                            <?= $selectedSize ?>px
+                                        </span>
+                                    </div>
+
+                                    <input type="range" id="logo_icon_size" name="logo_icon_size" min="20" max="64" step="2"
+                                        value="<?= $selectedSize ?>"
+                                        class="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-600">
+
+                                    <div class="grid grid-cols-4 gap-1.5 pt-1">
+                                        <?php foreach ($sizePresets as $px => $label): ?>
+                                        <button type="button" onclick="setBrandSize(<?= $px ?>)"
+                                            class="px-2 py-1 text-[11px] font-medium rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-primary-500 hover:text-primary-600 transition-colors">
+                                            <?= $px ?>px
+                                        </button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Favicon Sync & Background Options -->
+                            <div class="pt-4 border-t border-gray-100 dark:border-slate-800/80 space-y-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" name="favicon_sync_logo" id="favicon_sync_logo" value="1"
+                                        <?= $faviconSync ? 'checked' : '' ?>
+                                        class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-2.5 text-sm font-medium text-gray-700 dark:text-slate-300">
+                                        <?= __('settings.sync_favicon_with_logo') ?>
+                                    </span>
+                                </label>
+
+                                <!-- Favicon Background selector -->
+                                <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-slate-400">
+                                    <span class="font-medium"><?= __('settings.favicon_bg') ?>:</span>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="favicon_bg_color" value="transparent" <?= $favBg === 'transparent' ? 'checked' : '' ?> onchange="setFaviconBg('transparent')" class="text-primary-600">
+                                        <span><?= __('settings.favicon_bg_transparent') ?></span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="favicon_bg_color" value="#0f172a" <?= $favBg === '#0f172a' ? 'checked' : '' ?> onchange="setFaviconBg('#0f172a')" class="text-primary-600">
+                                        <span><?= __('settings.favicon_bg_dark') ?></span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="favicon_bg_color" value="#ffffff" <?= $favBg === '#ffffff' ? 'checked' : '' ?> onchange="setFaviconBg('#ffffff')" class="text-primary-600">
+                                        <span><?= __('settings.favicon_bg_light') ?></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION B: Custom Image Upload Fallback -->
+                        <div id="brandImageSection" class="<?= $logoType === 'icon' ? 'hidden' : '' ?> pt-4 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                                <div>
+                                    <label for="site_logo" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.site_logo') ?></label>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_logo_hint') ?></p>
+                                    <?php if (!empty($settings['site_logo'])): ?>
+                                        <div class="mb-3">
+                                            <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="Logo" class="h-12 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700">
+                                        </div>
+                                    <?php endif; ?>
+                                    <input type="file" id="site_logo" name="site_logo" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
+                                </div>
+
+                                <div>
+                                    <label for="site_favicon" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.site_favicon') ?></label>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_favicon_hint') ?></p>
+                                    <?php if (!empty($settings['site_favicon'])): ?>
+                                        <div class="mb-3">
+                                            <img src="<?= htmlspecialchars($settings['site_favicon']) ?>" alt="Favicon" class="h-8 w-8 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
+                                        </div>
+                                    <?php endif; ?>
+                                    <input type="file" id="site_favicon" name="site_favicon" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="pt-4 border-t border-gray-50 dark:border-slate-800">
@@ -405,6 +640,132 @@
                     // เริ่มต้น: ถ้าเป็นโหมด custom ให้แสดง picker
                     const customRadio = document.querySelector('input[name="sidebar_theme"][value="custom"]');
                     togglePicker(!!(customRadio && customRadio.checked));
+
+                    // ── Brand Icon & Logo/Favicon Live Customizer ──
+                    const brandIcons = <?= json_encode(\App\Core\BrandIcon::all()) ?>;
+                    const logoIconInput = document.getElementById('logo_icon');
+                    const logoColorInput = document.getElementById('logo_icon_color');
+                    const logoColorPicker = document.getElementById('logo_icon_color_picker');
+                    const logoSizeInput = document.getElementById('logo_icon_size');
+                    const logoSizeBadge = document.getElementById('logo_icon_size_badge');
+                    const liveSidebarIcon = document.getElementById('liveSidebarIcon');
+                    const liveFaviconIcon = document.getElementById('liveFaviconIcon');
+                    const liveSidebarTitle = document.getElementById('liveSidebarTitle');
+                    const liveTabTitle = document.getElementById('liveTabTitle');
+                    const siteNameInput = document.getElementById('site_name');
+
+                    window.switchBrandMode = function(mode) {
+                        const isIcon = mode === 'icon';
+                        document.getElementById('logo_type').value = mode;
+                        document.getElementById('favicon_type').value = mode;
+                        document.getElementById('brandIconSection').classList.toggle('hidden', !isIcon);
+                        document.getElementById('brandImageSection').classList.toggle('hidden', isIcon);
+
+                        const btnIcon = document.getElementById('btnModeIcon');
+                        const btnImg = document.getElementById('btnModeImage');
+                        if (isIcon) {
+                            btnIcon.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm";
+                            btnImg.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white";
+                        } else {
+                            btnImg.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm";
+                            btnIcon.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white";
+                        }
+                    };
+
+                    window.selectBrandIcon = function(key) {
+                        if (!brandIcons[key]) return;
+                        if (logoIconInput) logoIconInput.value = key;
+                        document.querySelectorAll('.brand-icon-btn').forEach(btn => {
+                            const isMatch = btn.getAttribute('data-icon-key') === key;
+                            btn.className = "brand-icon-btn group relative flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all " +
+                                (isMatch 
+                                    ? "border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 ring-2 ring-primary-500/30 font-semibold shadow-sm"
+                                    : "border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-slate-700/50");
+                            const check = btn.querySelector('.brand-icon-check');
+                            if (check) check.classList.toggle('hidden', !isMatch);
+                        });
+                        updateBrandLivePreviews();
+                    };
+
+                    window.setBrandColor = function(hex) {
+                        if (!hex) return;
+                        hex = hex.toUpperCase();
+                        if (logoColorPicker) logoColorPicker.value = hex;
+                        if (logoColorInput) logoColorInput.value = hex;
+                        updateBrandLivePreviews();
+                    };
+
+                    window.setBrandSize = function(px) {
+                        if (logoSizeInput) logoSizeInput.value = px;
+                        if (logoSizeBadge) logoSizeBadge.textContent = px + 'px';
+                        updateBrandLivePreviews();
+                    };
+
+                    window.setFaviconBg = function(bg) {
+                        if (liveFaviconIcon) {
+                            liveFaviconIcon.style.backgroundColor = (bg === 'transparent' ? 'transparent' : bg);
+                        }
+                    };
+
+                    function renderSvgMarkup(iconKey, color, size) {
+                        const icon = brandIcons[iconKey] || brandIcons['cube'];
+                        let paths = '';
+                        if (icon && icon.paths) {
+                            icon.paths.forEach(p => {
+                                paths += `<path fill="${color}" d="${p}"/>`;
+                            });
+                        }
+                        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;">${paths}</svg>`;
+                    }
+
+                    function updateBrandLivePreviews() {
+                        const key = logoIconInput ? logoIconInput.value : 'cube';
+                        let color = logoColorInput ? logoColorInput.value.trim() : '#3b82f6';
+                        if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) {
+                            color = '#3b82f6';
+                        }
+                        const size = logoSizeInput ? parseInt(logoSizeInput.value, 10) || 32 : 32;
+
+                        if (liveSidebarIcon) {
+                            liveSidebarIcon.innerHTML = renderSvgMarkup(key, color, size);
+                        }
+                        if (liveFaviconIcon) {
+                            liveFaviconIcon.innerHTML = renderSvgMarkup(key, color, 16);
+                        }
+                        if (siteNameInput) {
+                            const title = siteNameInput.value.trim() || 'CORE SYSTEM';
+                            if (liveSidebarTitle) liveSidebarTitle.textContent = title;
+                            if (liveTabTitle) liveTabTitle.textContent = title;
+                        }
+                    }
+
+                    if (logoColorPicker) {
+                        logoColorPicker.addEventListener('input', function() {
+                            setBrandColor(this.value);
+                        });
+                    }
+                    if (logoColorInput) {
+                        logoColorInput.addEventListener('input', function() {
+                            let val = this.value.trim();
+                            if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                            if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(val)) {
+                                if (logoColorPicker) logoColorPicker.value = val;
+                                updateBrandLivePreviews();
+                            }
+                        });
+                    }
+                    if (logoSizeInput) {
+                        logoSizeInput.addEventListener('input', function() {
+                            if (logoSizeBadge) logoSizeBadge.textContent = this.value + 'px';
+                            updateBrandLivePreviews();
+                        });
+                    }
+                    if (siteNameInput) {
+                        siteNameInput.addEventListener('input', updateBrandLivePreviews);
+                    }
+
+                    // Initial render of preview
+                    updateBrandLivePreviews();
                 });
             </script>
             <?php elseif ($tab === 'login'): ?>
@@ -1125,7 +1486,7 @@
         });
 
         // Button preloading & double-submit prevention (Rule 4)
-        $('#socialSettingsForm').on('submit', function() {
+        $('form[id$="SettingsForm"], #generalSettingsForm').on('submit', function() {
             var $btn = $(this).find('button[type="submit"]');
             $btn.prop('disabled', true).addClass('opacity-75 cursor-not-allowed');
             $btn.html('<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> <span><?= addslashes(__('common.saving')) ?></span>');

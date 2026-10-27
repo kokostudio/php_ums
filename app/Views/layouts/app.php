@@ -20,9 +20,7 @@
     <meta name="color-scheme" content="light dark">
     <title><?php echo htmlspecialchars(Settings::get('site_name', 'System')) ?></title>
 
-    <?php $favicon = Settings::get('site_favicon');if ($favicon): ?>
-        <link rel="icon" href="<?php echo htmlspecialchars($favicon) ?>">
-    <?php endif; ?>
+    <link rel="icon" href="<?php echo htmlspecialchars(\App\Core\BrandIcon::getFaviconUrl()) ?>">
     <!-- Dark Mode Init Script (Instant Theme Sync & FOUC Prevention) -->
     <script>
         (function() {
@@ -336,11 +334,7 @@
     <aside id="sidebar" class="w-64 sidebar-surface text-white flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-50 transition-all duration-300 shadow-xl flex">
         <div class="h-16 sidebar-header flex items-center px-6 border-b font-bold text-lg tracking-wider justify-between">
             <div class="flex items-center overflow-hidden">
-                <?php $logo = Settings::get('site_logo');if ($logo): ?>
-                    <img src="<?php echo htmlspecialchars($logo) ?>" alt="Logo" class="h-8 w-auto mr-3">
-                <?php else: ?>
-                    <i class="ph-fill ph-cube text-blue-400 text-2xl mr-2"></i>
-                <?php endif; ?>
+                <?= \App\Core\BrandIcon::renderLogoHtml() ?>
                 <span class="truncate"><?php echo htmlspecialchars(Settings::get('site_name', 'CORE SYSTEM')) ?></span>
             </div>
         </div>
