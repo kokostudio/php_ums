@@ -96,4 +96,9 @@ no API key, $0).
    - **Fixed Header:** The top header must be `flex-shrink-0 border-b border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900` with title and close button. It must NEVER scroll out of view.
    - **Scrollable Middle Body:** Content area in the middle must be `flex-1 overflow-y-auto p-6` (only the middle content scrolls when exceeding screen height).
    - **Fixed Footer:** Action buttons (Save, Cancel, Submit) must remain pinned at the bottom using `flex-shrink-0 border-t border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900 flex justify-end gap-3`, ensuring action buttons are always immediately visible and clickable without scrolling.
+
+16. **MULTI-TIER TRANSLATION SYSTEM & ZERO RAW KEYS (กฎระบบภาษา 2 ชั้น และการป้องกัน Raw Key หลุดสู่หน้าจอ)**:
+   - **Zero Raw Translation Keys**: NEVER allow raw translation keys (such as `settings.preset_slate`, `auth.username`, etc.) to be rendered or leaked to the user interface.
+   - **Two-Tier Architecture (`Lang::load()`)**: `App\Core\Lang::load()` MUST ALWAYS load disk language files (`app/Lang/{locale}/{namespace}.php`) as the mandatory **Baseline**, overlaid with dynamic database translations from the MySQL `translations` table. This guarantees that UI labels always display human-readable text even before DB sync runs or if the database is temporarily unreachable.
+   - **100% Symmetric Parity & Mandatory Sync**: Every single key used in views or controllers must be defined symmetrically in both `app/Lang/th/<namespace>.php` and `app/Lang/en/<namespace>.php`. Run `php compare_lang.php` (must output `[]`) and run `php sync_lang.php` to persist changes into the MySQL `translations` table.
 <!-- rules:end -->

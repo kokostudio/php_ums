@@ -175,6 +175,7 @@
 ### 2. View, UI, Buttons & Notifications (หน้าบ้าน)
 - [ ] **ใส่ภาษาให้ครบ 100%:** ห้าม Hardcode ข้อความภาษาไทยหรืออังกฤษใน View, JS หรือ Controller — ต้องเรียกผ่าน `__('namespace.key')`
 - [ ] **ความสมมาตรของพจนานุกรม:** มีคีย์คำแปลตรงกัน 1:1 ครบทั้ง `app/Lang/th/` และ `app/Lang/en/` (รัน `php compare_lang.php` ต้องได้ `[]`) และรัน `php sync_lang.php` ซิงค์เข้า MySQL DB
+- [ ] **ระบบภาษา 2 ชั้น & Zero Raw Keys:** ห้ามมีข้อความคีย์ดิบ (เช่น `settings.preset_*`) หลุดออกหน้าจอเด็ดขาด โดย `App\Core\Lang::load()` จะโหลดไฟล์ภาษาในเครื่องเป็น Baseline + DB Overlay เสมอ
 - [ ] **ปุ่มมีสถานะ Preloading:** ปุ่ม Submit และปุ่ม Action ทุกปุ่ม ต้องมีกลไก Disable (`btn.disabled = true;`) ป้องกันการกดซ้ำซ้อน พร้อมแสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความกำลังโหลดที่แปลภาษาแล้ว
 - [ ] **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุดต้องตั้งค่า `position: 'top'` (บนกลาง) เสมอ ห้ามใช้ `top-end`, `top-right` หรือ Native `alert()`
 - [ ] แสดงวันที่ต้องใช้ `formatDate($date)` (ฝั่งเซิร์ฟเวอร์) หรือ `formatDate(data)` (ฝั่ง JS) เท่านั้น (รูปแบบมาตรฐาน `d/m/Y`)
@@ -243,4 +244,12 @@
   - **Scrollable Middle Body:** ส่วนเนื้อหาแบบฟอร์มตรงกลางต้องกำหนดคลาส `flex-1 overflow-y-auto p-6` (พร้อม custom scrollbar) เพื่อให้สามารถเลื่อนดูเนื้อหาภายในได้เฉพาะส่วนนี้เมื่อข้อมูลยาวเกินหน้าจอ
   - **Fixed Footer:** แถบปุ่มดำเนินการด้านล่าง (เช่น บันทึก, ยกเลิก) ต้องมีคลาส `flex-shrink-0 border-t border-gray-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900 flex justify-end gap-3` เพื่อให้ปุ่ม Action สำคัญแสดงผลติดขอบล่างของ Modal ตลอดเวลา ผู้ใช้สามารถกดบันทึกหรือยกเลิกได้ทันทีโดยไม่ต้องเลื่อนหน้าจอลงไปล่างสุด
 
-
+## 24. Multi-Tier Translation System & Zero Raw Keys (ระบบภาษาแบบ 2 ชั้น และการป้องกัน Raw Translation Key หลุด)
+- **Zero Raw Keys (ห้ามมี Raw Key หลุดสู่หน้าจอเด็ดขาด):** ข้อความทุกจุดในระบบ (Labels, Placeholders, Swatches, Options, Badges, Modals, Toasts) ต้องแสดงผลเป็นข้อความที่แปลแล้วตามภาษาที่เลือก (`th` หรือ `en`) เสมอ ห้ามปล่อยให้หลุดเป็นข้อความคีย์ดิบ เช่น `settings.preset_slate` สู่สายตาผู้ใช้งานเด็ดขาด
+- **Two-Tier Architecture (สถาปัตยกรรมภาษา 2 ชั้น):**
+  - **Tier 1 (File Baseline):** คลาส `App\Core\Lang::load()` จะโหลดคำแปลจากไฟล์ภาษาในโปรเจกต์ (`app/Lang/{locale}/{namespace}.php`) เป็นค่าพื้นฐานเสมอ ทำให้ทุกคีย์ใหม่ที่เขียนในโค้ดพร้อมแสดงผลได้ทันที
+  - **Tier 2 (Database Overlay):** คำแปลที่ดึงมาจากตาราง `translations` ใน MySQL จะถูกนำมาทับซ้อน (Overlay) บนค่าพื้นฐาน เพื่อให้คำแปลที่ผู้ดูแลระบบปรับแต่งผ่านหน้าเว็บมีความสำคัญสูงสุด
+  - **ผลประโยชน์:** ป้องกันปัญหาคีย์หลุดเป็น Raw Key แม้จะยังไม่ได้รันคำสั่งซิงค์เข้าฐานข้อมูล หรือแม้กระทั่งกรณีฐานข้อมูลขัดข้อง
+- **Symmetric 1:1 Parity & DB Sync:**
+  - ต้องประกาศคีย์คำแปลให้ตรงกัน 1:1 ทั้งใน `app/Lang/th/` และ `app/Lang/en/` เสมอ
+  - ก่อนส่งมอบงาน ต้องรัน `php compare_lang.php` (ผลลัพธ์ต้องได้ `[]` เท่านั้น) และรัน `php sync_lang.php` เพื่อซิงค์คำแปลล่าสุดเข้าตาราง `translations`

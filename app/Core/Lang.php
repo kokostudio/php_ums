@@ -73,8 +73,8 @@ class Lang
     }
 
     /**
-     * Lazy-load a language namespace file from the database.
-     * Tries current locale first, falls back to 'en', then 'th'.
+     * Lazy-load a language namespace.
+     * Loads PHP language file as baseline, overlaid with dynamic database translations.
      */
     private static function load(string $namespace): array
     {
@@ -83,25 +83,29 @@ class Lang
             return static::$loaded[$cacheKey];
         }
 
-        try {
-            $db = Database::getInstance();
-            $locales = [static::$locale, 'th', 'en'];
-
-            foreach ($locales as $locale) {
-                $stmt = $db->prepare("SELECT key_name, text_value FROM translations WHERE locale = ? AND namespace = ?");
-                $stmt->execute([$locale, $namespace]);
-                $data = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
-
-                if (!empty($data)) {
-                    static::$loaded[$cacheKey] = $data;
-                    return $data;
-                }
+        // 1. Load from language file as baseline
+        $fileData = [];
+        $filePath = __DIR__ . '/../Lang/' . static::$locale . '/' . $namespace . '.php';
+        if (file_exists($filePath)) {
+            $loadedFile = require $filePath;
+            if (is_array($loadedFile)) {
+                $fileData = $loadedFile;
             }
-        } catch (\Exception $e) {
-            // Fallback to empty array if DB fails or table not found
         }
 
-        static::$loaded[$cacheKey] = [];
-        return [];
+        // 2. Overlay with database translations if available
+        $dbData = [];
+        try {
+            $db = Database::getInstance();
+            $stmt = $db->prepare("SELECT key_name, text_value FROM translations WHERE locale = ? AND namespace = ?");
+            $stmt->execute([static::$locale, $namespace]);
+            $dbData = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR) ?: [];
+        } catch (\Exception $e) {
+            // Graceful fallback to file data if DB fails
+        }
+
+        $merged = array_merge($fileData, $dbData);
+        static::$loaded[$cacheKey] = $merged;
+        return $merged;
     }
 }

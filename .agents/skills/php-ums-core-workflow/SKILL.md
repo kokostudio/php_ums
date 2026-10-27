@@ -503,7 +503,10 @@ To ensure absolute compliance with the system architecture, always verify the fo
   2. `flex-1 overflow-y-auto` on Body allows only the content area to scroll.
   3. `max-h-[85vh] md:max-h-[90vh]` on container ensures the modal fits comfortably on any screen.
 
-
-
-
-
+### 32. Multi-Tier Translation System & Zero Raw Keys (LOCALIZATION STANDARD)
+- **The Issue:** Relying exclusively on database queries for translations can cause the UI to display raw keys (e.g. `settings.preset_slate`) if keys were added in code but not yet synchronized to the database or if database records are empty.
+- **The Rule:** NEVER leak raw translation keys (`namespace.key`) to the user interface. Translations must use a resilient two-tier loading architecture.
+- **The Architecture:**
+  1. **File Baseline:** `App\Core\Lang::load()` loads the static PHP language dictionary (`app/Lang/{locale}/{namespace}.php`) as the baseline.
+  2. **Database Overlay:** Dynamic translations from MySQL `translations` table are overlaid on top of the file baseline, preserving user custom translations while ensuring all code keys have valid text.
+  3. **100% Symmetric Parity:** All keys must exist identically in both `app/Lang/th/` and `app/Lang/en/`. Always verify with `php compare_lang.php` (must be `[]`) and sync with `php sync_lang.php`.
