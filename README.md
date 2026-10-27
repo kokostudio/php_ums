@@ -13,7 +13,7 @@
 * **🌐 4-Provider Social Login & OAuth:** เข้าสู่ระบบและเชื่อมต่อบัญชีผ่าน Google, LINE, Facebook และ GitHub พร้อมแสดงโลโก้ด้วย Inline Vector SVG คมชัดทุกขนาดหน้าจอ ตัดปัญหา Hotlink ขาดหาย
 * **🛡️ Role-Based Access Control (RBAC):** กำหนดบทบาทและสิทธิ์อย่างละเอียดผ่าน Matrix พร้อมกลไก Superadmin Protection ปกป้องบัญชีแอดมินสูงสุด และเข้ารหัส Primary Key ด้วย Hashids 8 หลักทั้งระบบ
 * **🌍 100% Complete Bilingual Localization (i18n):** รองรับภาษาไทย (`th`) และภาษาอังกฤษ (`en`) แบบสมมาตร 1:1 ครบ 100% ทุกจุด (0 missing keys) สลับภาษาได้ทันที และมีระบบแก้ไขคำแปลผ่าน UI บันทึกลงฐานข้อมูล MySQL
-* **🎨 Modern UI/UX & Dynamic Theming:** พัฒนาด้วย Tailwind CSS, Google Font Prompt, Dark/Light Mode สมบูรณ์แบบ, สลับสีธีมได้ 5 เฉดสี (Primary Palettes), หลอดโหลดหน้าเว็บ YouTube-style Preloader ไร้แสงฟุ้ง, ตาราง DataTables แบบ Server-Side Processing 100% ประมวลผลบนฐานข้อมูลรวดเร็วและปลอดภัย, และ SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)
+* **🎨 Modern UI/UX & Dynamic Theming:** พัฒนาด้วย Tailwind CSS, Google Font Prompt, Dark/Light Mode สมบูรณ์แบบ, สลับสีธีมได้ 5 เฉดสี (Primary Palettes), ตาราง DataTables แบบ Server-Side Processing 100% ประมวลผลบนฐานข้อมูลรวดเร็วและปลอดภัย, และ SweetAlert2 Toast ตำแหน่งบนกลาง (`position: 'top'`)
 * **⚙️ System Settings & Design Spec Portal:** ปรับแต่งค่าระบบได้ละเอียด พร้อมหน้าจอ Design Specification Portal (`/settings/design_spec`) แสดงพิมพ์เขียวสถาปัตยกรรม โครงสร้างฐานข้อมูล 12 ตาราง และ UI Playground
 * **📊 Activity & Audit Logging:** บันทึกประวัติกิจกรรมผู้ใช้งาน (Activity Logs) และบันทึกประวัติการเปลี่ยนแปลงข้อมูลระดับลึกแบบ JSON Diff Viewer (Audit Logs)
 
@@ -55,7 +55,6 @@ php_ums/
 │   │   └── en/                    # ภาษาอังกฤษ (โครงสร้างคีย์ตรงกัน 1:1 กับ th)
 │   ├── Views/                     # ไฟล์มุมมองและหน้าจอแสดงผล (HTML/PHP)
 │   │   ├── layouts/               # โครงร่างหน้าเว็บ (app.php, auth.php)
-│   │   │   └── partials/          # progress_bar.php (YouTube-style Preloader)
 │   │   ├── auth/                  # หน้า Login, Register, Forgot/Reset Password, 2FA
 │   │   ├── dashboard/             # หน้าสถิติและกราฟวิเคราะห์
 │   │   ├── users/                 # หน้าแสดงรายการ สร้าง และแก้ไขผู้ใช้
@@ -84,7 +83,7 @@ php_ums/
 3. **Routing:** `App\Core\Router` อ่าน URL ที่ส่งเข้ามาแบบ Clean URL และจับคู่กับ Route ที่ลงทะเบียนไว้
 4. **Middleware:** Request จะวิ่งผ่าน Middleware Pipeline เช่น `AuthMiddleware` (ตรวจสิทธิ์ผู้ใช้และ 2FA) หรือ `PermissionMiddleware` (ตรวจสิทธิ์เฉพาะจุด)
 5. **Controller & Service:** Controller รับค่า ถอดรหัส ID (`Security::decodeId`), เรียกใช้ Model/Database, และส่งข้อมูลไปเรนเดอร์ที่ View
-6. **Rendering & Output:** View ดึง Layout หลัก (`layouts/app.php`) ประกอบส่วนหัว, แถบ YouTube Preloader, Dynamic Theme, และส่ง HTML กลับไปยังเบราว์เซอร์
+6. **Rendering & Output:** View ดึง Layout หลัก (`layouts/app.php`) ประกอบส่วนหัว, Dynamic Theme, และส่ง HTML กลับไปยังเบราว์เซอร์
 
 ---
 
