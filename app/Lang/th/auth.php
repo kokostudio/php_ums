@@ -55,4 +55,8 @@ return [
     'pwd_req_number'      => 'รหัสผ่านต้องมีตัวเลข (0-9) อย่างน้อยหนึ่งตัว',
     'pwd_req_special'     => 'รหัสผ่านต้องมีอักขระพิเศษอย่างน้อยหนึ่งตัว',
     'force_2fa_warning'   => 'นโยบายสำหรับผู้ดูแลระบบบังคับให้คุณต้องเปิดใช้งาน 2FA',
+    'login_only_social_notice'  => 'ระบบเปิดให้เข้าสู่ระบบผ่าน Social Media เท่านั้น กรุณาเลือกบัญชีที่ต้องการเข้าสู่ระบบ',
+    'all_auth_methods_disabled' => 'การเข้าสู่ระบบถูกปิดชั่วคราว กรุณาติดต่อผู้ดูแลระบบ',
+    'login_with_provider'       => 'เข้าสู่ระบบด้วย :provider',
+    'username_or_email_placeholder' => 'name@example.com หรือ username',
 ];

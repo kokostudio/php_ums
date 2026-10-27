@@ -64,4 +64,6 @@ return [
     'user_email_exists_other' => 'อีเมลถูกใช้งานโดยบัญชีอื่นแล้ว',
     'user_updated' => 'อัปเดตผู้ใช้สำเร็จ',
     'access_denied' => 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
+    'username_login_disabled' => 'การเข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่านถูกปิดใช้งาน',
+    'social_login_disabled' => 'การเข้าสู่ระบบด้วย Social Login ถูกปิดใช้งาน',
 ];

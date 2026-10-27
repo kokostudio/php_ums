@@ -55,4 +55,8 @@ return [
     'pwd_req_number'      => 'Password must contain at least one number (0-9).',
     'pwd_req_special'     => 'Password must contain at least one special character.',
     'force_2fa_warning'   => 'Administrator policy requires you to enable Two-Factor Authentication.',
+    'login_only_social_notice'  => 'Sign in is available via social accounts only. Please choose your provider below.',
+    'all_auth_methods_disabled' => 'Sign in is currently disabled. Please contact the system administrator.',
+    'login_with_provider'       => 'Sign in with :provider',
+    'username_or_email_placeholder' => 'name@example.com or username',
 ];

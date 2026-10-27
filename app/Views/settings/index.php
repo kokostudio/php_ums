@@ -900,17 +900,81 @@
                     </div>
 
                     <div>
-                        <label for="login_edition" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Edition Text</label>
-                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">ข้อความใต้โลโก้ เช่น ERP EDITION</p>
+                        <label for="login_edition" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.login_edition_text') ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.login_edition_hint') ?></p>
                         <input type="text" id="login_edition" name="login_edition" 
                             value="<?= htmlspecialchars($settings['login_edition'] ?? 'ERP EDITION') ?>"
                             class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
                             placeholder="ERP EDITION">
                     </div>
 
+                    <!-- Authentication Methods (Username & Password vs Social Login) -->
                     <div class="pt-6 border-t border-gray-100 dark:border-slate-800">
-                        <label for="login_pattern" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ลายพื้นหลัง (Background Pattern)</label>
-                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2">เลือกลายตกแต่งพื้นหลังสำหรับหน้าจอล็อกอิน</p>
+                        <div class="mb-4">
+                            <h4 class="text-base font-semibold text-gray-800 dark:text-white flex items-center">
+                                <i class="ph ph-shield-check text-primary-500 mr-2 text-xl"></i>
+                                <?= __('settings.auth_methods') ?>
+                            </h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                                <?= __('settings.auth_methods_desc') ?>
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+                            <!-- Username & Password Login Toggle Card -->
+                            <div class="p-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-xs flex flex-col justify-between">
+                                <div class="flex items-start justify-between gap-3 mb-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                            <i class="ph ph-user-circle text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-sm font-semibold text-gray-900 dark:text-white"><?= __('settings.enable_username_login') ?></h5>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 mt-0.5">Standard Auth</span>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" id="toggle_enable_username_login" name="enable_username_login" value="1" class="sr-only peer" <?= ($settings['enable_username_login'] ?? '1') === '1' ? 'checked' : '' ?> onchange="validateAuthToggles('username')">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.enable_username_login_desc') ?></p>
+                            </div>
+
+                            <!-- Social Login Toggle Card -->
+                            <div class="p-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-xs flex flex-col justify-between">
+                                <div class="flex items-start justify-between gap-3 mb-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                                            <i class="ph ph-share-network text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-sm font-semibold text-gray-900 dark:text-white"><?= __('settings.enable_social_login') ?></h5>
+                                            <a href="/settings/social" class="inline-flex items-center gap-1 text-[11px] text-primary-600 dark:text-primary-400 hover:underline mt-0.5">
+                                                <span><?= __('settings.manage_social_providers') ?></span>
+                                                <i class="ph ph-arrow-square-out text-xs"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" id="toggle_enable_social_login" name="enable_social_login" value="1" class="sr-only peer" <?= ($settings['enable_social_login'] ?? '1') === '1' ? 'checked' : '' ?> onchange="validateAuthToggles('social')">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1"><?= __('settings.enable_social_login_desc') ?></p>
+                            </div>
+                        </div>
+
+                        <!-- Warning container if both are toggled off -->
+                        <div id="authMethodsAlert" class="hidden mt-3 max-w-2xl p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                            <i class="ph ph-warning-circle text-base text-amber-600 dark:text-amber-400 shrink-0"></i>
+                            <span><?= __('settings.at_least_one_auth_method_required') ?></span>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-100 dark:border-slate-800">
+                        <label for="login_pattern" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.login_pattern') ?></label>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.login_pattern_desc') ?></p>
                         <select id="login_pattern" name="login_pattern" class="w-full max-w-lg px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             <option value="dots" <?= ($settings['login_pattern'] ?? 'dots') === 'dots' ? 'selected' : '' ?>>จุดและแสงฟุ้ง (Dots & Orbs)</option>
                             <option value="grid" <?= ($settings['login_pattern'] ?? 'dots') === 'grid' ? 'selected' : '' ?>>ตารางมินิมอล (Minimal Grid)</option>
@@ -1371,6 +1435,24 @@
                 </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
+                <!-- Master Social Login Toggle -->
+                <div class="mb-6 p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-start sm:items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
+                            <i class="ph ph-share-network text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-semibold text-gray-900 dark:text-white"><?= __('settings.social_login_master_title') ?></h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5"><?= __('settings.social_login_master_desc') ?></p>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input type="checkbox" name="enable_social_login" value="1" class="sr-only peer" <?= ($settings['enable_social_login'] ?? '1') === '1' ? 'checked' : '' ?>>
+                        <div class="w-12 h-6.5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5.5 after:w-5.5 after:transition-all peer-checked:bg-primary-600"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_social_login') ?></span>
+                    </label>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                     <!-- 1. Google Settings -->
                     <div class="bg-white dark:bg-slate-800/80 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -1584,6 +1666,38 @@
             }
         });
     });
+
+    // Validate Authentication Toggles (Prevent Lockout) - Rule 4 & 5
+    function validateAuthToggles(changed) {
+        const userToggle = document.getElementById('toggle_enable_username_login');
+        const socialToggle = document.getElementById('toggle_enable_social_login');
+        const alertBox = document.getElementById('authMethodsAlert');
+
+        if (!userToggle || !socialToggle) return;
+
+        if (!userToggle.checked && !socialToggle.checked) {
+            if (alertBox) alertBox.classList.remove('hidden');
+            if (changed === 'username') {
+                userToggle.checked = true;
+            } else {
+                socialToggle.checked = true;
+            }
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'warning',
+                    title: '<?= addslashes(__('settings.at_least_one_auth_method_required')) ?>',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                    customClass: { popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl' }
+                });
+            }
+        } else {
+            if (alertBox) alertBox.classList.add('hidden');
+        }
+    }
 
     // Global copy to clipboard helper with SweetAlert2 top-center Toast
     function copyToClipboard(inputId, btnElement) {

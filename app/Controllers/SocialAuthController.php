@@ -15,6 +15,12 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToGoogle()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_google_login') !== '1') {
             Session::setFlash('error', __('messages.google_login_disabled'));
             $this->redirect('/login');
@@ -43,6 +49,12 @@ class SocialAuthController extends Controller
 
     public function handleGoogleCallback()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_google_login') !== '1') {
             Session::setFlash('error', __('messages.google_login_disabled'));
             $this->redirect('/login');
@@ -123,6 +135,12 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToLine()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_line_login') !== '1') {
             Session::setFlash('error', __('messages.line_login_disabled'));
             $this->redirect('/login');
@@ -152,6 +170,12 @@ class SocialAuthController extends Controller
 
     public function handleLineCallback()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_line_login') !== '1') {
             Session::setFlash('error', __('messages.line_login_disabled'));
             $this->redirect('/login');
@@ -246,6 +270,12 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToFacebook()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_facebook_login') !== '1') {
             Session::setFlash('error', __('messages.facebook_login_disabled'));
             $this->redirect('/login');
@@ -272,6 +302,12 @@ class SocialAuthController extends Controller
 
     public function handleFacebookCallback()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_facebook_login') !== '1') {
             Session::setFlash('error', __('messages.facebook_login_disabled'));
             $this->redirect('/login');
@@ -344,6 +380,12 @@ class SocialAuthController extends Controller
     // ==========================================
     public function redirectToGithub()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_github_login') !== '1') {
             Session::setFlash('error', __('messages.github_login_disabled'));
             $this->redirect('/login');
@@ -369,6 +411,12 @@ class SocialAuthController extends Controller
 
     public function handleGithubCallback()
     {
+        if (Settings::get('enable_social_login', '1') !== '1') {
+            Session::setFlash('error', __('messages.social_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         if (Settings::get('enable_github_login') !== '1') {
             Session::setFlash('error', __('messages.github_login_disabled'));
             $this->redirect('/login');

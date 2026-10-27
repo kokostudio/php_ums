@@ -150,6 +150,31 @@ class SettingController extends Controller
                 }
                 Settings::set('favicon_bg_color', $favBg);
             }
+            if ($tab === 'login') {
+                $enableUsername = !empty($_POST['enable_username_login']) ? '1' : '0';
+                $enableSocial   = !empty($_POST['enable_social_login']) ? '1' : '0';
+
+                if ($enableUsername === '0' && $enableSocial === '0') {
+                    Session::setFlash('error', __('settings.at_least_one_auth_method_required'));
+                    $this->redirect("/settings/{$tab}");
+                    return;
+                }
+
+                if ($enableUsername === '0') {
+                    $googleOn   = Settings::get('enable_google_login') === '1';
+                    $lineOn     = Settings::get('enable_line_login') === '1';
+                    $facebookOn = Settings::get('enable_facebook_login') === '1';
+                    $githubOn   = Settings::get('enable_github_login') === '1';
+                    if (!$googleOn && !$lineOn && !$facebookOn && !$githubOn) {
+                        Session::setFlash('error', __('settings.need_active_social_if_username_disabled'));
+                        $this->redirect("/settings/{$tab}");
+                        return;
+                    }
+                }
+
+                Settings::set('enable_username_login', $enableUsername);
+                Settings::set('enable_social_login', $enableSocial);
+            }
             if ($tab === 'security') {
                 Settings::set('pwd_require_upper', !empty($_POST['pwd_require_upper']) ? '1' : '0');
                 Settings::set('pwd_require_lower', !empty($_POST['pwd_require_lower']) ? '1' : '0');
@@ -158,10 +183,31 @@ class SettingController extends Controller
                 Settings::set('force_2fa_admin', !empty($_POST['force_2fa_admin']) ? '1' : '0');
             }
             if ($tab === 'social') {
-                Settings::set('enable_google_login', !empty($_POST['enable_google_login']) ? '1' : '0');
-                Settings::set('enable_line_login', !empty($_POST['enable_line_login']) ? '1' : '0');
-                Settings::set('enable_facebook_login', !empty($_POST['enable_facebook_login']) ? '1' : '0');
-                Settings::set('enable_github_login', !empty($_POST['enable_github_login']) ? '1' : '0');
+                $enableSocial   = !empty($_POST['enable_social_login']) ? '1' : '0';
+                $enableUsername = Settings::get('enable_username_login', '1');
+
+                if ($enableSocial === '0' && $enableUsername === '0') {
+                    Session::setFlash('error', __('settings.at_least_one_auth_method_required'));
+                    $this->redirect("/settings/{$tab}");
+                    return;
+                }
+
+                $googleOn   = !empty($_POST['enable_google_login']) ? '1' : '0';
+                $lineOn     = !empty($_POST['enable_line_login']) ? '1' : '0';
+                $facebookOn = !empty($_POST['enable_facebook_login']) ? '1' : '0';
+                $githubOn   = !empty($_POST['enable_github_login']) ? '1' : '0';
+
+                if ($enableUsername === '0' && (!$enableSocial || (!$googleOn && !$lineOn && !$facebookOn && !$githubOn))) {
+                    Session::setFlash('error', __('settings.need_active_social_if_username_disabled'));
+                    $this->redirect("/settings/{$tab}");
+                    return;
+                }
+
+                Settings::set('enable_social_login', $enableSocial);
+                Settings::set('enable_google_login', $googleOn);
+                Settings::set('enable_line_login', $lineOn);
+                Settings::set('enable_facebook_login', $facebookOn);
+                Settings::set('enable_github_login', $githubOn);
             }
             if ($tab === 'translations') {
                 Settings::set('enable_language_switcher', !empty($_POST['enable_language_switcher']) ? '1' : '0');

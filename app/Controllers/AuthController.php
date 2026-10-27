@@ -29,6 +29,12 @@ class AuthController extends Controller
         Session::init();
         Security::checkCsrf();
 
+        if (\App\Core\Settings::get('enable_username_login', '1') === '0') {
+            Session::setFlash('error', __('messages.username_login_disabled'));
+            $this->redirect('/login');
+            return;
+        }
+
         $username = Security::sanitize($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
 

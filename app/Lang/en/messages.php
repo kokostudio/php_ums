@@ -64,4 +64,6 @@ return [
     'user_email_exists_other' => 'Email is already used by another account.',
     'user_updated' => 'User updated successfully.',
     'access_denied' => 'Access denied. You do not have permission to view this section.',
+    'username_login_disabled' => 'Username and password sign in is currently disabled.',
+    'social_login_disabled' => 'Social login is currently disabled.',
 ];
