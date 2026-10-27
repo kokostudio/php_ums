@@ -6,29 +6,54 @@ use App\Core\Theme;
 // ── Dynamic Theme (Preset หรือ Custom Color Picker) — ต้องตรงกับ Layout หลัก ──
 $theme       = Theme::resolve();
 $paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
+
+// ── Cookie-backed Theme Detection (Zero-FOUC Paint-Holding) ──
+$isDark = isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark') : true;
 ?>
 <!DOCTYPE html>
-<html lang="<?= \App\Core\Lang::locale() ?>" class="dark bg-slate-50 dark:bg-[#0f172a] <?= htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>"> <!-- Added dark as default fallback if needed, but script will override -->
+<html lang="<?= \App\Core\Lang::locale() ?>" class="<?= $isDark ? 'dark ' : '' ?>bg-slate-50 dark:bg-[#0f172a] <?= htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?>" style="color-scheme: <?= $isDark ? 'dark' : 'light' ?>; background-color: <?= $isDark ? '#0f172a' : '#f8fafc' ?>;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title><?= htmlspecialchars(Settings::get('site_name', 'System')) ?> - <?= $pageTitle ?? __('auth.login_title') ?></title>
     
     <?php $favicon = Settings::get('site_favicon'); if ($favicon): ?>
         <link rel="icon" href="<?= htmlspecialchars($favicon) ?>">
     <?php endif; ?>
-    <!-- Dark Mode Init Script (Prevents FOUC) -->
+    <!-- Dark Mode Init Script (Instant Theme Sync & FOUC Prevention) -->
     <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = stored === 'dark' || (!stored && prefersDark);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.style.colorScheme = 'dark';
+                document.documentElement.style.backgroundColor = '#0f172a';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.style.colorScheme = 'light';
+                document.documentElement.style.backgroundColor = '#f8fafc';
+            }
+            document.cookie = "theme=" + (isDark ? 'dark' : 'light') + ";path=/;max-age=31536000;SameSite=Lax";
+        })();
     </script>
     <style>
+        :root {
+            color-scheme: light dark;
+        }
         /* Instant Background & FOUC Prevention (prevents white flash before Tailwind CDN compiles) */
-        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; }
-        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; }
+        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; color-scheme: dark; }
+        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; color-scheme: light; }
+
+        /* Smooth transitions only during user-initiated theme switch, NOT on initial page navigation */
+        html.theme-transitioning,
+        html.theme-transitioning *,
+        html.theme-transitioning *:before,
+        html.theme-transitioning *:after {
+            transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease !important;
+        }
     </style>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -81,7 +106,7 @@ $bgClass = $bgImage ? "bg-cover bg-center bg-no-repeat" : "bg-slate-900";
 $bgStyle = $bgImage ? "background-image: url('" . htmlspecialchars($bgImage) . "');" : "";
 $currentLocale = \App\Core\Lang::locale();
 ?>
-<body class="antialiased min-h-screen flex flex-col md:flex-row transition-colors duration-300">
+<body class="antialiased min-h-screen flex flex-col md:flex-row">
 
 
     <!-- LEFT PANEL (BRANDING) -->
@@ -262,14 +287,23 @@ $currentLocale = \App\Core\Lang::locale();
         }
         
         function toggleTheme() {
+            document.documentElement.classList.add('theme-transitioning');
+            let newTheme;
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
+                newTheme = 'light';
             } else {
                 document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
+                newTheme = 'dark';
             }
+            localStorage.theme = newTheme;
+            document.cookie = "theme=" + newTheme + ";path=/;max-age=31536000;SameSite=Lax";
+            document.documentElement.style.colorScheme = newTheme;
+            document.documentElement.style.backgroundColor = newTheme === 'dark' ? '#0f172a' : '#f8fafc';
             updateThemeIcon();
+            setTimeout(function() {
+                document.documentElement.classList.remove('theme-transitioning');
+            }, 350);
         }
         
         // Initial setup

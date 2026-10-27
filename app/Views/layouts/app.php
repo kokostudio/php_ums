@@ -8,29 +8,54 @@
     $theme       = Theme::resolve();
     $sidebarHex  = $theme['background'];
     $paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
+
+    // ── Cookie-backed Theme Detection (Zero-FOUC Paint-Holding) ──
+    $isDark = isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark') : true;
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?> bg-slate-50 dark:bg-slate-900">
+<html lang="<?php echo \App\Core\Lang::locale() ?>" class="<?php echo $isDark ? 'dark ' : '' ?><?php echo htmlspecialchars(Settings::get('base_font_size', 'text-[16px]')) ?> bg-slate-50 dark:bg-slate-900" style="color-scheme: <?php echo $isDark ? 'dark' : 'light' ?>; background-color: <?php echo $isDark ? '#0f172a' : '#f8fafc' ?>;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title><?php echo htmlspecialchars(Settings::get('site_name', 'System')) ?></title>
 
     <?php $favicon = Settings::get('site_favicon');if ($favicon): ?>
         <link rel="icon" href="<?php echo htmlspecialchars($favicon) ?>">
     <?php endif; ?>
-    <!-- Dark Mode Init Script (Prevents FOUC) -->
+    <!-- Dark Mode Init Script (Instant Theme Sync & FOUC Prevention) -->
     <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = stored === 'dark' || (!stored && prefersDark);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.style.colorScheme = 'dark';
+                document.documentElement.style.backgroundColor = '#0f172a';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.style.colorScheme = 'light';
+                document.documentElement.style.backgroundColor = '#f8fafc';
+            }
+            document.cookie = "theme=" + (isDark ? 'dark' : 'light') + ";path=/;max-age=31536000;SameSite=Lax";
+        })();
     </script>
     <style>
+        :root {
+            color-scheme: light dark;
+        }
         /* Instant Background & FOUC Prevention (prevents white flash before Tailwind CDN compiles) */
-        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; }
-        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; }
+        html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; color-scheme: dark; }
+        html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; color-scheme: light; }
+
+        /* Smooth transitions only during user-initiated theme switch, NOT on initial page navigation */
+        html.theme-transitioning,
+        html.theme-transitioning *,
+        html.theme-transitioning *:before,
+        html.theme-transitioning *:after {
+            transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease !important;
+        }
 
         /* ── Dynamic Theme Variables (Custom Color Picker) ── */
         <?= \App\Core\Theme::cssVariables($theme) ?>
@@ -301,7 +326,7 @@
         });
     </script>
 </head>
-<body class="text-gray-800 dark:text-slate-200 antialiased h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+<body class="text-gray-800 dark:text-slate-200 antialiased h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-950">
 
 
     <!-- Mobile Sidebar Overlay -->
@@ -748,14 +773,23 @@
 
         // Toggle action
         themeToggleBtn.addEventListener('click', function() {
+            document.documentElement.classList.add('theme-transitioning');
+            let newTheme;
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
+                newTheme = 'light';
             } else {
                 document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
+                newTheme = 'dark';
             }
+            localStorage.theme = newTheme;
+            document.cookie = "theme=" + newTheme + ";path=/;max-age=31536000;SameSite=Lax";
+            document.documentElement.style.colorScheme = newTheme;
+            document.documentElement.style.backgroundColor = newTheme === 'dark' ? '#0f172a' : '#f8fafc';
             updateIcon();
+            setTimeout(function() {
+                document.documentElement.classList.remove('theme-transitioning');
+            }, 350);
         });
 
         // Mobile Sidebar Toggle
