@@ -57,10 +57,7 @@ class SettingController extends Controller
         // Keys allowed per tab
         $textKeysByTab = [
             'general' => [
-                'site_name', 'site_footer', 'base_font_size',
-                'logo_type', 'logo_icon', 'logo_icon_color', 'logo_icon_size',
-                'favicon_type', 'favicon_icon', 'favicon_icon_color', 'favicon_icon_size', 'favicon_bg_color',
-                'favicon_sync_logo'
+                'site_name', 'site_footer', 'base_font_size'
             ],
             'login'   => [
                 'login_title', 'login_subtitle', 'login_edition', 'login_features_enabled',
@@ -211,7 +208,8 @@ class SettingController extends Controller
             Session::setFlash('success', __('settings.settings_saved'));
             $this->redirect("/settings/{$tab}");
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error("Failed to update system settings (tab: {$tab}): " . $e->getMessage());
             Session::setFlash('error', __('settings.failed_update_settings') . ' ' . $e->getMessage());
             $this->redirect("/settings/{$tab}");
         }
@@ -250,7 +248,8 @@ class SettingController extends Controller
 
             Logger::activity("Updated translation for {$namespace}.{$keyName}");
             echo json_encode(['success' => true, 'message' => __('settings.translation_updated')]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error("Failed to update translation for {$namespace}.{$keyName}: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }

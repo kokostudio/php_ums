@@ -1583,13 +1583,6 @@
                 $('html').removeClass('text-[14px] text-[16px] text-[18px]').addClass($(this).val());
             }
         });
-
-        // Button preloading & double-submit prevention (Rule 4)
-        $('form[id$="SettingsForm"], #generalSettingsForm').on('submit', function() {
-            var $btn = $(this).find('button[type="submit"]');
-            $btn.prop('disabled', true).addClass('opacity-75 cursor-not-allowed');
-            $btn.html('<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> <span><?= addslashes(__('common.saving')) ?></span>');
-        });
     });
 
     // Global copy to clipboard helper with SweetAlert2 top-center Toast

@@ -1002,19 +1002,19 @@
             }
         });
 
-        // Global Form Submit Loading State
+        // Global Form Submit Loading State (Rule 4)
         document.addEventListener('submit', function(e) {
             const form = e.target;
             if (form.hasAttribute('data-no-loading')) return;
             
             const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submitBtn) {
-                if (submitBtn.disabled) {
+                // If already submitted once, block duplicate submission
+                if (submitBtn.dataset.submitting === 'true') {
                     e.preventDefault();
                     return;
                 }
-                
-                submitBtn.disabled = true;
+                submitBtn.dataset.submitting = 'true';
                 
                 // Keep original text
                 if (!submitBtn.dataset.originalContent) {
@@ -1027,7 +1027,13 @@
                 }
                 
                 submitBtn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
-                submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> ${submitBtn.dataset.originalContent.replace(/(<([^>]+)>)/gi, '').trim()}`;
+                const rawText = submitBtn.dataset.originalContent.replace(/(<([^>]+)>)/gi, '').trim();
+                submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> <span>${rawText || '<?= addslashes(__('common.saving')) ?>'}</span>`;
+                
+                // Defer disabling the button so browser completes native HTTP POST submission pipeline
+                setTimeout(function() {
+                    submitBtn.disabled = true;
+                }, 10);
             }
         });
     </script>

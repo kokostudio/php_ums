@@ -299,7 +299,7 @@ $currentLocale = \App\Core\Lang::locale();
         updateThemeIcon();
     </script>
 
-    <!-- Global Form Submit Loading State -->
+    <!-- Global Form Submit Loading State (Rule 4) -->
     <script>
         document.addEventListener('submit', function(e) {
             const form = e.target;
@@ -307,12 +307,11 @@ $currentLocale = \App\Core\Lang::locale();
             
             const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submitBtn) {
-                if (submitBtn.disabled) {
+                if (submitBtn.dataset.submitting === 'true') {
                     e.preventDefault();
                     return;
                 }
-                
-                submitBtn.disabled = true;
+                submitBtn.dataset.submitting = 'true';
                 
                 if (!submitBtn.dataset.originalContent) {
                     submitBtn.dataset.originalContent = submitBtn.innerHTML;
@@ -323,7 +322,12 @@ $currentLocale = \App\Core\Lang::locale();
                 }
                 
                 submitBtn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
-                submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> ${submitBtn.dataset.originalContent.replace(/(<([^>]+)>)/gi, '').trim()}`;
+                const rawText = submitBtn.dataset.originalContent.replace(/(<([^>]+)>)/gi, '').trim();
+                submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin mr-2 text-lg"></i> <span>${rawText || '<?= addslashes(__('common.saving')) ?>'}</span>`;
+                
+                setTimeout(function() {
+                    submitBtn.disabled = true;
+                }, 10);
             }
         });
     </script>
