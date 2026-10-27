@@ -198,34 +198,78 @@
                                 </div>
                             </div>
 
-                            <!-- 20 Icons Selection Grid -->
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                                        <?= __('settings.select_icon_label') ?>
-                                    </label>
-                                    <span class="text-xs text-gray-500 dark:text-slate-400 font-mono">20 Phosphor Icons</span>
+                            <!-- Comprehensive Industry Icons Selection Grid with Search and Category Filter -->
+                            <div class="space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">
+                                            <?= __('settings.select_icon_label') ?>
+                                        </label>
+                                        <span id="brandIconCountBadge" class="px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700">
+                                            <?= count($allBrandIcons) ?> <?= __('settings.showing_icons_count', ['count' => count($allBrandIcons)]) ?? 'icons' ?>
+                                        </span>
+                                    </div>
+
+                                    <!-- Search Input -->
+                                    <div class="relative w-full sm:w-72">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                            <i class="ph ph-magnifying-glass text-sm"></i>
+                                        </span>
+                                        <input type="text" id="brandIconSearch" oninput="filterBrandIcons()"
+                                            class="w-full pl-8 pr-7 py-1.5 bg-white dark:bg-slate-800 rounded-xl border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white text-xs placeholder-gray-400 focus:ring-2 focus:ring-primary-500 outline-none transition-colors"
+                                            placeholder="<?= __('settings.ph_search_icons') ?>">
+                                        <button type="button" id="brandIconSearchClear" onclick="clearBrandIconSearch()"
+                                            class="hidden absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-white text-xs">
+                                            <i class="ph ph-x-circle text-sm"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[300px] overflow-y-auto p-1.5 rounded-2xl border border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50" id="iconPickerGrid">
+
+                                <!-- Category Filter Pills (Horizontal Scrollable) -->
+                                <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin text-xs" id="brandCategoryTabs">
+                                    <?php foreach (\App\Core\BrandIcon::categories() as $catKey => $catInfo): ?>
+                                    <button type="button" onclick="filterBrandCategory('<?= $catKey ?>')"
+                                        data-cat-key="<?= $catKey ?>"
+                                        class="brand-cat-btn shrink-0 px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 border <?= $catKey === 'all' ? 'bg-primary-600 text-white border-primary-600 shadow-sm' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:border-primary-400' ?>">
+                                        <i class="ph <?= htmlspecialchars($catInfo['icon']) ?> text-sm"></i>
+                                        <span><?= __('settings.brand_cat_' . $catKey) ?></span>
+                                    </button>
+                                    <?php endforeach; ?>
+                                </div>
+
+                                <!-- Icons Grid -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 max-h-[380px] overflow-y-auto p-2 rounded-2xl border border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50" id="iconPickerGrid">
                                     <?php foreach ($allBrandIcons as $k => $iconData): 
                                         $isSelected = ($k === $selectedIcon);
+                                        $searchTokens = strtolower($k . ' ' . $iconData['name_th'] . ' ' . $iconData['name_en'] . ' ' . $iconData['category']);
                                     ?>
                                     <button type="button" onclick="selectBrandIcon('<?= htmlspecialchars($k) ?>')"
                                         data-icon-key="<?= htmlspecialchars($k) ?>"
-                                        class="brand-icon-btn group relative flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all <?= $isSelected ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 ring-2 ring-primary-500/30 font-semibold shadow-sm' : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-slate-700/50' ?>">
-                                        <span class="brand-icon-check absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center text-[10px] <?= $isSelected ? '' : 'hidden' ?>">
+                                        data-category="<?= htmlspecialchars($iconData['category']) ?>"
+                                        data-search="<?= htmlspecialchars($searchTokens) ?>"
+                                        class="brand-icon-btn group relative flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all <?= $isSelected ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 ring-2 ring-primary-500/30 font-semibold shadow-sm' : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-slate-700/50' ?>">
+                                        <span class="brand-icon-check absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-primary-500 text-white flex items-center justify-center text-[9px] <?= $isSelected ? '' : 'hidden' ?>">
                                             <i class="ph ph-check"></i>
                                         </span>
-                                        <div class="w-8 h-8 flex items-center justify-center mb-1.5 icon-glyph shrink-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="28" height="28" class="transition-transform group-hover:scale-110">
+                                        <div class="w-7 h-7 flex items-center justify-center mb-1 icon-glyph shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="24" height="24" class="transition-transform group-hover:scale-110">
                                                 <?php foreach ($iconData['paths'] as $p): ?>
                                                     <path fill="currentColor" d="<?= htmlspecialchars($p) ?>"/>
                                                 <?php endforeach; ?>
                                             </svg>
                                         </div>
-                                        <span class="text-[11px] truncate w-full px-1"><?= __('settings.icon_' . $k) ?></span>
+                                        <span class="text-[10px] truncate w-full px-0.5 leading-tight"><?= __('settings.icon_' . $k) ?></span>
                                     </button>
                                     <?php endforeach; ?>
+                                </div>
+
+                                <!-- Empty State when no icons match -->
+                                <div id="brandIconEmptyState" class="hidden p-8 text-center rounded-2xl border border-dashed border-gray-300 dark:border-slate-700">
+                                    <i class="ph ph-magnifying-glass text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.no_icons_found') ?></p>
+                                    <button type="button" onclick="clearBrandIconSearch()" class="mt-2 text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                                        <?= __('settings.brand_cat_all') ?>
+                                    </button>
                                 </div>
                             </div>
 
@@ -653,6 +697,61 @@
                     const liveSidebarTitle = document.getElementById('liveSidebarTitle');
                     const liveTabTitle = document.getElementById('liveTabTitle');
                     const siteNameInput = document.getElementById('site_name');
+
+                    let currentCategoryFilter = 'all';
+
+                    window.filterBrandCategory = function(catKey) {
+                        currentCategoryFilter = catKey;
+                        document.querySelectorAll('.brand-cat-btn').forEach(btn => {
+                            const isMatch = btn.getAttribute('data-cat-key') === catKey;
+                            btn.className = "brand-cat-btn shrink-0 px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 border " +
+                                (isMatch
+                                    ? "bg-primary-600 text-white border-primary-600 shadow-sm"
+                                    : "bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:border-primary-400");
+                        });
+                        filterBrandIcons();
+                    };
+
+                    window.filterBrandIcons = function() {
+                        const searchInput = document.getElementById('brandIconSearch');
+                        const clearBtn = document.getElementById('brandIconSearchClear');
+                        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+                        if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
+
+                        const cards = document.querySelectorAll('.brand-icon-btn');
+                        let visibleCount = 0;
+
+                        cards.forEach(card => {
+                            const cat = card.getAttribute('data-category');
+                            const searchTokens = card.getAttribute('data-search') || '';
+
+                            const catMatch = (currentCategoryFilter === 'all' || cat === currentCategoryFilter);
+                            const searchMatch = (query === '' || searchTokens.includes(query));
+
+                            const isVisible = catMatch && searchMatch;
+                            card.classList.toggle('hidden', !isVisible);
+                            if (isVisible) visibleCount++;
+                        });
+
+                        const countBadge = document.getElementById('brandIconCountBadge');
+                        if (countBadge) {
+                            countBadge.textContent = visibleCount + ' icons';
+                        }
+
+                        const emptyState = document.getElementById('brandIconEmptyState');
+                        if (emptyState) {
+                            emptyState.classList.toggle('hidden', visibleCount > 0);
+                        }
+                    };
+
+                    window.clearBrandIconSearch = function() {
+                        const searchInput = document.getElementById('brandIconSearch');
+                        if (searchInput) {
+                            searchInput.value = '';
+                        }
+                        filterBrandCategory('all');
+                    };
 
                     window.switchBrandMode = function(mode) {
                         const isIcon = mode === 'icon';
