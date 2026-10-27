@@ -386,12 +386,13 @@ To ensure absolute compliance with the system architecture, always verify the fo
   1. In `RateLimiter::check()`, always check elapsed time against `updated_at` (sliding time window) rather than letting old attempts persist indefinitely.
   2. Always call `RateLimiter::reset('/login')` upon successful login and 2FA authentication in `AuthController`.
 
-### 23. Clean & Instant Page Navigation (Prohibition of Artificial Navigation Preloaders / Interceptors)
-- **The Issue:** Intercepting internal link clicks to display artificial progress bars (such as YouTube-style bars) causes distracting flashes, preloader flickers, or perceived visual delay before the new page renders.
-- **The Rule:** Page navigation must remain natural, instant, and clean. Do NOT intercept link clicks to render artificial preloader bars across the top of the viewport.
+### 23. YouTube-Style Top Preloader Progress Bar (CRITICAL UX STANDARD)
+- **The Issue:** In multi-page applications, clicking links or navigating between pages without immediate visual feedback makes the app feel sluggish or unresponsive.
+- **The Rule:** All layouts and page navigation flows MUST maintain the YouTube-style top preloader progress bar.
 - **The Solution:**
-  1. Allow the browser to navigate naturally across pages without attaching click interception progress bars to internal links.
-  2. Maintain button preloading on explicit form submissions and asynchronous actions while keeping standard link navigation instant and clean.
+  1. Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right before `</body>` in all layout files (`app/Views/layouts/*.php`) to avoid parser-blocking DOM execution.
+  2. The component automatically intercepts internal `<a>` clicks, form submissions, and non-polling Axios AJAX calls.
+  3. Fully compliant with Chromium Paint-Holding: avoids `beforeunload` style changes to eliminate white screen flashes during navigation.
 
 ### 24. Sticky Side Navigation & Tabs on Scroll (LAYOUT CONVENTION)
 - **The Issue:** On long forms or multi-tab settings screens, scrolling down causes the navigation sidebar/tabs to disappear off-screen, forcing users to scroll all the way back to the top to switch tabs.

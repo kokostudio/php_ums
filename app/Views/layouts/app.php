@@ -1117,5 +1117,6 @@
             </div>
         </div>
     </div>
+    <?php require __DIR__ . '/partials/progress_bar.php'; ?>
 </body>
 </html>

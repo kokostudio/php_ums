@@ -223,10 +223,10 @@
                     </tr>
                     <tr>
                         <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                            <i class="ph ph-lightning text-amber-500 text-base"></i> Instant Navigation
+                            <i class="ph ph-hourglass text-amber-500 text-base"></i> Top Progress Bar
                         </td>
-                        <td class="px-4 py-3 font-mono font-medium text-amber-600 dark:text-amber-400">Native Chromium Routing</td>
-                        <td class="px-4 py-3">Clean & instant page transitions without artificial preloader flickers or link-click interceptor delays</td>
+                        <td class="px-4 py-3 font-mono font-medium text-amber-600 dark:text-amber-400">YouTube-style Preloader</td>
+                        <td class="px-4 py-3">Chromium Paint-Holding compliant, zero white screen flicker during page transitions, automatically tracks Axios requests</td>
                     </tr>
                     <tr>
                         <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -307,7 +307,7 @@ php_ums/
 │   │   ├── auth/                          <span class="text-indigo-400"># Login, Register, 2FA, Forgot & Reset Password views</span>
 │   │   ├── dashboard/                     <span class="text-indigo-400"># Main Admin Dashboard with Realtime Analytics</span>
 │   │   ├── errors/                        <span class="text-indigo-400"># 403, 404, 500, and Maintenance Mode screens</span>
-│   │   ├── layouts/                       <span class="text-indigo-400"># Master layouts (app.php, auth.php)</span>
+│   │   ├── layouts/                       <span class="text-indigo-400"># Master layouts (app.php, auth.php) & Partials (progress_bar.php)</span>
 │   │   ├── logs/                          <span class="text-indigo-400"># Activity Logs & JSON Diff Audit Logs views</span>
 │   │   ├── profile/                       <span class="text-indigo-400"># User Profile, Change Password, 2FA QR Setup, Active Sessions management</span>
 │   │   ├── roles/                         <span class="text-indigo-400"># RBAC Roles & Module Permissions Matrix views</span>

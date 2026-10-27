@@ -76,7 +76,7 @@ no API key, $0).
 
 9. **RATE LIMITING & 429 PREVENTION**: Always call `RateLimiter::reset('/login')` upon successful login and 2FA verification. `RateLimiter` must use a sliding time window (relative to `updated_at`) so failed attempts do not accumulate indefinitely and lock users out unexpectedly.
 
-10. **CLEAN & INSTANT PAGE NAVIGATION (NO ARTIFICIAL PRELOADERS OR INTERCEPTORS)**: Do NOT use artificial page navigation preloader bars, loading flickers, or link-click interceptors that display visual bars/spinners before navigation finishes. Standard browser page navigation should remain natural, instant, and clean without distracting visual flashes or delays.
+10. **YOUTUBE-STYLE PRELOADER PROGRESS BAR**: All layouts (`app/Views/layouts/*.php`) and page navigation flows must maintain the YouTube-style top preloader progress bar (`app/Views/layouts/partials/progress_bar.php`). Always include `<?php require __DIR__ . '/partials/progress_bar.php'; ?>` right before `</body>` in any layout (preserving Chromium Paint-Holding and eliminating white flashes). It automatically handles link clicks, form submissions, page transitions, and non-polling AJAX requests.
 
 11. **STICKY SIDE NAVIGATION & TABS ON SCROLL**: In multi-column views with side navigation or tabs alongside long forms/content (such as `settings/index.php`), always ensure the sidebar/tab card is sticky on scroll (`lg:sticky lg:top-6 self-start z-10` with `items-start` on the parent grid container) so navigation stays immediately accessible without requiring users to scroll all the way back to the top.
 
