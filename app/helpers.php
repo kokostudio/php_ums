@@ -15,6 +15,22 @@ if (!function_exists('__')) {
     }
 }
 
+if (!function_exists('class_basename')) {
+    /**
+     * Get the class name without its namespace.
+     *
+     * @param  object|string $class
+     * @return string
+     */
+    function class_basename(object|string $class): string
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+        $class = str_replace('/', '\\', $class);
+
+        return basename(str_replace('\\', '/', $class));
+    }
+}
+
 if (!function_exists('formatDate')) {
     /**
      * Format date or datetime to standard d/m/Y (e.g. 30/12/2026)
