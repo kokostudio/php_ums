@@ -65,12 +65,68 @@ class Router
     }
 
     /**
-     * สร้าง Route Group (Prefix + Middleware ร่วมกัน)
+     * ลงทะเบียน POST Delete ควบคู่กับ GET Fallback Redirect อัตโนมัติ (Rule #8)
      */
-    public function group(string $prefix, array $middlewares, callable $callback): void
+    public function deleteWithFallback(
+        string $path,
+        array|callable $handler,
+        string $redirectUrl,
+        array $middlewares = []
+    ): void {
+        $this->post($path, $handler, $middlewares);
+
+        $this->get($path, function () use ($redirectUrl): void {
+            header('Location: ' . $redirectUrl);
+            exit;
+        }, $middlewares);
+    }
+
+    /**
+     * สร้าง Route Group
+     * รองรับทั้งแบบ php_health array attributes และ shorthand prefix + middlewares
+     *
+     * สไตล์ 1 (php_health array style):
+     *   $router->group(['prefix' => '/health', 'middlewares' => [...]], function (Router $r) { ... });
+     *
+     * สไตล์ 2 (String prefix + middlewares array):
+     *   $router->group('/users', Groups::auth(), function (Router $r) { ... });
+     *
+     * สไตล์ 3 (String prefix only):
+     *   $router->group('/auth', function (Router $r) { ... });
+     */
+    public function group(string|array $prefixOrAttributes, array|callable $middlewaresOrCallback = [], ?callable $callback = null): void
     {
+        $prefix = '';
+        $middlewares = [];
+        $cb = null;
+
+        if (is_array($prefixOrAttributes)) {
+            $prefix = (string)($prefixOrAttributes['prefix'] ?? '');
+            $middlewares = (array)($prefixOrAttributes['middlewares'] ?? []);
+            $cb = is_callable($middlewaresOrCallback) ? $middlewaresOrCallback : $callback;
+        } elseif (is_callable($middlewaresOrCallback)) {
+            $prefix = (string)$prefixOrAttributes;
+            $cb = $middlewaresOrCallback;
+        } else {
+            $prefix = (string)$prefixOrAttributes;
+            $middlewares = is_array($middlewaresOrCallback) ? $middlewaresOrCallback : [];
+            $cb = $callback;
+        }
+
+        if (!is_callable($cb)) {
+            throw new \InvalidArgumentException('Route group requires a valid callback');
+        }
+
         $group = new RouteGroup($this, $this->normalizePrefix($prefix), $middlewares);
-        $callback($group);
+        $cb($group);
+    }
+
+    /**
+     * Auto-load route files (เข้ากันได้กับ php_health)
+     */
+    public function loadRoutes(?string $rootDir = null): void
+    {
+        (new RouteRegistrar())->load($this, $rootDir);
     }
 
     /**

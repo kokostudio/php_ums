@@ -30,14 +30,53 @@ class RouteGroup extends Router
     }
 
     /**
-     * สร้างกลุ่มย่อย (Nested Group)
+     * ลงทะเบียน POST Delete ควบคู่กับ GET Fallback Redirect อัตโนมัติในกลุ่ม (Rule #8)
      */
-    public function group(string $prefix, array $middlewares, callable $callback): void
+    public function deleteWithFallback(
+        string $path,
+        array|callable $handler,
+        string $redirectUrl,
+        array $middlewares = []
+    ): void {
+        $this->post($path, $handler, $middlewares);
+
+        $this->get($path, function () use ($redirectUrl): void {
+            header('Location: ' . $redirectUrl);
+            exit;
+        }, $middlewares);
+    }
+
+    /**
+     * สร้างกลุ่มย่อย (Nested Group)
+     * รองรับทั้งแบบ php_health array attributes และ shorthand
+     */
+    public function group(string|array $prefixOrAttributes, array|callable $middlewaresOrCallback = [], ?callable $callback = null): void
     {
+        $prefix = '';
+        $middlewares = [];
+        $cb = null;
+
+        if (is_array($prefixOrAttributes)) {
+            $prefix = (string)($prefixOrAttributes['prefix'] ?? '');
+            $middlewares = (array)($prefixOrAttributes['middlewares'] ?? []);
+            $cb = is_callable($middlewaresOrCallback) ? $middlewaresOrCallback : $callback;
+        } elseif (is_callable($middlewaresOrCallback)) {
+            $prefix = (string)$prefixOrAttributes;
+            $cb = $middlewaresOrCallback;
+        } else {
+            $prefix = (string)$prefixOrAttributes;
+            $middlewares = is_array($middlewaresOrCallback) ? $middlewaresOrCallback : [];
+            $cb = $callback;
+        }
+
+        if (!is_callable($cb)) {
+            throw new \InvalidArgumentException('Route group requires a valid callback');
+        }
+
         $this->parentRouter->group(
             $this->groupPrefix . $this->normalizePrefix($prefix),
             array_merge($this->groupMiddlewares, $middlewares),
-            $callback
+            $cb
         );
     }
 
