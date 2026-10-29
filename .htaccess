@@ -1,4 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Prevent infinite internal recursion loop
+    RewriteCond %{REQUEST_URI} ^/public/ [NC]
+    RewriteRule ^ - [L]
+
+    # Forward all requests to public directory safely
+    RewriteCond %{REQUEST_URI} !^/public/ [NC]
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
 </IfModule>

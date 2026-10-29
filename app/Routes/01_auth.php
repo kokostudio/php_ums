@@ -8,13 +8,15 @@
 use App\Controllers\AuthController;
 use App\Controllers\SocialAuthController;
 use App\Controllers\LangController;
+use App\Controllers\FaviconController;
 use App\Middlewares\Groups;
 use App\Core\Router;
 
 /** @var Router $router */
 
-// ── สลับภาษา (อยู่นอก Group เพราะไม่ต้อง Login) ──
+// ── สลับภาษา & Dynamic Vector Favicon ──
 $router->get('/lang/{locale}', [LangController::class, 'switch']);
+$router->get('/favicon.svg', [FaviconController::class, 'render']);
 
 // ── หน้า Login / Register (Guest only) ──
 $router->group('', Groups::guest(), function (Router $r) {

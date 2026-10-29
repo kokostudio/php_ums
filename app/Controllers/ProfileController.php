@@ -59,7 +59,13 @@ class ProfileController extends Controller
             'user' => $user,
             'roleName' => $roleName,
             'qrCodeSvg' => $qrCodeSvg,
-            'twoFactorSecret' => $secret
+            'twoFactorSecret' => $secret,
+            'socialSettings' => [
+                'google'   => \App\Core\Settings::get('enable_google_login') === '1',
+                'line'     => \App\Core\Settings::get('enable_line_login') === '1',
+                'facebook' => \App\Core\Settings::get('enable_facebook_login') === '1',
+                'github'   => \App\Core\Settings::get('enable_github_login') === '1',
+            ]
         ]);
     }
 
@@ -69,13 +75,26 @@ class ProfileController extends Controller
         $db = Database::getInstance();
         $userId = Session::get('user_id');
 
-        $email = Security::sanitize($_POST['email'] ?? '');
-        $firstName = Security::sanitize($_POST['first_name'] ?? '');
-        $lastName = Security::sanitize($_POST['last_name'] ?? '');
+        // Fetch current user details
+        $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
+        $stmt->execute(['id' => $userId]);
+        $currentUser = $stmt->fetch();
+
+        if (!$currentUser) {
+            Session::setFlash('error', __('messages.user_not_found'));
+            $this->redirect('/profile');
+            return;
+        }
+
+        $email = Security::sanitize(trim($_POST['email'] ?? ''));
+        $firstName = Security::sanitize(trim($_POST['first_name'] ?? ''));
+        $lastName = Security::sanitize(trim($_POST['last_name'] ?? ''));
+        $rawUsername = isset($_POST['username']) ? trim($_POST['username']) : null;
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Session::setFlash('error', __('messages.invalid_email_format'));
             $this->redirect('/profile');
+            return;
         }
 
         // Check duplicate email
@@ -84,11 +103,66 @@ class ProfileController extends Controller
         if ($check->fetch()) {
             Session::setFlash('error', __('messages.email_taken'));
             $this->redirect('/profile');
+            return;
+        }
+
+        // Username 1-time change check
+        $usernameChanged = false;
+        $finalUsername = $currentUser['username'];
+        $changesCount = (int)($currentUser['username_changes_count'] ?? 0);
+
+        if ($rawUsername !== null && $rawUsername !== '' && $rawUsername !== $currentUser['username']) {
+            if ($changesCount >= 1) {
+                Session::setFlash('error', __('profile.username_change_limit_reached'));
+                $this->redirect('/profile');
+                return;
+            }
+
+            $sanitizedUsername = Security::sanitize($rawUsername);
+            if (!preg_match('/^[a-zA-Z0-9_-]{3,30}$/', $sanitizedUsername)) {
+                Session::setFlash('error', __('profile.invalid_username_format'));
+                $this->redirect('/profile');
+                return;
+            }
+
+            // Check duplicate username
+            $checkUser = $db->prepare("SELECT id FROM users WHERE username = :username AND id != :id");
+            $checkUser->execute(['username' => $sanitizedUsername, 'id' => $userId]);
+            if ($checkUser->fetch()) {
+                Session::setFlash('error', __('profile.username_taken'));
+                $this->redirect('/profile');
+                return;
+            }
+
+            $usernameChanged = true;
+            $finalUsername = $sanitizedUsername;
         }
 
         try {
-            $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name WHERE id = :id";
-            $params = ['email' => $email, 'first_name' => $firstName, 'last_name' => $lastName, 'id' => $userId];
+            $setClauses = [
+                'email = :email',
+                'first_name = :first_name',
+                'last_name = :last_name'
+            ];
+            $params = [
+                'email' => $email,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'id' => $userId
+            ];
+
+            if ($usernameChanged) {
+                // Ensure columns exist on users table (Zero-500 Guarantee if migration not yet run)
+                try {
+                    $db->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS username_changes_count INT UNSIGNED NOT NULL DEFAULT 0 AFTER role_id");
+                    $db->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS username_changed_at DATETIME NULL DEFAULT NULL AFTER username_changes_count");
+                } catch (\Throwable $e) {}
+
+                $setClauses[] = 'username = :username';
+                $setClauses[] = 'username_changes_count = username_changes_count + 1';
+                $setClauses[] = 'username_changed_at = NOW()';
+                $params['username'] = $finalUsername;
+            }
 
             // Handle Cropped Profile Image Upload (Base64)
             if (!empty($_POST['cropped_image'])) {
@@ -111,7 +185,7 @@ class ProfileController extends Controller
                 $targetPath = $uploadDir . $filename;
 
                 if (file_put_contents($targetPath, $data)) {
-                    $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name, profile_image = :profile_image WHERE id = :id";
+                    $setClauses[] = 'profile_image = :profile_image';
                     $params['profile_image'] = '/uploads/profiles/' . $filename;
                     Session::set('profile_image', '/uploads/profiles/' . $filename);
                 }
@@ -135,7 +209,7 @@ class ProfileController extends Controller
                     $targetPath = $uploadDir . $filename;
 
                     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                        $updateSql = "UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name, profile_image = :profile_image WHERE id = :id";
+                        $setClauses[] = 'profile_image = :profile_image';
                         $params['profile_image'] = '/uploads/profiles/' . $filename;
                         
                         // Update session with new image
@@ -144,13 +218,20 @@ class ProfileController extends Controller
                 }
             }
 
+            $updateSql = "UPDATE users SET " . implode(', ', $setClauses) . " WHERE id = :id";
             $stmt = $db->prepare($updateSql);
             $stmt->execute($params);
 
-            Logger::activity("Updated own profile information.");
+            if ($usernameChanged) {
+                Session::set('username', $finalUsername);
+                Logger::activity("User #{$userId} changed username from '{$currentUser['username']}' to '{$finalUsername}'.");
+            } else {
+                Logger::activity("Updated own profile information.");
+            }
             
             Session::setFlash('success', __('messages.profile_updated'));
             $this->redirect('/profile');
+            return;
         } catch (\Exception $e) {
             Session::setFlash('error', __('messages.failed_update_profile'));
             $this->redirect('/profile');

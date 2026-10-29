@@ -97,9 +97,40 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.username_no_change') ?></label>
-                        <input type="text" value="<?= htmlspecialchars($user['username']) ?>" readonly
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700/50 bg-gray-100 dark:bg-slate-800/80 text-gray-500 dark:text-slate-400 outline-none cursor-not-allowed">
+                        <?php $canChangeUsername = ((int)($user['username_changes_count'] ?? 0)) < 1; ?>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-slate-300">
+                                <?= __('profile.username') ?>
+                                <?php if ($canChangeUsername): ?>
+                                    <span class="text-red-500">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <?php if ($canChangeUsername): ?>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                    <i class="ph ph-check-circle mr-1"></i><?= __('profile.can_change_once_badge') ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400">
+                                    <i class="ph ph-lock-key mr-1"></i><?= __('profile.username_changed_badge') ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($canChangeUsername): ?>
+                            <input type="text" id="username" name="username" required value="<?= htmlspecialchars($user['username']) ?>"
+                                pattern="[a-zA-Z0-9_-]{3,30}"
+                                title="<?= htmlspecialchars(__('profile.invalid_username_format')) ?>"
+                                class="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all shadow-sm">
+                            <p class="mt-1.5 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                <i class="ph ph-info shrink-0"></i> <?= __('profile.username_change_hint') ?>
+                            </p>
+                        <?php else: ?>
+                            <input type="text" value="<?= htmlspecialchars($user['username']) ?>" readonly
+                                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700/50 bg-gray-100 dark:bg-slate-800/80 text-gray-500 dark:text-slate-400 outline-none cursor-not-allowed">
+                            <p class="mt-1.5 text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1">
+                                <i class="ph ph-lock shrink-0"></i> <?= __('profile.username_cannot_change_anymore') ?>
+                            </p>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.email_address') ?> <span class="text-red-500">*</span></label>
@@ -200,6 +231,14 @@
         </div>
 
         <!-- Social Connections -->
+        <?php 
+            $googleEnabled   = !empty($socialSettings['google']) || \App\Core\Settings::get('enable_google_login') === '1';
+            $lineEnabled     = !empty($socialSettings['line']) || \App\Core\Settings::get('enable_line_login') === '1';
+            $facebookEnabled = !empty($socialSettings['facebook']) || \App\Core\Settings::get('enable_facebook_login') === '1';
+            $githubEnabled   = !empty($socialSettings['github']) || \App\Core\Settings::get('enable_github_login') === '1';
+            $enabledSocialCount = ($googleEnabled ? 1 : 0) + ($lineEnabled ? 1 : 0) + ($facebookEnabled ? 1 : 0) + ($githubEnabled ? 1 : 0);
+        ?>
+        <?php if ($enabledSocialCount > 0): ?>
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-800 pb-2 flex items-center">
                 <i class="ph ph-share-network mr-2 text-blue-500"></i> <?= __('profile.social_connections') ?? 'Social Connections' ?>
@@ -207,6 +246,7 @@
             <p class="text-sm text-gray-500 dark:text-slate-400 mb-6"><?= __('profile.social_connections_desc') ?? 'Connect your social accounts to log in quickly.' ?></p>
 
             <div class="space-y-4">
+                <?php if ($googleEnabled): ?>
                 <!-- Google -->
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
                     <div class="flex items-center">
@@ -244,7 +284,9 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
 
+                <?php if ($lineEnabled): ?>
                 <!-- LINE -->
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
                     <div class="flex items-center">
@@ -279,7 +321,9 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
 
+                <?php if ($facebookEnabled): ?>
                 <!-- Facebook -->
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
                     <div class="flex items-center">
@@ -314,7 +358,9 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
 
+                <?php if ($githubEnabled): ?>
                 <!-- GitHub -->
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
                     <div class="flex items-center">
@@ -349,8 +395,10 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Active Sessions -->
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6 flex items-center justify-between">
@@ -500,6 +548,11 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base mr-1.5"></i><?= addslashes(__('common.please_wait')) ?>';
+                }
                 form.submit();
             }
         });

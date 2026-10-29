@@ -527,6 +527,11 @@ class SocialAuthController extends Controller
         $providerColumn = $provider . '_id';
         $currentUserId = Session::get('user_id');
 
+        // Ensure provider column exists (Zero-500 Guarantee if migration not yet run)
+        try {
+            $db->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS {$providerColumn} VARCHAR(191) NULL DEFAULT NULL AFTER email");
+        } catch (\Throwable $e) {}
+
         // Check if provider_id is already linked to any account
         $stmt = $db->prepare("SELECT * FROM users WHERE {$providerColumn} = :provider_id LIMIT 1");
         $stmt->execute(['provider_id' => $providerId]);
@@ -569,8 +574,9 @@ class SocialAuthController extends Controller
         // ==========================================
         $user = $existingUser;
 
-        // If not found by provider_id, check by email
-        if (!$user && $email && strpos($email, '@line.login') === false) {
+        // If not found by provider_id, check by email (excluding synthetic emails)
+        $isSyntheticEmail = strpos($email, '@line.login') !== false || strpos($email, '@facebook.login') !== false || strpos($email, '@github.login') !== false;
+        if (!$user && $email && !$isSyntheticEmail) {
             $stmt = $db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch();
@@ -587,32 +593,46 @@ class SocialAuthController extends Controller
 
         // If still no user, create a new one
         if (!$user) {
-            $username = $provider . '_' . substr(md5($providerId . time()), 0, 10);
+            $username = $provider . '_' . substr(md5($providerId . microtime()), 0, 10);
             
             // Assume default role is user (role_id 2 usually)
             $defaultRole = Settings::get('default_role_id', 2);
             
-            $insert = $db->prepare("INSERT INTO users (username, email, first_name, last_name, avatar_url, {$providerColumn}, role_id) VALUES (:username, :email, :first_name, :last_name, :avatar_url, :provider_id, :role_id)");
-            $insert->execute([
-                'username' => $username,
-                'email' => $email,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'avatar_url' => $profileImage,
-                'provider_id' => $providerId,
-                'role_id' => $defaultRole
-            ]);
+            // Generate a secure hashed random password so NOT NULL constraint is always satisfied
+            $dummyPassword = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
             
-            $userId = $db->lastInsertId();
-            
-            // Re-fetch the newly created user
-            $stmt = $db->prepare("SELECT * FROM users WHERE id = :id LIMIT 1");
-            $stmt->execute(['id' => $userId]);
-            $user = $stmt->fetch();
+            try {
+                $insert = $db->prepare("
+                    INSERT INTO users (username, email, password, first_name, last_name, avatar_url, {$providerColumn}, role_id, status, email_verified_at) 
+                    VALUES (:username, :email, :password, :first_name, :last_name, :avatar_url, :provider_id, :role_id, 'active', NOW())
+                ");
+                $insert->execute([
+                    'username'    => $username,
+                    'email'       => $email,
+                    'password'    => $dummyPassword,
+                    'first_name'  => $firstName,
+                    'last_name'   => $lastName,
+                    'avatar_url'  => $profileImage,
+                    'provider_id' => $providerId,
+                    'role_id'     => $defaultRole
+                ]);
+                
+                $userId = $db->lastInsertId();
+                
+                // Re-fetch the newly created user
+                $stmt = $db->prepare("SELECT * FROM users WHERE id = :id LIMIT 1");
+                $stmt->execute(['id' => $userId]);
+                $user = $stmt->fetch();
+            } catch (\Throwable $e) {
+                Logger::activity("Failed to register social user for {$provider}: " . $e->getMessage());
+                Session::setFlash('error', __('messages.social_register_failed'));
+                $this->redirect('/login');
+                return;
+            }
         }
 
         if ($user['status'] !== 'active') {
-            Logger::activity("Failed {$provider} login attempt (Account disabled) for user: {$user['username']}");
+            Logger::activity("Failed {$provider} login attempt (Account {$user['status']}) for user: {$user['username']}");
             Session::setFlash('error', __('messages.account_disabled') ?? 'Your account is disabled.');
             $this->redirect('/login');
         }
@@ -630,7 +650,7 @@ class SocialAuthController extends Controller
     private function finalizeLogin($user, $db)
     {
         // Check for 2FA
-        if ($user['two_factor_enabled']) {
+        if (!empty($user['two_factor_enabled'])) {
             Session::set('temp_user_id', $user['id']);
             $this->redirect('/login/2fa');
         }
@@ -642,7 +662,6 @@ class SocialAuthController extends Controller
         Session::set('username', $user['username']);
         Session::set('user_email', $user['email']);
         Session::set('role_id', $user['role_id']);
-        Session::set('2fa_enabled', false);
         Session::set('profile_image', $user['avatar_url']);
 
         // Update Last Login
@@ -651,6 +670,11 @@ class SocialAuthController extends Controller
 
         // Record User Session
         $this->recordSession($user['id'], $db);
+
+        // Reset rate limiter on successful login
+        if (class_exists(\App\Core\RateLimiter::class)) {
+            \App\Core\RateLimiter::reset('/login');
+        }
 
         Logger::activity("Successful social login for user: {$user['username']}");
 
@@ -662,22 +686,26 @@ class SocialAuthController extends Controller
         $sessionId = session_id();
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+        $time = time();
 
         // Check if session already recorded
-        $stmt = $db->prepare("SELECT id FROM user_sessions WHERE id = :id");
-        $stmt->execute(['id' => $sessionId]);
+        try {
+            $stmt = $db->prepare("SELECT id FROM user_sessions WHERE id = :id");
+            $stmt->execute(['id' => $sessionId]);
 
-        if ($stmt->fetch()) {
-            $update = $db->prepare("UPDATE user_sessions SET last_activity = NOW() WHERE id = :id");
-            $update->execute(['id' => $sessionId]);
-        } else {
-            $insert = $db->prepare("INSERT INTO user_sessions (id, user_id, ip_address, user_agent, last_activity) VALUES (:id, :user_id, :ip, :ua, NOW())");
-            $insert->execute([
-                'id' => $sessionId,
-                'user_id' => $userId,
-                'ip' => $ip,
-                'ua' => $userAgent
-            ]);
-        }
+            if ($stmt->fetch()) {
+                $update = $db->prepare("UPDATE user_sessions SET last_activity = :time, user_id = :user_id WHERE id = :id");
+                $update->execute(['time' => $time, 'user_id' => $userId, 'id' => $sessionId]);
+            } else {
+                $insert = $db->prepare("INSERT INTO user_sessions (id, user_id, ip_address, user_agent, payload, last_activity) VALUES (:id, :user_id, :ip, :ua, '', :time)");
+                $insert->execute([
+                    'id' => $sessionId,
+                    'user_id' => $userId,
+                    'ip' => $ip,
+                    'ua' => $userAgent,
+                    'time' => $time
+                ]);
+            }
+        } catch (\Throwable $e) {}
     }
 }
