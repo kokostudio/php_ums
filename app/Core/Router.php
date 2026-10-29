@@ -335,6 +335,11 @@ class Router
         return $list;
     }
 
+    public function getRoutes(): array
+    {
+        return $this->routes();
+    }
+
     public function routeCount(): int
     {
         return array_sum(array_map('count', $this->routes));
