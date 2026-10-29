@@ -47,6 +47,26 @@
         html.dark, html.dark body { background-color: #0f172a !important; color: #f8fafc; color-scheme: dark; }
         html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #0f172a; color-scheme: light; }
 
+        /* Universal Toast Fade Down & Fade Up Animations */
+        @keyframes swalToastFadeDown {
+            0% { opacity: 0; transform: translate3d(0, -32px, 0) scale(0.96); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        }
+        @keyframes swalToastFadeUp {
+            0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+            100% { opacity: 0; transform: translate3d(0, -32px, 0) scale(0.96); }
+        }
+        .swal2-popup.swal2-toast.swal2-show,
+        .swal2-container.swal2-top .swal2-popup.swal2-toast.swal2-show,
+        .swal2-toast-fade-down {
+            animation: swalToastFadeDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .swal2-popup.swal2-toast.swal2-hide,
+        .swal2-container.swal2-top .swal2-popup.swal2-toast.swal2-hide,
+        .swal2-toast-fade-up {
+            animation: swalToastFadeUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+
         /* Smooth transitions only during user-initiated theme switch, NOT on initial page navigation */
         html.theme-transitioning,
         html.theme-transitioning *,
@@ -89,6 +109,87 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Global Universal SweetAlert2 Toast Helper with Fade Down & Fade Up animations
+        window.Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            width: 'auto',
+            customClass: {
+                popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
+                title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
+            },
+            showClass: {
+                popup: 'swal2-toast-fade-down'
+            },
+            hideClass: {
+                popup: 'swal2-toast-fade-up'
+            },
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+
+        window.showTopToast = function(icon, title, timer = 3000, btn = null) {
+            if (btn && btn.nodeType === 1) {
+                const origHtml = btn.innerHTML;
+                const origWidth = btn.offsetWidth ? (btn.offsetWidth + 'px') : 'auto';
+                btn.style.minWidth = origWidth;
+                btn.disabled = true;
+                btn.classList.add('opacity-80', 'cursor-not-allowed');
+                const loadingLabel = icon === 'success' ? '<?= addslashes(__('common.saving')) ?>' : '<?= addslashes(__('common.please_wait')) ?>';
+                btn.innerHTML = `<i class="ph ph-circle-notch animate-spin text-base mr-1.5"></i><span>${loadingLabel}</span>`;
+
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        btn.innerHTML = origHtml;
+                        btn.style.minWidth = '';
+                        resolve(window.Toast.fire({
+                            icon: icon,
+                            title: title,
+                            timer: timer
+                        }));
+                    }, 600);
+                });
+            }
+
+            return window.Toast.fire({
+                icon: icon,
+                title: title,
+                timer: timer
+            });
+        };
+
+        window.withButtonLoading = async function(btn, actionFn, loadingText = null) {
+            if (!btn || btn.nodeType !== 1) {
+                return typeof actionFn === 'function' ? await actionFn() : null;
+            }
+            const origHtml = btn.innerHTML;
+            const origWidth = btn.offsetWidth ? (btn.offsetWidth + 'px') : 'auto';
+            btn.style.minWidth = origWidth;
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            const label = loadingText || '<?= addslashes(__('common.please_wait')) ?>';
+            btn.innerHTML = `<i class="ph ph-circle-notch animate-spin text-base mr-1.5"></i><span>${label}</span>`;
+
+            try {
+                if (typeof actionFn === 'function') {
+                    return await actionFn();
+                }
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.innerHTML = origHtml;
+                btn.style.minWidth = '';
+            }
+        };
+    </script>
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Cropper.js -->
@@ -476,36 +577,11 @@
         <!-- Dynamic Content Area -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8 pb-0 md:pb-0">
             <div class="w-full">
-                <!-- Flash Messages (Toast Notifications) -->
+                <!-- Flash Messages (Toast Notifications with Fade Down / Fade Up) -->
                 <?php if ($flashSuccess = Session::getFlash('success')): ?>
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: 'top',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                                width: 'auto',
-                                customClass: {
-                                    popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
-                                    title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
-                                },
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown animate__faster'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp animate__faster'
-                                },
-                                didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
-                                }
-                            });
-                            Toast.fire({
-                                icon: 'success',
-                                title: <?php echo json_encode(htmlspecialchars($flashSuccess)) ?>
-                            });
+                            window.showTopToast('success', <?php echo json_encode(htmlspecialchars($flashSuccess)) ?>, 3000);
                         });
                     </script>
                 <?php endif; ?>
@@ -513,32 +589,23 @@
                 <?php if ($flashError = Session::getFlash('error')): ?>
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: 'top',
-                                showConfirmButton: false,
-                                timer: 4000,
-                                timerProgressBar: true,
-                                width: 'auto',
-                                customClass: {
-                                    popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl',
-                                    title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2'
-                                },
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown animate__faster'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp animate__faster'
-                                },
-                                didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
-                                }
-                            });
-                            Toast.fire({
-                                icon: 'error',
-                                title: <?php echo json_encode(htmlspecialchars($flashError)) ?>
-                            });
+                            window.showTopToast('error', <?php echo json_encode(htmlspecialchars($flashError)) ?>, 4000);
+                        });
+                    </script>
+                <?php endif; ?>
+
+                <?php if ($flashWarning = Session::getFlash('warning')): ?>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            window.showTopToast('warning', <?php echo json_encode(htmlspecialchars($flashWarning)) ?>, 3500);
+                        });
+                    </script>
+                <?php endif; ?>
+
+                <?php if ($flashInfo = Session::getFlash('info')): ?>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            window.showTopToast('info', <?php echo json_encode(htmlspecialchars($flashInfo)) ?>, 3000);
                         });
                     </script>
                 <?php endif; ?>
