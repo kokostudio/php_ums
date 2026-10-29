@@ -8,8 +8,36 @@
  * และรองรับการ Auto-load Route ของ Module ส่วนขยายใน app/Modules/<Module>/routes.php
  */
 
-// 1. Register Autoloader
-require_once __DIR__ . '/../vendor/autoload.php';
+// Production Diagnostic & Debug Trigger (?debug=1)
+if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
+
+// 1. Auto-detect Root Directory & Register Autoloader
+$rootDir = null;
+if (is_dir(__DIR__ . '/vendor')) {
+    $rootDir = __DIR__;
+} elseif (is_dir(__DIR__ . '/../php_ums/vendor')) {
+    $rootDir = realpath(__DIR__ . '/../php_ums');
+} elseif (is_dir(dirname(__DIR__) . '/php_ums/vendor')) {
+    $rootDir = realpath(dirname(__DIR__) . '/php_ums');
+} elseif (is_dir(dirname(__DIR__) . '/vendor')) {
+    $rootDir = dirname(__DIR__);
+} else {
+    $rootDir = dirname(__DIR__);
+}
+
+if (function_exists('opcache_invalidate')) {
+    @opcache_invalidate($rootDir . '/app/Core/Router.php', true);
+    @opcache_invalidate($rootDir . '/app/Core/RouteRegistrar.php', true);
+}
+if (isset($_GET['clear_cache']) && function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+
+require_once $rootDir . '/vendor/autoload.php';
 
 use App\Core\Config;
 use App\Core\ErrorHandler;
@@ -20,7 +48,7 @@ use App\Core\RouteRegistrar;
 ErrorHandler::register();
 
 // 3. Load Environment Variables
-Config::load(__DIR__ . '/../.env');
+Config::load($rootDir . '/.env');
 
 // 4. Initialize Multi-Language System
 \App\Core\Lang::init();
@@ -28,13 +56,13 @@ Config::load(__DIR__ . '/../.env');
 // 5. Initialize Session (Globally)
 \App\Core\Session::init();
 
-// 6. Initialize Router
+// 6. Initialize Router & Load Modular Routes
 $router = new Router();
+if (class_exists(RouteRegistrar::class)) {
+    (new RouteRegistrar($rootDir))->load($router, $rootDir);
+} elseif (method_exists($router, 'loadRoutes')) {
+    $router->loadRoutes($rootDir);
+}
 
-// 7. Load Route Files
-//    - app/Routes/*.php         (Core System)
-//    - app/Modules/*/routes.php (Module ส่วนขยาย — Auto-load)
-(new RouteRegistrar())->load($router);
-
-// 8. Dispatch Request
+// 7. Dispatch Request
 $router->resolve();
