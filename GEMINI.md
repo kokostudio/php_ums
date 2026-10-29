@@ -101,4 +101,17 @@ no API key, $0).
    - **Zero Raw Translation Keys**: NEVER allow raw translation keys (such as `settings.preset_slate`, `auth.username`, etc.) to be rendered or leaked to the user interface.
    - **Two-Tier Architecture (`Lang::load()`)**: `App\Core\Lang::load()` MUST ALWAYS load disk language files (`app/Lang/{locale}/{namespace}.php`) as the mandatory **Baseline**, overlaid with dynamic database translations from the MySQL `translations` table. This guarantees that UI labels always display human-readable text even before DB sync runs or if the database is temporarily unreachable.
    - **100% Symmetric Parity & Mandatory Sync**: Every single key used in views or controllers must be defined symmetrically in both `app/Lang/th/<namespace>.php` and `app/Lang/en/<namespace>.php`. Run `php compare_lang.php` (must output `[]`) and run `php sync_lang.php` to persist changes into the MySQL `translations` table.
+
+17. **LOGIN BUTTON COLOR LOCK (ห้ามเปลี่ยนสีปุ่มเข้าสู่ระบบหน้า Login เด็ดขาด)**:
+   - The Sign-In submit button on the Login page (`app/Views/auth/login.php`) MUST strictly keep its original blue styling: `bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 dark:shadow-blue-900/20 focus:ring-blue-500`.
+   - **NEVER** change the login button to `bg-sidebar` or `primary-*` theme colors under any circumstances.
+
+18. **MODULAR ROUTING ARCHITECTURE & PHP_HEALTH COMPATIBILITY (กฎสถาปัตยกรรมระบบ Route แบบแยก Domain และความเข้ากันได้กับ php_health)**:
+   - **Domain-Driven Modular Routes**: Core routes must strictly be separated by domain into individual files in `app/Routes/` (e.g. `01_auth.php`, `02_users.php`, `03_roles.php`, etc.). NEVER define inline route definitions in `public/index.php`. Keep `public/index.php` minimal and clean.
+   - **Auto-loading Extension Modules**: The system must automatically detect and load module routes from `app/Modules/*/routes.php` via `App\Core\RouteRegistrar` (or `$router->loadRoutes()`) without requiring any manual route registration in core files.
+   - **Cross-Compatibility with php_health**: The Router MUST support dual-signature syntax:
+     1. Array attributes style (matching `php_health`): `$router->group(['prefix' => '/module', 'middlewares' => [...]], function(Router $r) { ... })`
+     2. Shorthand style: `$router->group('/prefix', Groups::auth(), function(Router $r) { ... })`
+     3. Helper method: `$router->deleteWithFallback($path, $handler, $redirectUrl)` to guarantee Rule #8 compliance.
+   - **PHP 8+ Parameter Reflection Safety**: The router must inspect handler parameter requirements using reflection (`ReflectionFunctionAbstract`) to prevent `Fatal error: Uncaught Error: Unknown named parameter` when invoking closures without parameter definitions for routes containing dynamic URI segments (such as `{id}`).
 <!-- rules:end -->

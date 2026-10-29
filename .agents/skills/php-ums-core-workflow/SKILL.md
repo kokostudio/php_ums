@@ -33,12 +33,15 @@ root.
 0. **Inspect Rules First (CRITICAL)** — Always read and review all rules in `GEMINI.md` and `rules.md` before analyzing, planning, designing, or writing any code.
 1. **Plan first** — create or update `implementation_plan.md` artifact and get approval before writing code.
 2. **Create Controller** in `app/Controllers/` extending `App\Core\Controller`.
-3. **Register Routes** in `public/index.php` using clean URL pattern (see Rule: Clean URL).
+3. **Register Routes** in domain files under `app/Routes/` (e.g. `02_users.php`, `05_settings.php`) or inside the extension module's `app/Modules/{Module}/routes.php` (auto-loaded via `RouteRegistrar`). Never write inline routes in `public/index.php`.
 4. **Create Views** in `app/Views/{module}/` — use `app.php` layout via `$this->view()`.
 5. **Apply Hashids** on all ID-bearing URLs and form values (see Rule: ID Encryption).
 6. **Update CHANGELOG.md** (Thai language only) after completing the feature.
 
-### 2. Adding a New Route
+### 2. Adding a New Route & Modular Architecture
+
+- **Domain-Driven Route Files:** Place routes in `app/Routes/` by domain, or in `app/Modules/*/routes.php` for plug-and-play extension modules.
+- **Route Groups & php_health Cross-Compatibility:** Supports both array attributes (`$router->group(['prefix' => '...', 'middlewares' => [...]])`) and shorthand syntax (`$router->group('/prefix', Groups::auth(), ...)`), along with `$router->deleteWithFallback()`.
 
 Always use **clean URLs** — never query strings for navigation:
 
@@ -263,7 +266,7 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 ### 10. Dynamic Theme & Tailwind Conventions (UI/UX)
 - **Dynamic Palette:** `layouts/app.php` injects the current theme color into Tailwind's `primary` color scale. Use `primary-*` classes for accents, active states, and hover effects (e.g. `text-primary-400`, `bg-primary-900/20`).
 - **Global Color Scope:** Do not override base Tailwind colors (blue, gray, slate) globally.
-- **Buttons:** Main action buttons should use `bg-sidebar` to match the current sidebar theme. Destructive buttons should use standard red (`bg-red-500`).
+- **Buttons:** Main action buttons in backend forms should use `bg-sidebar` to match the current sidebar theme (**STRICT EXCEPTION:** The login submit button in `app/Views/auth/login.php` MUST always remain `bg-blue-600 hover:bg-blue-700 shadow-blue-500/30 dark:shadow-blue-900/20 focus:ring-blue-500` and must NEVER be changed to `bg-sidebar`). Destructive buttons should use standard red (`bg-red-500`).
 - **Confirmation Dialogs:** Destructive actions MUST trigger **SweetAlert2 (`Swal.fire`)** confirmation dialogs instead of the browser's native `confirm()`.
 - **Ultra Dark Mode:** Use translucent backgrounds for cards/modals in dark mode (e.g., `dark:bg-black/20 dark:backdrop-blur-md`).
 
@@ -331,7 +334,7 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] **NO Hardcoded Text:** Always use the `<?= __('module.key') ?>` helper for translations.
 - [ ] **Flash & Popup Translations:** All controller `Session::setFlash()` messages and `Swal.fire()` messages must be translated via `__()` helper. No raw strings allowed.
 - [ ] **Date Standard:** Always use `formatDate()` (PHP) or `formatDate()` (JS) to ensure the `d/m/Y` global standard.
-- [ ] **Primary Buttons:** Must use `bg-sidebar` so the color matches the dynamic theme.
+- [ ] **Primary Buttons:** Must use `bg-sidebar` so the color matches the dynamic theme (**Exception:** Never change the login submit button in `app/Views/auth/login.php`; it must stay `bg-blue-600 hover:bg-blue-700`).
 - [ ] **Destructive Buttons:** Must use `bg-red-500` and MUST trigger a **SweetAlert2 (`Swal.fire`)** confirmation dialog, not native `confirm()`.
 - [ ] **AJAX Deletion:** Delete actions MUST use `axios.post` with SweetAlert2, NEVER traditional HTML `form.submit()`.
 - [ ] **Active/Hover States:** Must use `primary-*` classes (e.g. `bg-primary-50`) instead of hardcoding slate/blue.

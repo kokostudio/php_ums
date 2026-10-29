@@ -102,7 +102,7 @@
 
 ## 12. Dynamic Theme, UI/UX, Button Preloading & SweetAlert2 Standards
 - **Dynamic Palette:** ระบบรองรับการเปลี่ยนธีมแบบ Dynamic โดย `layouts/app.php` จะดึงค่าสีธีมปัจจุบันส่งเข้าไปทับ `primary` ของ Tailwind เสมอ ดังนั้นให้ใช้ class กลุ่ม `primary-*` สำหรับลูกเล่นหรือจุดที่ต้องการเปลี่ยนสีตามธีม
-- **Primary Buttons:** ปุ่มกดหลักในแบบฟอร์ม (เช่น Save, Update, Create) **ต้องใช้ class `bg-sidebar` เสมอ** เพื่อให้ปุ่มมีสีตรงกับธีม Sidebar ปัจจุบันอย่างสมบูรณ์แบบ
+- **Primary Buttons:** ปุ่มกดหลักในแบบฟอร์มภายในระบบหลังบ้าน (เช่น Save, Update, Create) **ต้องใช้ class `bg-sidebar` เสมอ** เพื่อให้ปุ่มมีสีตรงกับธีม Sidebar ปัจจุบันอย่างสมบูรณ์แบบ **(ยกเว้นปุ่มเข้าสู่ระบบในหน้า `app/Views/auth/login.php` ที่ต้องล็อกเป็นสีน้ำเงิน `bg-blue-600 hover:bg-blue-700 shadow-blue-500/30 dark:shadow-blue-900/20 focus:ring-blue-500` เสมอ ห้ามเปลี่ยนเป็น `bg-sidebar` เด็ดขาด)**
 - **Destructive Buttons:** ปุ่มที่เป็นอันตราย เช่น ลบข้อมูล หรือปิดการใช้งาน (Disable) ให้ใช้สีแดง (เช่น `bg-red-500`) ตามมาตรฐานสากลเสมอ
 - **Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม):**
   - ทุกปุ่มดำเนินการ (Action Button) และปุ่ม Submit ในแบบฟอร์ม (บันทึก, อัปเดต, ลบ, ซิงค์ข้อมูล, ส่งคำขอ AJAX) **ต้องมีสถานะ Preloading เสมอ**
@@ -179,7 +179,7 @@
 - [ ] **ปุ่มมีสถานะ Preloading:** ปุ่ม Submit และปุ่ม Action ทุกปุ่ม ต้องมีกลไก Disable (`btn.disabled = true;`) ป้องกันการกดซ้ำซ้อน พร้อมแสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความกำลังโหลดที่แปลภาษาแล้ว
 - [ ] **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุดต้องตั้งค่า `position: 'top'` (บนกลาง) เสมอ ห้ามใช้ `top-end`, `top-right` หรือ Native `alert()`
 - [ ] แสดงวันที่ต้องใช้ `formatDate($date)` (ฝั่งเซิร์ฟเวอร์) หรือ `formatDate(data)` (ฝั่ง JS) เท่านั้น (รูปแบบมาตรฐาน `d/m/Y`)
-- [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้)
+- [ ] **ปุ่ม Primary Action** (เช่น สร้าง, บันทึก) ต้องใช้ Class `bg-sidebar` (เพื่อให้สีเปลี่ยนตามธีมที่ตั้งค่าไว้) **ยกเว้นปุ่มเข้าสู่ระบบหน้า Login (`app/Views/auth/login.php`) ที่ห้ามเปลี่ยนสีเด็ดขาด ต้องใช้ `bg-blue-600 hover:bg-blue-700` เท่านั้น**
 - [ ] **ปุ่มอันตราย** (ลบ, ระงับ) ต้องใช้ `bg-red-500` และต้องแสดงหน้าต่างยืนยันด้วย **SweetAlert2 (`Swal.fire`)** เท่านั้น ห้ามใช้ `confirm()` ปกติ
 - [ ] **ห้ามใช้สัญลักษณ์สกุลเงินบาท:** ห้ามใช้สัญลักษณ์ `฿` ทุกที่ ให้ใช้คำว่า 'บาท' หรือ 'THB' เท่านั้น
 - [ ] **โลโก้และไอคอนแบรนด์ (Social Logos):** ต้องใช้ **Inline Vector SVG** หรือไฟล์ Asset ภายในระบบเท่านั้น ห้ามดึงภาพจาก Hotlink ภายนอก (เช่น Wikimedia Commons หรือ CDN นอก) ที่อาจโหลดไม่ติดเมื่อออฟไลน์หรือถูกบล็อก
@@ -253,3 +253,12 @@
 - **Symmetric 1:1 Parity & DB Sync:**
   - ต้องประกาศคีย์คำแปลให้ตรงกัน 1:1 ทั้งใน `app/Lang/th/` และ `app/Lang/en/` เสมอ
   - ก่อนส่งมอบงาน ต้องรัน `php compare_lang.php` (ผลลัพธ์ต้องได้ `[]` เท่านั้น) และรัน `php sync_lang.php` เพื่อซิงค์คำแปลล่าสุดเข้าตาราง `translations`
+
+## 25. Modular Routing Architecture & php_health Compatibility (สถาปัตยกรรม Route แบบแยก Domain และความเข้ากันได้กับ php_health)
+- **แยกไฟล์ Route ตาม Domain (Domain-Driven):** Route หลักของระบบต้องถูกแยกออกเป็นไฟล์ย่อยใน `app/Routes/` (เช่น `01_auth.php`, `02_users.php`, `03_roles.php`, `04_logs.php`, `05_settings.php`, `06_profile.php`, `07_dashboard.php`, `08_api.php`, `09_root.php`) ห้ามเขียน Route รวมกันใน `public/index.php` เด็ดขาด เพื่อให้ไฟล์ `public/index.php` มีขนาดกะทัดรัดและคลีนที่สุด
+- **ระบบ Auto-load โมดูลเสริม (Extension Modules):** โมดูลเสริมใน `app/Modules/<ModuleName>/routes.php` ต้องถูกสแกนและโหลดเข้าสู่ระบบ Route โดยอัตโนมัติผ่าน `App\Core\RouteRegistrar` (หรือ `$router->loadRoutes()`) โดยไม่ต้องแก้ไขไฟล์ Core ใดๆ
+- **ความเข้ากันได้กับ php_health แบบ 100% (Dual-Signature):** Router ต้องรองรับการประกาศ Route Group ได้ทั้ง 2 รูปแบบ:
+  1. แบบ Array attributes สไตล์ `php_health`: `$router->group(['prefix' => '/health', 'middlewares' => [...]], function(Router $r) { ... })`
+  2. แบบ Shorthand สไตล์ `php_ums`: `$router->group('/prefix', Groups::auth(), function(Router $r) { ... })`
+  3. มีเมธอด `$router->deleteWithFallback($path, $handler, $redirectUrl)` เพื่อรองรับการลบข้อมูลพร้อม Fallback ตาม Rule 8 ได้อย่างสะดวก
+- **PHP 8+ Parameter Reflection Safety:** Router ต้องใช้ `ReflectionFunctionAbstract` ในการตรวจสอบพารามิเตอร์ของ Callback เพื่อส่งเฉพาะ Named Parameters ที่ฟังก์ชันยอมรับ ป้องกัน Error `Fatal error: Unknown named parameter` เมื่อเรียกใช้งาน Closure ที่ไม่มีการประกาศพารามิเตอร์กับ Route ที่มีไดนามิกพารามิเตอร์ (เช่น `{id}`)

@@ -52,3 +52,8 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
 10. **Fixed Modal Header & Footer Architecture:**
     - All modal dialogs MUST use a restricted flex container (`flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden`).
     - The Modal Header must be fixed at the top (`flex-shrink-0`), the Modal Footer containing action buttons must be fixed at the bottom (`flex-shrink-0`), and only the middle Modal Body scrolls (`flex-1 overflow-y-auto p-6`). Action buttons must remain visible at all times without scrolling.
+
+11. **Modular Routing & php_health Cross-Compatibility:**
+    - Core routes must be organized into domain files in `app/Routes/` (e.g. `01_auth.php`, `02_users.php`, etc.) rather than inline in `public/index.php`.
+    - Auto-load extension modules from `app/Modules/*/routes.php` via `App\Core\RouteRegistrar`.
+    - Maintain 100% cross-compatibility with `php_health` routing syntax by supporting both array attributes (`group(['prefix' => '...', 'middlewares' => [...]])`) and shorthand, along with `deleteWithFallback()` and PHP 8 reflection parameter filtering.
