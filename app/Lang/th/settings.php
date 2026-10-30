@@ -456,4 +456,8 @@ return array (
   'manage_social_providers' => 'ตั้งค่าผู้ให้บริการ Social',
   'social_login_master_title' => 'ระบบ Social Login โดยรวม',
   'social_login_master_desc' => 'เปิดหรือปิดการทำงานของ Social Login ทั้งหมดบนหน้าเข้าสู่ระบบ',
+  'translation_invalid' => 'ข้อมูลคำแปลไม่ครบถ้วน กรุณาระบุ namespace และ key ให้ถูกต้อง',
+  'username_login_master_title' => 'การเข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่าน',
+  'username_login_master_desc' => 'เปิดหรือปิดการเข้าสู่ระบบด้วย Username / Password บนหน้าเข้าสู่ระบบ',
+  'enable_username_login' => 'เปิดใช้งาน Username Login',
 );

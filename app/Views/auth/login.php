@@ -20,7 +20,7 @@
         </div>
 
         <?php if ($usernameLoginEnabled): ?>
-        <form action="/login" method="POST" id="loginForm" class="space-y-4" novalidate>
+        <form action="/login" method="POST" id="loginForm" class="space-y-4" novalidate data-ajax="true">
             <input type="hidden" name="csrf_token" value="<?php echo \App\Core\Session::getCsrfToken() ?>">
 
             <div class="space-y-1.5">
@@ -74,7 +74,7 @@
         <?php endif; ?>
 
         <?php if ($unverifiedEmail = \App\Core\Session::getFlash('unverified_email')): ?>
-        <form action="/resend-verification" method="POST" class="mt-4">
+        <form action="/resend-verification" method="POST" class="mt-4" data-ajax="true">
             <input type="hidden" name="csrf_token" value="<?php echo \App\Core\Session::getCsrfToken() ?>">
             <input type="hidden" name="email" value="<?php echo htmlspecialchars($unverifiedEmail) ?>">
             <button type="submit" class="w-full flex justify-center items-center px-4 py-2 rounded-xl text-sm font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
@@ -93,12 +93,6 @@
                 <div class="relative flex justify-center text-sm">
                     <span class="px-2 bg-white dark:bg-[#1a2234] text-gray-500 dark:text-slate-400"><?= __('auth.or_login_with') ?></span>
                 </div>
-            </div>
-            <?php else: ?>
-            <!-- Notice when only social login is enabled -->
-            <div class="mb-5 p-3.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2.5">
-                <i class="ph ph-info text-lg text-blue-500 shrink-0"></i>
-                <span><?= __('auth.login_only_social_notice') ?></span>
             </div>
             <?php endif; ?>
 

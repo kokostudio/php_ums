@@ -56,7 +56,7 @@
         
         <!-- Profile Info Form -->
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors">
-            <form action="/profile" method="POST" enctype="multipart/form-data" id="profileInfoForm">
+            <form action="/profile" method="POST" enctype="multipart/form-data" id="profileInfoForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 px-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                         <?= __('profile.profile_info') ?>
@@ -144,7 +144,7 @@
 
         <!-- Change Password Form -->
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-colors mt-6">
-            <form action="/profile/password" method="POST" id="passwordForm">
+            <form action="/profile/password" method="POST" id="passwordForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 px-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                         <?= __('profile.change_password') ?>

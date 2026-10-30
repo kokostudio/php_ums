@@ -155,8 +155,7 @@ class SettingController extends Controller
                 $enableSocial   = !empty($_POST['enable_social_login']) ? '1' : '0';
 
                 if ($enableUsername === '0' && $enableSocial === '0') {
-                    Session::setFlash('error', __('settings.at_least_one_auth_method_required'));
-                    $this->redirect("/settings/{$tab}");
+                    $this->respond("/settings/{$tab}", __('settings.at_least_one_auth_method_required'), 'error', 422);
                     return;
                 }
 
@@ -166,8 +165,7 @@ class SettingController extends Controller
                     $facebookOn = Settings::get('enable_facebook_login') === '1';
                     $githubOn   = Settings::get('enable_github_login') === '1';
                     if (!$googleOn && !$lineOn && !$facebookOn && !$githubOn) {
-                        Session::setFlash('error', __('settings.need_active_social_if_username_disabled'));
-                        $this->redirect("/settings/{$tab}");
+                        $this->respond("/settings/{$tab}", __('settings.need_active_social_if_username_disabled'), 'error', 422);
                         return;
                     }
                 }
@@ -184,11 +182,10 @@ class SettingController extends Controller
             }
             if ($tab === 'social') {
                 $enableSocial   = !empty($_POST['enable_social_login']) ? '1' : '0';
-                $enableUsername = Settings::get('enable_username_login', '1');
+                $enableUsername = !empty($_POST['enable_username_login']) ? '1' : '0';
 
                 if ($enableSocial === '0' && $enableUsername === '0') {
-                    Session::setFlash('error', __('settings.at_least_one_auth_method_required'));
-                    $this->redirect("/settings/{$tab}");
+                    $this->respond("/settings/{$tab}", __('settings.at_least_one_auth_method_required'), 'error', 422);
                     return;
                 }
 
@@ -198,11 +195,11 @@ class SettingController extends Controller
                 $githubOn   = !empty($_POST['enable_github_login']) ? '1' : '0';
 
                 if ($enableUsername === '0' && (!$enableSocial || (!$googleOn && !$lineOn && !$facebookOn && !$githubOn))) {
-                    Session::setFlash('error', __('settings.need_active_social_if_username_disabled'));
-                    $this->redirect("/settings/{$tab}");
+                    $this->respond("/settings/{$tab}", __('settings.need_active_social_if_username_disabled'), 'error', 422);
                     return;
                 }
 
+                Settings::set('enable_username_login', $enableUsername);
                 Settings::set('enable_social_login', $enableSocial);
                 Settings::set('enable_google_login', $googleOn);
                 Settings::set('enable_line_login', $lineOn);
@@ -225,6 +222,7 @@ class SettingController extends Controller
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
+            $updatedFiles = []; // เก็บ path รูปใหม่เพื่อส่งกลับไปอัปเดต preview แบบ AJAX
 
             foreach ($fileKeys as $fileKey) {
                 if (isset($_FILES[$fileKey]) && $_FILES[$fileKey]['error'] === UPLOAD_ERR_OK) {
@@ -238,6 +236,7 @@ class SettingController extends Controller
                         $destination = $uploadDir . $safeName;
                         if (move_uploaded_file($tmpName, $destination)) {
                             Settings::set($fileKey, '/uploads/settings/' . $safeName);
+                            $updatedFiles[$fileKey] = '/uploads/settings/' . $safeName;
                             if ($fileKey === 'site_logo') {
                                 Settings::set('logo_type', 'image');
                             } elseif ($fileKey === 'site_favicon') {
@@ -251,28 +250,27 @@ class SettingController extends Controller
             }
 
             Logger::activity("Updated system settings (tab: {$tab}).");
-            Session::setFlash('success', __('settings.settings_saved'));
-            $this->redirect("/settings/{$tab}");
+            // AJAX: อยู่หน้าเดิม ไม่รีเฟรช + Toast แจ้งบันทึก (ส่ง path รูปใหม่กลับไปอัปเดต preview ทันที)
+            // Fallback (ไม่มี JS): PRG รีโหลดแท็บเดิมเพื่อ apply ธีม/โลโก้ใหม่จากฝั่ง Server
+            $this->respond("/settings/{$tab}", __('settings.settings_saved'), 'success', 200, ['stay' => true, 'updated_files' => $updatedFiles]);
 
         } catch (\Throwable $e) {
             \App\Core\Logger::error("Failed to update system settings (tab: {$tab}): " . $e->getMessage());
-            Session::setFlash('error', __('settings.failed_update_settings') . ' ' . $e->getMessage());
-            $this->redirect("/settings/{$tab}");
+            $this->respond("/settings/{$tab}", __('settings.failed_update_settings') . ' ' . $e->getMessage(), 'error', 500);
         }
     }
 
     public function updateTranslation()
     {
         Security::checkCsrf();
-        
+
         $namespace = $_POST['namespace'] ?? '';
         $keyName = $_POST['key_name'] ?? '';
         $thValue = $_POST['th_value'] ?? '';
         $enValue = $_POST['en_value'] ?? '';
 
         if (!$namespace || !$keyName) {
-            echo json_encode(['success' => false, 'message' => 'Missing namespace or key.']);
-            return;
+            $this->json(['success' => false, 'type' => 'error', 'message' => __('settings.translation_invalid')], 422);
         }
 
         try {
@@ -293,10 +291,10 @@ class SettingController extends Controller
             $stmt->execute([$namespace, $keyName, $enValue]);
 
             Logger::activity("Updated translation for {$namespace}.{$keyName}");
-            echo json_encode(['success' => true, 'message' => __('settings.translation_updated')]);
+            $this->json(['success' => true, 'type' => 'success', 'message' => __('settings.translation_updated')]);
         } catch (\Throwable $e) {
             \App\Core\Logger::error("Failed to update translation for {$namespace}.{$keyName}: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            $this->json(['success' => false, 'type' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 }

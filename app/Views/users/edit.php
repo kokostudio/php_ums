@@ -1,4 +1,4 @@
-<form action="/users/<?= \App\Core\Security::encodeId($user['id']) ?>/edit" method="POST" enctype="multipart/form-data">
+<form action="/users/<?= \App\Core\Security::encodeId($user['id']) ?>/edit" method="POST" enctype="multipart/form-data" data-ajax="true">
     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
     <div class="mb-6 flex items-center justify-between sticky -top-6 md:-top-8 z-40 bg-slate-50/90 dark:bg-[#0f172a]/90 backdrop-blur-md py-4 -mx-6 md:-mx-8 px-6 md:px-8 border-b border-gray-200 dark:border-slate-800">

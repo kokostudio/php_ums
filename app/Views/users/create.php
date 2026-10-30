@@ -1,4 +1,4 @@
-<form action="/users/create" method="POST" enctype="multipart/form-data">
+<form action="/users/create" method="POST" enctype="multipart/form-data" data-ajax="true">
     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
     <div class="mb-6 flex items-center justify-between sticky -top-6 md:-top-8 z-40 bg-slate-50/90 dark:bg-[#0f172a]/90 backdrop-blur-md py-4 -mx-6 md:-mx-8 px-6 md:px-8 border-b border-gray-200 dark:border-slate-800">
@@ -122,4 +122,12 @@ function previewAvatar(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+// เคลียร์ Avatar Preview คืนค่าเริ่มต้น เมื่อฟอร์มถูกรีเซ็ตหลังบันทึกสำเร็จ (reset_form)
+document.addEventListener('ajax:form-reset', function(e) {
+    var form = e.target;
+    if (!form || !form.querySelector('#avatar-preview')) return;
+    var preview = form.querySelector('#avatar-preview');
+    preview.src = 'https://ui-avatars.com/api/?name=User&background=random';
+});
 </script>

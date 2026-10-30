@@ -456,4 +456,8 @@ return array (
   'manage_social_providers' => 'Configure Social Providers',
   'social_login_master_title' => 'Master Social Login System',
   'social_login_master_desc' => 'Enable or disable all social logins globally on the login screen',
+  'translation_invalid' => 'Incomplete translation data. Please provide a valid namespace and key.',
+  'username_login_master_title' => 'Username & Password Login',
+  'username_login_master_desc' => 'Enable or disable sign-in with username and password on the login screen',
+  'enable_username_login' => 'Enable Username Login',
 );

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "mimosa-finding-ledger-batch/v1",
+  "batchId": "stop-20261030T152428711Z-52828-c412b4f98cec",
+  "runId": "20261030T152428711Z-52828-c412b4f98cec",
+  "runStatus": "completed",
+  "coverage": {
+    "status": "complete",
+    "reasons": []
+  },
+  "source": {
+    "component": "zcode-hook",
+    "operationId": "Stop"
+  },
+  "revision": "f9cc630f3ae8798ac44665d4e429aca76c5dae17",
+  "diffHash": "42f6249e6a03fc685b3402e378093af03ef967b1a9cea5605099a57951721061",
+  "rulesVersion": "unavailable",
+  "sessionHash": "b9aa36a8b97187f01fa7fb0de01aa06efba7e16fd0080cafd01c906f41e3a3ec",
+  "reportRef": ".mimosa/reports/task-review-sess_5e1e8786-1bb2-407a-a71e-442f3160ce15-20261030T152428711Z-52828-c412b4f98cec.json",
+  "events": [],
+  "observedFindingIds": [
+    "mimosa-507154ec64b2a6c152ffbd79"
+  ],
+  "verifiedFiles": [
+    {
+      "file": "app/Views/settings/index.php",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "app/Controllers/SettingController.php",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "app/Lang/th/settings.php",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "app/Lang/en/settings.php",
+      "direct": "complete",
+      "projectContext": "partial"
+    }
+  ],
+  "recordedAt": "2026-10-30T15:24:29.133Z"
+}

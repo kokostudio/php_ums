@@ -120,8 +120,7 @@ class UserController extends Controller
 
         if (!empty($errors)) {
             $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
-            Session::setFlash('error', $errorMsg);
-            $this->redirect('/users/create');
+            $this->respond('/users/create', $errorMsg, 'error', 422, ['errors' => $errors]);
         }
 
         $username = Security::sanitize($_POST['username']);
@@ -136,23 +135,20 @@ class UserController extends Controller
         try {
             $avatarName = UploadManager::handle($_FILES['avatar'] ?? [], __DIR__ . '/../../public/uploads/avatars/');
         } catch (\Exception $e) {
-            Session::setFlash('error', $e->getMessage());
-            $this->redirect('/users/create');
+            $this->respond('/users/create', $e->getMessage(), 'error', 422);
         }
 
         // Check unique
         $stmt = $db->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
         $stmt->execute(['username' => $username, 'email' => $email]);
         if ($stmt->fetch()) {
-            Session::setFlash('error', __('messages.user_exists'));
-            $this->redirect('/users/create');
+            $this->respond('/users/create', __('messages.user_exists'), 'error', 422);
         }
 
         $hashedPassword = Security::hashPassword($password);
 
         if ($roleId == 1 && Session::get('role_id') != 1) {
-            Session::setFlash('error', 'You cannot assign the Super Admin role.');
-            $this->redirect('/users/create');
+            $this->respond('/users/create', 'You cannot assign the Super Admin role.', 'error', 403);
         }
 
         try {
@@ -170,11 +166,10 @@ class UserController extends Controller
             Logger::activity("Created user: {$username}");
             Logger::audit('users', $newId, 'insert', null, ['username' => $username, 'email' => $email, 'role_id' => $roleId]);
 
-            Session::setFlash('success', __('messages.user_created'));
-            $this->redirect('/users');
+            // AJAX: อยู่หน้าเดิม + Toast แจ้งบันทึก + เคลียร์ฟอร์มรอรับข้อมูลใหม่ | Fallback: กลับมาหน้าฟอร์มเปล่า
+            $this->respond('/users/create', __('messages.user_created'), 'success', 200, ['stay' => true, 'reset_form' => true]);
         } catch (\Exception $e) {
-            Session::setFlash('error', __('messages.failed_create_user'));
-            $this->redirect('/users/create');
+            $this->respond('/users/create', __('messages.failed_create_user'), 'error', 500);
         }
     }
 
@@ -241,8 +236,7 @@ class UserController extends Controller
 
         if (!empty($errors)) {
             $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
-            Session::setFlash('error', $errorMsg);
-            $this->redirect("/users/{$id}/edit");
+            $this->respond("/users/{$id}/edit", $errorMsg, 'error', 422, ['errors' => $errors ?? []]);
         }
 
         $username = Security::sanitize($_POST['username']);
@@ -262,8 +256,7 @@ class UserController extends Controller
         $roleId = $roleIdHash ? Security::decodeId($roleIdHash) : null;
 
         if ($roleId == 1 && Session::get('role_id') != 1) {
-            Session::setFlash('error', 'You cannot assign the Super Admin role.');
-            $this->redirect("/users/{$id}/edit");
+            $this->respond("/users/{$id}/edit", 'You cannot assign the Super Admin role.', 'error', 403);
         }
 
         $avatarName = $oldUser['profile_image'] ?? null;
@@ -277,16 +270,14 @@ class UserController extends Controller
                 $avatarName = $newAvatarName;
             }
         } catch (\Exception $e) {
-            Session::setFlash('error', $e->getMessage());
-            $this->redirect("/users/{$id}/edit");
+            $this->respond("/users/{$id}/edit", $e->getMessage(), 'error', 422);
         }
 
         // Check unique (excluding current user)
         $checkStmt = $db->prepare("SELECT id FROM users WHERE (username = :username OR email = :email) AND id != :id");
         $checkStmt->execute(['username' => $username, 'email' => $email, 'id' => $realId]);
         if ($checkStmt->fetch()) {
-            Session::setFlash('error', __('messages.user_email_exists_other'));
-            $this->redirect("/users/{$id}/edit");
+            $this->respond("/users/{$id}/edit", __('messages.user_email_exists_other'), 'error', 422);
         }
 
         $query = "UPDATE users SET username = :username, email = :email, role_id = :role_id, status = :status, profile_image = :profile_image";
@@ -321,8 +312,8 @@ class UserController extends Controller
         Logger::audit('users', $realId, 'update', $oldUser, $newUser);
         Logger::activity("Updated user profile: {$username}");
 
-        Session::setFlash('success', __('messages.user_updated'));
-        $this->redirect('/users');
+        // AJAX: อยู่หน้าเดิม + Toast แจ้งบันทึกสำเร็จ | Fallback: PRG กลับมาหน้าเดิม
+        $this->respond("/users/{$id}/edit", __('messages.user_updated'), 'success', 200, ['stay' => true]);
     }
 
     public function delete($id)

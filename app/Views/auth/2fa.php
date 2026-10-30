@@ -10,7 +10,7 @@
             </p>
         </div>
 
-        <form action="/login/2fa" method="POST" class="space-y-6">
+        <form action="/login/2fa" method="POST" class="space-y-6" data-ajax="true">
             <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
             <div>

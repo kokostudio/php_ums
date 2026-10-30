@@ -1,4 +1,4 @@
-<form action="/roles/create" method="POST">
+<form action="/roles/create" method="POST" data-ajax="true">
     <input type="hidden" name="csrf_token" value="<?php echo \App\Core\Session::getCsrfToken() ?>">
 
     <div class="mb-6 flex items-center justify-between sticky -top-6 md:-top-8 z-40 bg-slate-50/90 dark:bg-[#0f172a]/90 backdrop-blur-md py-4 -mx-6 md:-mx-8 px-6 md:px-8 border-b border-gray-200 dark:border-slate-800">
@@ -122,6 +122,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const allModuleCbs = document.querySelectorAll(`.perm-checkbox[data-module="${moduleName}"]`);
             const allChecked = Array.from(allModuleCbs).every(c => c.checked);
             document.querySelector(`.module-checkbox[data-module="${moduleName}"]`).checked = allChecked;
+        });
+    });
+
+    // เคลียร์สถานะ Select All และซิงก์ Checkbox กลับค่าเริ่มต้น หลังบันทึกสำเร็จ (reset_form)
+    document.addEventListener('ajax:form-reset', (e) => {
+        const form = e.target;
+        if (!form || !form.querySelector('.perm-checkbox')) return;
+
+        isAllSelected = false;
+        if (selectAllBtn) {
+            selectAllBtn.textContent = '<?php echo __('common.select_all') ?>';
+        }
+
+        // ซิงก์ module checkbox ให้ตรงกับสถานะ perm checkbox หลังรีเซ็ต
+        const moduleNames = new Set();
+        form.querySelectorAll('.perm-checkbox').forEach(cb => moduleNames.add(cb.dataset.module));
+        moduleNames.forEach(moduleName => {
+            const perms = form.querySelectorAll(`.perm-checkbox[data-module="${moduleName}"]`);
+            const allChecked = Array.from(perms).every(c => c.checked);
+            const moduleCb = form.querySelector(`.module-checkbox[data-module="${moduleName}"]`);
+            if (moduleCb) moduleCb.checked = allChecked;
         });
     });
 });

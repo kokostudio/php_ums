@@ -66,4 +66,12 @@ return [
     'access_denied' => 'Access denied. You do not have permission to view this section.',
     'username_login_disabled' => 'Username and password sign in is currently disabled.',
     'social_login_disabled' => 'Social login is currently disabled.',
+    'email_not_verified' => 'Please verify your email address before logging in.',
+    'register_success_verify' => 'Registration successful. Please check your email to verify your account.',
+    'verification_link_sent' => 'If the email is registered and unverified, a new verification link has been sent.',
+    'reset_link_sent' => 'If an account with that email exists, a password reset link has been sent.',
+    'invalid_2fa_code' => 'Invalid authentication code.',
+    'session_expired' => 'Your session has expired. Please sign in again.',
+    'password_reset_success' => 'Your password has been reset successfully. Please login with your new password.',
+    'failed_reset_password' => 'Failed to reset password. Please try again.',
 ];

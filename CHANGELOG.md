@@ -7,6 +7,11 @@
 
 ## [ยังไม่ปล่อยเวอร์ชัน (Unreleased)]
 ### เพิ่ม (Added)
+- เพิ่ม **Global AJAX Form Engine** (`app/Views/layouts/partials/ajax_engine.php`) สำหรับดักจับการส่งฟอร์มทั้งหมดที่มี `data-ajax="true"` ให้ทำงานผ่าน axios โดยหน้าเว็บไม่ต้องรีเฟรช พร้อมปุ่ม Loading (Rule 27), Toast บนกลาง (Rule 28), ไฮไลต์ข้อผิดพลาดรายฟิลด์ และระบบ Pending Toast ที่แสดงต่อเนื่องหลังเปลี่ยนหน้า
+- เพิ่ม **Dual-Response Pattern** ใน `App\Core\Controller` เมธอด `isAjax()` และ `respond()` — ตอบ JSON เมื่อเป็น AJAX และตอบ Redirect + Flash ตามเดิมเมื่อเป็นฟอร์มปกติ (ไม่มี Breaking Changes ต่อโปรเจกต์ที่เชื่อมต่อ)
+- ยกระดับฟอร์มทั้งระบบเป็น AJAX: Settings (ทุกแท็บ), Profile (ข้อมูล/รหัสผ่าน), Users & Roles (สร้าง/แก้ไข) และ Authentication ทั้งหมด (Login, Register, 2FA, Resend Verification, Forgot/Reset Password)
+- ปุ่มส่งอีเมลยืนยันบัญชี (Resend Verification) แสดงแบบไดนามิกทันทีกรณีเข้าสู่ระบบด้วยบัญชีที่ยังไม่ยืนยันอีเมลในโหมด AJAX
+- เพิ่มคีย์ภาษาไทย/อังกฤษใหม่ (`messages`) ครบทั้ง 2 ภาษา: การยืนยันอีเมล, ลิงก์รีเซ็ตรหัสผ่าน, รหัส 2FA ไม่ถูกต้อง, เซสชันหมดอายุ และผลลัพธ์การรีเซ็ตรหัสผ่าน
 - ตั้งค่าโครงสร้างโปรเจกต์เริ่มต้น
 - ตั้งค่าระบบโหลดคลาสอัตโนมัติ (PSR-4 autoloader)
 - ติดตั้งแพ็กเกจ `phpmailer/phpmailer` ผ่าน Composer สำหรับระบบส่งอีเมล

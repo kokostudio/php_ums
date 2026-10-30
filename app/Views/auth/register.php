@@ -9,7 +9,7 @@
             <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">สมัครสมาชิกเพื่อเข้าใช้งาน <?php echo htmlspecialchars(\App\Core\Settings::get('site_name', 'WorkPOS')) ?></p>
         </div>
 
-        <form action="/register" method="POST" id="registerForm" class="space-y-4" novalidate>
+        <form action="/register" method="POST" id="registerForm" class="space-y-4" novalidate data-ajax="true">
             <input type="hidden" name="csrf_token" value="<?php echo \App\Core\Session::getCsrfToken() ?>">
 
             <div class="space-y-1.5">

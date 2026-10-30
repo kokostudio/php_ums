@@ -192,6 +192,13 @@
     </script>
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        if (window.axios) {
+            axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = '<?= \App\Core\Session::getCsrfToken() ?>';
+        }
+    </script>
+    <?php require __DIR__ . '/partials/ajax_engine.php'; ?>
     <!-- Cropper.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -617,7 +624,16 @@
                 <footer class="mt-6 py-4 border-t border-gray-200/60 dark:border-slate-800/60">
                     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="text-sm font-medium text-gray-500 dark:text-slate-400">
-                            <?php echo Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.') ?>
+                            <?php
+                            // ค่าที่บันทึกเก่าอาจถูก escape ซ้อนหลายชั้น (&amp;amp;copy;) — ถอด entity ซ้ำจนนิ่งก่อนแสดงผล
+                            $footer = Settings::get('site_footer', '&copy; ' . date('Y') . ' Standard Core System. All rights reserved.');
+                            $prev = null;
+                            for ($i = 0; $i < 10 && $footer !== $prev; $i++) {
+                                $prev = $footer;
+                                $footer = html_entity_decode((string) $footer, ENT_QUOTES, 'UTF-8');
+                            }
+                            echo $footer;
+                            ?>
                         </div>
                         <div class="flex items-center space-x-4 text-xs font-semibold text-gray-400 dark:text-slate-500">
                             <span class="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer" title="Secure System">
@@ -1073,7 +1089,9 @@
         document.addEventListener('submit', function(e) {
             const form = e.target;
             if (form.hasAttribute('data-no-loading')) return;
-            
+            // ฟอร์ม AJAX จัดการปุ่มเองผ่าน Global AJAX Engine (withButtonLoading) — ข้าม
+            if (form.matches('form[data-ajax="true"], form.ajax-form')) return;
+
             const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submitBtn) {
                 // If already submitted once, block duplicate submission

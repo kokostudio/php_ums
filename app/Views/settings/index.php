@@ -56,7 +56,7 @@
         <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 md:p-8 transition-colors">
 
             <?php if ($tab === 'general'): ?>
-            <form action="/settings/general" method="POST" enctype="multipart/form-data" id="generalSettingsForm">
+            <form action="/settings/general" method="POST" enctype="multipart/form-data" id="generalSettingsForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                         <i class="ph ph-sliders mr-2"></i><?= __('settings.general_info') ?>
@@ -369,7 +369,7 @@
                                     <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_logo_hint') ?></p>
                                     <?php if (!empty($settings['site_logo'])): ?>
                                         <div class="mb-3">
-                                            <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="Logo" class="h-12 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700">
+                                            <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="Logo" data-preview-for="site_logo" class="h-12 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700">
                                         </div>
                                     <?php endif; ?>
                                     <input type="file" id="site_logo" name="site_logo" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
@@ -380,7 +380,7 @@
                                     <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.site_favicon_hint') ?></p>
                                     <?php if (!empty($settings['site_favicon'])): ?>
                                         <div class="mb-3">
-                                            <img src="<?= htmlspecialchars($settings['site_favicon']) ?>" alt="Favicon" class="h-8 w-8 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
+                                            <img src="<?= htmlspecialchars($settings['site_favicon']) ?>" alt="Favicon" data-preview-for="site_favicon" class="h-8 w-8 object-contain bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
                                         </div>
                                     <?php endif; ?>
                                     <input type="file" id="site_favicon" name="site_favicon" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-slate-800 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-slate-700">
@@ -869,7 +869,7 @@
             </script>
             <?php elseif ($tab === 'login'): ?>
             <!-- ===== LOGIN PAGE TAB ===== -->
-            <form action="/settings/login" method="POST" enctype="multipart/form-data" id="loginSettingsForm">
+            <form action="/settings/login" method="POST" enctype="multipart/form-data" id="loginSettingsForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                         <i class="ph ph-sign-in mr-2"></i><?= __('settings.login_page') ?>
@@ -1040,7 +1040,7 @@
                         <p class="text-xs text-gray-500 dark:text-slate-400 mb-2"><?= __('settings.login_logo_hint') ?></p>
                         <?php if (!empty($settings['login_logo'])): ?>
                             <div class="mb-3 flex items-center gap-3">
-                                <img src="<?= htmlspecialchars($settings['login_logo']) ?>" alt="Login Logo" class="h-16 object-contain bg-slate-100 dark:bg-slate-800 p-2 rounded shadow-sm">
+                                <img src="<?= htmlspecialchars($settings['login_logo']) ?>" alt="Login Logo" data-preview-for="login_logo" class="h-16 object-contain bg-slate-100 dark:bg-slate-800 p-2 rounded shadow-sm">
                                 <a href="/settings/remove-login-logo" onclick="return confirm('Remove login logo?')" class="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
                                     <i class="ph ph-trash"></i> <?= __('settings.remove') ?>
                                 </a>
@@ -1110,7 +1110,7 @@
                 </button>
             </div>
 
-            <form action="/settings/translations" method="POST" id="translationsSettingsForm" class="mb-10 pb-8 border-b border-gray-100 dark:border-slate-800">
+            <form action="/settings/translations" method="POST" id="translationsSettingsForm" class="mb-10 pb-8 border-b border-gray-100 dark:border-slate-800" data-ajax="true">
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
                 <div class="space-y-6">
@@ -1186,7 +1186,7 @@
                     <tbody class="text-sm text-gray-700 dark:text-slate-300">
                         <?php if (isset($translations)): ?>
                         <?php foreach ($translations as $groupKey => $row): ?>
-                        <tr class="border-b border-gray-50 dark:border-slate-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 transition-colors">
+                        <tr class="border-b border-gray-50 dark:border-slate-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 transition-colors" data-ns="<?= htmlspecialchars($row['namespace']) ?>" data-key="<?= htmlspecialchars($row['key_name']) ?>">
                             <td class="p-4"><span class="px-2 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-lg text-xs font-bold"><?= htmlspecialchars($row['namespace']) ?></span></td>
                             <td class="p-4 font-mono text-xs"><?= htmlspecialchars($row['key_name']) ?></td>
                             <td class="p-4 truncate max-w-[200px]" title="<?= htmlspecialchars($row['th'] ?? '') ?>"><?= htmlspecialchars($row['th'] ?? '') ?></td>
@@ -1206,7 +1206,7 @@
             <!-- Edit Translation Modal -->
             <div id="editTranslationModal" class="fixed inset-0 z-50 hidden bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
                 <div class="bg-white dark:bg-black/20 dark:backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
-                    <form id="editTranslationForm" onsubmit="saveTranslation(event)" class="flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden">
+                    <form action="/settings/translations/update" method="POST" id="editTranslationForm" data-ajax="true" class="flex flex-col h-full max-h-[85vh] md:max-h-[90vh] overflow-hidden">
                         <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                         <input type="hidden" id="edit_namespace" name="namespace">
                         <input type="hidden" id="edit_key" name="key_name">
@@ -1285,47 +1285,41 @@
                 $('#editTranslationModal').addClass('hidden');
             }
 
-            function saveTranslation(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '/settings/translations/update',
-                    type: 'POST',
-                    data: $('#editTranslationForm').serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '<?= __('common.success') ?>',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: '<?= __('common.error') ?>',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '<?= __('common.error') ?>',
-                            text: '<?= __('common.unexpected_error') ?>'
-                        });
+            // บันทึกคำแปลสำเร็จ (AJAX): ปิด Modal + อัปเดตค่าในตารางทันที — ไม่ต้องรีเฟรชหน้า
+            document.addEventListener('ajax:form-saved', function(e) {
+                var form = e.target;
+                if (!form || form.id !== 'editTranslationForm') return;
+
+                closeTranslationModal();
+
+                var ns  = document.getElementById('edit_namespace').value;
+                var key = document.getElementById('edit_key').value;
+                var th  = document.getElementById('th_value').value;
+                var en  = document.getElementById('en_value').value;
+
+                var row = Array.prototype.find.call(
+                    document.querySelectorAll('#translationsTable tbody tr'),
+                    function(tr) {
+                        return tr.getAttribute('data-ns') === ns && tr.getAttribute('data-key') === key;
                     }
-                });
-            }
+                );
+                if (!row) return;
+
+                row.cells[2].textContent = th;
+                row.cells[2].setAttribute('title', th);
+                row.cells[3].textContent = en;
+                row.cells[3].setAttribute('title', en);
+
+                // ให้ DataTables อ่านค่าใหม่จาก DOM (ใช้กับการค้นหา/เรียงล่าสุด) โดยไม่เปลี่ยนหน้า
+                if (window.jQuery && jQuery.fn.DataTable) {
+                    jQuery(row.closest('table')).DataTable().row(row).invalidate().draw(false);
+                }
+            });
             </script>
 
             <?php elseif ($tab === 'security'): ?>
             <!-- ===== SECURITY TAB ===== -->
-            <form action="/settings/security" method="POST" id="securitySettingsForm">
+            <form action="/settings/security" method="POST" id="securitySettingsForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                         <i class="ph ph-shield-check mr-2"></i><?= __('settings.security') ?? 'Security Settings' ?>
@@ -1423,7 +1417,7 @@
             <?php endif; ?>
 
             <?php if ($tab === 'social'): ?>
-            <form action="/settings/social" method="POST" id="socialSettingsForm">
+            <form action="/settings/social" method="POST" id="socialSettingsForm" data-ajax="true">
                 <div class="sticky top-[-24px] md:top-[-32px] z-20 flex items-center justify-between mb-6 border-b border-gray-100 dark:border-slate-800 pb-4 pt-6 md:pt-8 -mt-6 md:-mt-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-2xl">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
                         <i class="ph ph-share-network mr-2 text-primary-600 dark:text-primary-400"></i><?= __('settings.social_login') ?>
@@ -1435,23 +1429,27 @@
                 </div>
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
 
-                <!-- Master Social Login Toggle -->
+                <!-- Username/Password Login Toggle -->
                 <div class="mb-6 p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-start sm:items-center gap-3.5">
                         <div class="w-11 h-11 rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
-                            <i class="ph ph-share-network text-2xl"></i>
+                            <i class="ph ph-sign-in text-2xl"></i>
                         </div>
                         <div>
-                            <h4 class="text-base font-semibold text-gray-900 dark:text-white"><?= __('settings.social_login_master_title') ?></h4>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5"><?= __('settings.social_login_master_desc') ?></p>
+                            <h4 class="text-base font-semibold text-gray-900 dark:text-white"><?= __('settings.username_login_master_title') ?></h4>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5"><?= __('settings.username_login_master_desc') ?></p>
                         </div>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                        <input type="checkbox" name="enable_social_login" value="1" class="sr-only peer" <?= ($settings['enable_social_login'] ?? '1') === '1' ? 'checked' : '' ?>>
-                        <div class="w-12 h-6.5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5.5 after:w-5.5 after:transition-all peer-checked:bg-primary-600"></div>
-                        <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_social_login') ?></span>
+                        <input type="hidden" name="enable_username_login" value="0">
+                        <input type="checkbox" name="enable_username_login" value="1" class="sr-only peer" <?= ($settings['enable_username_login'] ?? '1') === '1' ? 'checked' : '' ?>>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300"><?= __('settings.enable_username_login') ?></span>
                     </label>
                 </div>
+
+                <!-- Master Social Login: คงค่าไว้เสมอ (ควบคุมรายค่ายผ่านสวิตช์ของแต่ละ provider แทน) -->
+                <input type="hidden" name="enable_social_login" value="1">
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                     <!-- 1. Google Settings -->
@@ -1742,4 +1740,18 @@
             showFeedback();
         }
     }
+</script>
+
+<script>
+// อัปเดตรูป Preview (โลโก้/ฟาวิคอน) ทันทีหลังบันทึกสำเร็จแบบ AJAX — ไม่ต้องรีเฟรชหน้า
+// Server ส่ง path ใหม่กลับมาทาง updated_files (SettingController::update)
+document.addEventListener('ajax:form-saved', function(e) {
+    var files = (e.detail && e.detail.updated_files) || {};
+    Object.keys(files).forEach(function(key) {
+        var img = document.querySelector('img[data-preview-for="' + key + '"]');
+        if (img) {
+            img.src = files[key] + '?t=' + Date.now();
+        }
+    });
+});
 </script>

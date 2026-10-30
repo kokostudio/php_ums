@@ -81,8 +81,7 @@ class ProfileController extends Controller
         $currentUser = $stmt->fetch();
 
         if (!$currentUser) {
-            Session::setFlash('error', __('messages.user_not_found'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.user_not_found'), 'error', 404);
             return;
         }
 
@@ -92,8 +91,7 @@ class ProfileController extends Controller
         $rawUsername = isset($_POST['username']) ? trim($_POST['username']) : null;
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', __('messages.invalid_email_format'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.invalid_email_format'), 'error', 422);
             return;
         }
 
@@ -101,8 +99,7 @@ class ProfileController extends Controller
         $check = $db->prepare("SELECT id FROM users WHERE email = :email AND id != :id");
         $check->execute(['email' => $email, 'id' => $userId]);
         if ($check->fetch()) {
-            Session::setFlash('error', __('messages.email_taken'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.email_taken'), 'error', 422);
             return;
         }
 
@@ -113,15 +110,13 @@ class ProfileController extends Controller
 
         if ($rawUsername !== null && $rawUsername !== '' && $rawUsername !== $currentUser['username']) {
             if ($changesCount >= 1) {
-                Session::setFlash('error', __('profile.username_change_limit_reached'));
-                $this->redirect('/profile');
+                $this->respond('/profile', __('profile.username_change_limit_reached'), 'error', 422);
                 return;
             }
 
             $sanitizedUsername = Security::sanitize($rawUsername);
             if (!preg_match('/^[a-zA-Z0-9_-]{3,30}$/', $sanitizedUsername)) {
-                Session::setFlash('error', __('profile.invalid_username_format'));
-                $this->redirect('/profile');
+                $this->respond('/profile', __('profile.invalid_username_format'), 'error', 422);
                 return;
             }
 
@@ -129,8 +124,7 @@ class ProfileController extends Controller
             $checkUser = $db->prepare("SELECT id FROM users WHERE username = :username AND id != :id");
             $checkUser->execute(['username' => $sanitizedUsername, 'id' => $userId]);
             if ($checkUser->fetch()) {
-                Session::setFlash('error', __('profile.username_taken'));
-                $this->redirect('/profile');
+                $this->respond('/profile', __('profile.username_taken'), 'error', 422);
                 return;
             }
 
@@ -229,12 +223,10 @@ class ProfileController extends Controller
                 Logger::activity("Updated own profile information.");
             }
             
-            Session::setFlash('success', __('messages.profile_updated'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.profile_updated'), 'success');
             return;
         } catch (\Exception $e) {
-            Session::setFlash('error', __('messages.failed_update_profile'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.failed_update_profile'), 'error', 500);
         }
     }
 
@@ -249,20 +241,17 @@ class ProfileController extends Controller
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
-            Session::setFlash('error', __('messages.all_password_fields_required'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.all_password_fields_required'), 'error', 422);
         }
 
         if ($newPassword !== $confirmPassword) {
-            Session::setFlash('error', __('messages.new_passwords_not_match'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.new_passwords_not_match'), 'error', 422);
         }
 
         $pwdErrors = Security::validatePasswordComplexity($newPassword);
         if (!empty($pwdErrors)) {
             $errorMsg = implode('<br>', $pwdErrors);
-            Session::setFlash('error', $errorMsg);
-            $this->redirect('/profile');
+            $this->respond('/profile', $errorMsg, 'error', 422);
         }
 
         $stmt = $db->prepare("SELECT password FROM users WHERE id = :id");
@@ -270,8 +259,7 @@ class ProfileController extends Controller
         $hash = $stmt->fetchColumn();
 
         if (!Security::verifyPassword($currentPassword, $hash)) {
-            Session::setFlash('error', __('messages.current_password_incorrect'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.current_password_incorrect'), 'error', 422);
         }
 
         try {
@@ -281,11 +269,9 @@ class ProfileController extends Controller
 
             Logger::activity("Changed own password.");
             
-            Session::setFlash('success', __('messages.password_updated'));
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.password_updated'), 'success');
         } catch (\Exception $e) {
-            Session::setFlash('error', 'Failed to update password.');
-            $this->redirect('/profile');
+            $this->respond('/profile', 'Failed to update password.', 'error', 500);
         }
     }
 

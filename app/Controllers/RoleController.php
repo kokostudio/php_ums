@@ -59,15 +59,13 @@ class RoleController extends Controller
         $perms = $_POST['permissions'] ?? [];
 
         if (empty($name)) {
-            Session::setFlash('error', __('messages.role_name_required'));
-            $this->redirect('/roles/create');
+            $this->respond('/roles/create', __('messages.role_name_required'), 'error', 422);
         }
 
         $stmt = $db->prepare("SELECT id FROM roles WHERE name = :name");
         $stmt->execute(['name' => $name]);
         if ($stmt->fetch()) {
-            Session::setFlash('error', __('messages.role_exists'));
-            $this->redirect('/roles/create');
+            $this->respond('/roles/create', __('messages.role_exists'), 'error', 422);
         }
 
         try {
@@ -91,12 +89,11 @@ class RoleController extends Controller
             Logger::activity("Created role: {$name}");
             Logger::audit('roles', $roleId, 'insert', null, ['name' => $name, 'description' => $description, 'permissions' => $perms]);
 
-            Session::setFlash('success', __('messages.role_created'));
-            $this->redirect('/roles');
+            // AJAX: อยู่หน้าเดิม + Toast แจ้งบันทึก + เคลียร์ฟอร์มรอรับข้อมูลใหม่ | Fallback: กลับมาหน้าฟอร์มเปล่า
+            $this->respond('/roles/create', __('messages.role_created'), 'success', 200, ['stay' => true, 'reset_form' => true]);
         } catch (\Exception $e) {
             $db->rollBack();
-            Session::setFlash('error', __('messages.failed_create_role') . ' ' . $e->getMessage());
-            $this->redirect('/roles/create');
+            $this->respond('/roles/create', __('messages.failed_create_role') . ' ' . $e->getMessage(), 'error', 500);
         }
     }
 
@@ -156,20 +153,17 @@ class RoleController extends Controller
         $perms = $_POST['permissions'] ?? [];
 
         if (empty($name)) {
-            Session::setFlash('error', __('messages.role_name_required'));
-            $this->redirect("/roles/{$id}/edit");
+            $this->respond("/roles/{$id}/edit", __('messages.role_name_required'), 'error', 422);
         }
 
         if ($realId == 1 && $name !== 'Super Admin') {
-            Session::setFlash('error', __('messages.cannot_rename_superadmin'));
-            $this->redirect("/roles/{$id}/edit");
+            $this->respond("/roles/{$id}/edit", __('messages.cannot_rename_superadmin'), 'error', 403);
         }
 
         $checkStmt = $db->prepare("SELECT id FROM roles WHERE name = :name AND id != :id");
         $checkStmt->execute(['name' => $name, 'id' => $realId]);
         if ($checkStmt->fetch()) {
-            Session::setFlash('error', __('messages.role_exists'));
-            $this->redirect("/roles/{$id}/edit");
+            $this->respond("/roles/{$id}/edit", __('messages.role_exists'), 'error', 422);
         }
 
         try {
@@ -207,12 +201,11 @@ class RoleController extends Controller
             Logger::activity("Updated role: {$name}");
             Logger::audit('roles', $realId, 'update', ['name' => $oldRole['name'], 'description' => $oldRole['description']], ['name' => $name, 'description' => $description, 'permissions' => $perms]);
 
-            Session::setFlash('success', __('messages.role_updated'));
-            $this->redirect('/roles');
+            // AJAX: อยู่หน้าเดิม + Toast แจ้งบันทึกสำเร็จ | Fallback: PRG กลับมาหน้าเดิม
+            $this->respond("/roles/{$id}/edit", __('messages.role_updated'), 'success', 200, ['stay' => true]);
         } catch (\Exception $e) {
             $db->rollBack();
-            Session::setFlash('error', __('messages.failed_update_role'));
-            $this->redirect("/roles/{$id}/edit");
+            $this->respond("/roles/{$id}/edit", __('messages.failed_update_role'), 'error', 500);
         }
     }
 

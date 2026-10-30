@@ -153,7 +153,16 @@ $currentLocale = \App\Core\Lang::locale();
         
         <!-- Footer -->
         <div class="relative z-10 mt-12 text-xs text-white/50">
-            <?= Settings::get('site_footer', '&copy; ' . date('Y') . ' ' . Settings::get('site_name', 'WorkPOS') . ' ERP — ระบบจัดการร้านค้าครบวงจร') ?>
+            <?php
+            // ค่าที่บันทึกเก่าอาจถูก escape ซ้อนหลายชั้น (&amp;amp;copy;) — ถอด entity ซ้ำจนนิ่งก่อนแสดงผล
+            $footer = Settings::get('site_footer', '&copy; ' . date('Y') . ' ' . Settings::get('site_name', 'WorkPOS') . ' ERP — ระบบจัดการร้านค้าครบวงจร');
+            $prev = null;
+            for ($i = 0; $i < 10 && $footer !== $prev; $i++) {
+                $prev = $footer;
+                $footer = html_entity_decode((string) $footer, ENT_QUOTES, 'UTF-8');
+            }
+            echo $footer;
+            ?>
         </div>
     </div>
 
@@ -228,16 +237,22 @@ $currentLocale = \App\Core\Lang::locale();
             
             <!-- SweetAlert2 -->
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+            <!-- Axios (Global AJAX Engine) -->
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <script>
+                if (window.axios) {
+                    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+                    axios.defaults.headers.common['X-CSRF-TOKEN'] = '<?= \App\Core\Session::getCsrfToken() ?>';
+                }
+            </script>
+            <?php require __DIR__ . '/partials/ajax_engine.php'; ?>
             
-            <!-- Flash Messages -->
+            <!-- Flash Messages (ผ่าน showTopToast มาตรฐานของระบบจาก ajax_engine) -->
             <?php if ($flashSuccess = Session::getFlash('success')): ?>
                 <script>
                     document.addEventListener("DOMContentLoaded", function() {
-                        const Toast = Swal.mixin({
-                            toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true,
-                            customClass: { popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl', title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2' }
-                        });
-                        Toast.fire({ icon: 'success', title: <?= json_encode(htmlspecialchars($flashSuccess)) ?> });
+                        window.showTopToast('success', <?= json_encode(htmlspecialchars($flashSuccess)) ?>, 3000);
                     });
                 </script>
             <?php endif; ?>
@@ -245,11 +260,7 @@ $currentLocale = \App\Core\Lang::locale();
             <?php if ($flashError = Session::getFlash('error')): ?>
                 <script>
                     document.addEventListener("DOMContentLoaded", function() {
-                        const Toast = Swal.mixin({
-                            toast: true, position: 'top', showConfirmButton: false, timer: 4000, timerProgressBar: true,
-                            customClass: { popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-xl', title: 'text-[13px] font-medium font-sans whitespace-nowrap px-2' }
-                        });
-                        Toast.fire({ icon: 'error', title: <?= json_encode(htmlspecialchars($flashError)) ?> });
+                        window.showTopToast('error', <?= json_encode(htmlspecialchars($flashError)) ?>, 4000);
                     });
                 </script>
             <?php endif; ?>
@@ -304,6 +315,8 @@ $currentLocale = \App\Core\Lang::locale();
         document.addEventListener('submit', function(e) {
             const form = e.target;
             if (form.hasAttribute('data-no-loading')) return;
+            // ฟอร์ม AJAX จัดการปุ่มเองผ่าน Global AJAX Engine (withButtonLoading) — ข้าม
+            if (form.matches('form[data-ajax="true"], form.ajax-form')) return;
             
             const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submitBtn) {

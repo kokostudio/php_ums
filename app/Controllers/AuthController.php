@@ -30,8 +30,7 @@ class AuthController extends Controller
         Security::checkCsrf();
 
         if (\App\Core\Settings::get('enable_username_login', '1') === '0') {
-            Session::setFlash('error', __('messages.username_login_disabled'));
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.username_login_disabled'), 'error', 403);
             return;
         }
 
@@ -39,9 +38,15 @@ class AuthController extends Controller
         $password = $_POST['password'] ?? '';
 
         if (empty($username) || empty($password)) {
-            Session::setFlash('error', __('messages.enter_user_pass'));
+            $errors = [];
+            if (empty($username)) {
+                $errors['username'] = [__('auth.username_required')];
+            }
+            if (empty($password)) {
+                $errors['password'] = [__('auth.password_required')];
+            }
             Session::setFlash('old_username', $username);
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.enter_user_pass'), 'error', 422, ['errors' => $errors]);
         }
 
         $db = Database::getInstance();
@@ -52,25 +57,23 @@ class AuthController extends Controller
         if ($user && Security::verifyPassword($password, $user['password'])) {
             if ($user['status'] !== 'active') {
                 Logger::activity("Failed login attempt (Account {$user['status']}) for user: {$username}");
-                Session::setFlash('error', __('messages.account_disabled'));
                 Session::setFlash('old_username', $username);
-                $this->redirect('/login');
+                $this->respond('/login', __('messages.account_disabled'), 'error', 403);
             }
 
             // Check email verification
             $requireVerification = Settings::get('require_email_verification', '0') === '1';
             if ($requireVerification && empty($user['email_verified_at'])) {
                 Logger::activity("Failed login attempt (Unverified email) for user: {$username}");
-                Session::setFlash('error', 'Please verify your email address before logging in.');
                 Session::setFlash('unverified_email', $user['email']);
                 Session::setFlash('old_username', $username);
-                $this->redirect('/login');
+                $this->respond('/login', __('messages.email_not_verified'), 'error', 403, ['unverified_email' => $user['email']]);
             }
 
             // Check if 2FA is enabled
             if ($user['two_factor_enabled']) {
                 Session::set('2fa_pending_user_id', $user['id']);
-                $this->redirect('/login/2fa');
+                $this->respond('/login/2fa', __('common.please_wait'), 'info');
             }
 
             // Regenerate session ID for security against fixation
@@ -93,12 +96,11 @@ class AuthController extends Controller
 
             Logger::activity("User logged in successfully.");
 
-            $this->redirect('/dashboard');
+            $this->respond('/dashboard', __('common.welcome'), 'success');
         } else {
             Logger::activity("Failed login attempt (Invalid credentials) for user: {$username}");
-            Session::setFlash('error', __('messages.invalid_credentials'));
             Session::setFlash('old_username', $username);
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.invalid_credentials'), 'error', 401, ['errors' => ['password' => [__('messages.invalid_credentials')]]]);
         }
     }
 
@@ -132,8 +134,7 @@ class AuthController extends Controller
     {
         if (\App\Core\Settings::get('enable_registration') === '0') {
             Session::init();
-            Session::setFlash('error', __('messages.registration_disabled') ?? __('messages.registration_disabled_text'));
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.registration_disabled') ?? __('messages.registration_disabled_text'), 'error', 403);
         }
 
         Security::checkCsrf();
@@ -144,18 +145,15 @@ class AuthController extends Controller
         $confirm_password = $_POST['confirm_password'] ?? '';
 
         if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-            Session::setFlash('error', __('messages.all_fields_required'));
-            $this->redirect('/register');
+            $this->respond('/register', __('messages.all_fields_required'), 'error', 422);
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', __('messages.invalid_email'));
-            $this->redirect('/register');
+            $this->respond('/register', __('messages.invalid_email'), 'error', 422, ['errors' => ['email' => [__('messages.invalid_email')]]]);
         }
 
         if ($password !== $confirm_password) {
-            Session::setFlash('error', __('messages.password_mismatch'));
-            $this->redirect('/register');
+            $this->respond('/register', __('messages.password_mismatch'), 'error', 422, ['errors' => ['confirm_password' => [__('messages.password_mismatch')]]]);
         }
 
         $db = Database::getInstance();
@@ -164,8 +162,7 @@ class AuthController extends Controller
         $stmt = $db->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
         $stmt->execute(['username' => $username, 'email' => $email]);
         if ($stmt->fetch()) {
-            Session::setFlash('error', __('messages.user_exists'));
-            $this->redirect('/register');
+            $this->respond('/register', __('messages.user_exists'), 'error', 422, ['errors' => ['username' => [__('messages.user_exists')]]]);
         }
 
         // Default role for new users (usually 2 = User)
@@ -194,7 +191,7 @@ class AuthController extends Controller
             ], 'email');
             Mailer::send($email, $subject, $body);
             
-            Session::setFlash('success', 'Registration successful. Please check your email to verify your account.');
+            $message = __('messages.register_success_verify');
         } else {
             $insert = $db->prepare("INSERT INTO users (username, email, password, role_id, status, email_verified_at) VALUES (:username, :email, :password, :role, 'active', NOW())");
             $insert->execute([
@@ -203,10 +200,10 @@ class AuthController extends Controller
                 'password' => $hashedPassword,
                 'role' => $defaultRole
             ]);
-            Session::setFlash('success', __('messages.register_success'));
+            $message = __('messages.register_success');
         }
 
-        $this->redirect('/login');
+        $this->respond('/login', $message, 'success');
     }
 
     public function verifyEmail()
@@ -240,10 +237,9 @@ class AuthController extends Controller
         $email = Security::sanitize($_POST['email'] ?? '');
         
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', __('messages.invalid_email_format'));
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.invalid_email_format'), 'error', 422);
         }
-        
+
         $db = Database::getInstance();
         $stmt = $db->prepare("SELECT id, username, email_verified_at FROM users WHERE email = :email");
         $stmt->execute(['email' => $email]);
@@ -261,8 +257,7 @@ class AuthController extends Controller
             Mailer::send($email, $subject, $body);
         }
         
-        Session::setFlash('success', 'If the email is registered and unverified, a new verification link has been sent.');
-        $this->redirect('/login');
+        $this->respond('/login', __('messages.verification_link_sent'), 'success');
     }
 
     public function show2faForm()
@@ -281,7 +276,7 @@ class AuthController extends Controller
         Security::checkCsrf();
 
         if (!Session::has('2fa_pending_user_id')) {
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.session_expired'), 'error', 401);
         }
 
         $code = $_POST['totp_code'] ?? '';
@@ -294,7 +289,8 @@ class AuthController extends Controller
 
         if (!$user) {
             Session::destroy();
-            $this->redirect('/login');
+            Session::init();
+            $this->respond('/login', __('messages.session_expired'), 'error', 401);
         }
 
         $google2fa = new Google2FA();
@@ -320,11 +316,10 @@ class AuthController extends Controller
             \App\Core\RateLimiter::reset('/login/2fa');
 
             Logger::activity("User logged in successfully with 2FA.");
-            $this->redirect('/dashboard');
+            $this->respond('/dashboard', __('common.welcome'), 'success');
         } else {
             Logger::activity("Failed 2FA attempt for user: {$user['username']}");
-            Session::setFlash('error', 'Invalid authentication code.');
-            $this->redirect('/login/2fa');
+            $this->respond('/login/2fa', __('messages.invalid_2fa_code'), 'error', 422, ['errors' => ['totp_code' => [__('messages.invalid_2fa_code')]]]);
         }
     }
 
@@ -341,8 +336,7 @@ class AuthController extends Controller
         $email = Security::sanitize($_POST['email'] ?? '');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::setFlash('error', __('messages.invalid_email_format'));
-            $this->redirect('/forgot-password');
+            $this->respond('/forgot-password', __('messages.invalid_email_format'), 'error', 422);
         }
 
         $db = Database::getInstance();
@@ -376,8 +370,7 @@ class AuthController extends Controller
         }
 
         // Always show success message to prevent email enumeration
-        Session::setFlash('success', 'If an account with that email exists, a password reset link has been sent.');
-        $this->redirect('/forgot-password');
+        $this->respond('/forgot-password', __('messages.reset_link_sent'), 'success');
     }
 
     public function resetPassword()
@@ -409,13 +402,11 @@ class AuthController extends Controller
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if (empty($token) || empty($newPassword) || empty($confirmPassword)) {
-            Session::setFlash('error', __('messages.all_fields_required'));
-            $this->redirect('/reset-password?token=' . $token);
+            $this->respond('/reset-password?token=' . $token, __('messages.all_fields_required'), 'error', 422);
         }
 
         if ($newPassword !== $confirmPassword) {
-            Session::setFlash('error', __('messages.passwords_not_match'));
-            $this->redirect('/reset-password?token=' . $token);
+            $this->respond('/reset-password?token=' . $token, __('messages.passwords_not_match'), 'error', 422, ['errors' => ['confirm_password' => [__('messages.passwords_not_match')]]]);
         }
 
         $db = Database::getInstance();
@@ -424,8 +415,7 @@ class AuthController extends Controller
         $email = $stmt->fetchColumn();
 
         if (!$email) {
-            Session::setFlash('error', __('messages.invalid_reset_token'));
-            $this->redirect('/forgot-password');
+            $this->respond('/forgot-password', __('messages.invalid_reset_token'), 'error', 422);
         }
 
         $newHash = Security::hashPassword($newPassword);
@@ -441,12 +431,10 @@ class AuthController extends Controller
             $db->commit();
             Logger::activity("Password reset successfully using token for email: {$email}");
             
-            Session::setFlash('success', 'Your password has been reset successfully. Please login.');
-            $this->redirect('/login');
+            $this->respond('/login', __('messages.password_reset_success'), 'success');
         } catch (\Exception $e) {
             $db->rollBack();
-            Session::setFlash('error', 'Failed to reset password. Please try again.');
-            $this->redirect('/reset-password?token=' . $token);
+            $this->respond('/reset-password?token=' . $token, __('messages.failed_reset_password'), 'error', 500);
         }
     }
 }
