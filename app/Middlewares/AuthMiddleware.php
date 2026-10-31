@@ -3,6 +3,7 @@
 namespace App\Middlewares;
 
 use App\Core\MiddlewareInterface;
+use App\Core\Redirect;
 use App\Core\Session;
 
 class AuthMiddleware implements MiddlewareInterface
@@ -10,11 +11,24 @@ class AuthMiddleware implements MiddlewareInterface
     public function handle(): bool
     {
         Session::init();
-        
+
         if (!Session::has('user_id')) {
+            // AJAX (axios/fetch): ตอบ 401 JSON ตาม contract ของระบบ — หน้า client จะแจ้ง
+            // "เซสชันหมดอายุ" แล้วพาไปหน้าเข้าสู่ระบบ (กัน toast สำเร็จปลอมจากการตาม redirect ไปเจอ HTML)
+            if ($this->wantsJson()) {
+                http_response_code(401);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'success'         => false,
+                    'type'            => 'error',
+                    'session_expired' => true,
+                    'message'         => __('messages.session_expired'),
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
+            }
+
             // Not logged in, redirect to login page
-            header("Location: /login");
-            exit;
+            Redirect::to('/login');
         }
 
         // Check maintenance mode
@@ -30,12 +44,19 @@ class AuthMiddleware implements MiddlewareInterface
                 $uri = $_SERVER['REQUEST_URI'];
                 if ($uri !== '/profile' && !str_starts_with($uri, '/profile/2fa') && $uri !== '/logout') {
                     Session::setFlash('error', __('auth.force_2fa_warning') ?? 'Administrator policy requires you to enable Two-Factor Authentication.');
-                    header("Location: /profile");
-                    exit;
+                    Redirect::to('/profile');
                 }
             }
         }
 
         return true;
+    }
+
+    /**
+     * ตรวจว่า client ขอ JSON (ใช้ logic เดียวกับ Controller::isAjax)
+     */
+    private function wantsJson(): bool
+    {
+        return \App\Core\Request::wantsJson();
     }
 }

@@ -7,6 +7,44 @@
 
 ## [ยังไม่ปล่อยเวอร์ชัน (Unreleased)]
 ### เพิ่ม (Added)
+- **ระบบทดสอบอัตโนมัติ (PHPUnit):** เพิ่ม `tests/` + `phpunit.xml` ครอบคลุม Security (AES-256-GCM round-trip/tamper, Hashids, sanitize), UploadManager (ปฏิเสธไฟล์ .php ปลอมเป็นรูป, MIME mismatch, base64 magic bytes, ขนาดเกิน), Router (route compilation) และ Language Parity — รันด้วย `vendor/bin/phpunit`
+- **CI Pipeline:** เพิ่ม `.github/workflows/ci.yml` รัน lint + PHPUnit + ตรวจคู่ภาษาอัตโนมัติทุก push (PHP 8.4)
+- **Global CSRF Enforcement:** Router บังคับตรวจ CSRF token ทุก POST/PUT/PATCH/DELETE อัตโนมัติ (ยกเว้น `/api/*` ที่ใช้ JWT และ `/install/*` ก่อนล็อก) — จุดที่เคยหลุด (logout, notifications) ได้รับการคุ้มครองครบ, กรณ fail ตอบ 419 JSON สำหรับ AJAX
+- **Security Headers ทั้งระบบ:** `App\Core\SecurityHeaders` ส่ง X-Frame-Options (DENY), X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS (HTTPS) และ CSP โหมด Report-Only ทุก request
+- **Safe Redirect รวมศูนย์:** `App\Core\Redirect` — redirect ภายในยอมรับเฉพาะ relative path, redirect ภายนอก (OAuth) ต้องผ่าน host allowlist
+- **`App\Core\Request::wantsJson()`:** ตรวจ AJAX/JSON จากจุดเดียว (Controller, Middlewares, ErrorHandler, Router ใช้ร่วมกัน)
+- **`Logger::error()/warning()`:** บันทึก error ระดับระบบลง `storage/logs/error.log` พร้อม metadata อัตโนมัติ (user, IP, URI) + หมุนไฟล์อัตโนมัติเมื่อเกิน 5MB (เก็บ 3 ฉบับ)
+- **Permission Gate ครบระบบ:** Settings ต้องมีสิทธิ์ `settings/view`+`settings/edit`, Logs ต้องมี `logs/view` (เพิ่ม permission ใหม่พร้อม grant ให้ Super Admin/Admin) — sidebar และ Search Palette แสดงเฉพาะเมนู/ผลค้นหาที่มีสิทธิ์
+- **Session หมดอายุระหว่าง AJAX:** AuthMiddleware ตอบ 401 JSON พร้อม `session_expired` → ajax_engine แสดง toast และพาไป `/login` (แก้ปัญหา "toast สำเร็จปลอม")
+- **AJAX Engine 2.0:** ตรวจชนิดข้อมูลตอบกลับก่อนตีความ (กัน HTML หลุดเข้ามา), รองรับ `session_expired`, define `closeActiveModal` ให้ flag `modal_close` ใช้งานได้จริง
+- ฟอร์ม 2FA enable/disable และ Social Disconnect ทั้ง 4 ผู้ให้บริการเป็น AJAX แบบ stay + ยืนยันผ่าน SweetAlert2 (`data-confirm-text`) แทน native `confirm()`
+- ย้ายเครื่องมือ CLI สู่ `cli/`: `compare_lang.php`, `sync_lang.php` (อัปเดตคำสั่งในเอกสารทุกจุด)
+- เพิ่มคีย์ภาษาใหม่ TH/EN ครบถ้วน (upload, csrf, session, delete, secret placeholder ฯลฯ)
+
+### แก้ไข (Fixed)
+- **ปิดช่องโหว่ RCE ผ่านไฟล์อัปโหลด:** ทุก flow (avatar, base64 crop, logo/favicon/พื้นหลัง) ผ่าน `UploadManager` ที่ตรวจ extension whitelist คู่กับ MIME จริง + magic bytes + สร้างชื่อไฟล์สุ่ม (เดิมตรวจเฉพาะ MIME แต่เอา extension จากผู้ใช้ ทำให้อัปโหลด .php ได้)
+- **แก้ toast "สำเร็จ" ปลอม 2 จุด:** `UserController::update` (password complexity / superadmin guard) เปลี่ยนเป็น `respond()` พร้อม errors รายฟิลด์ และ ajax_engine ตรวจ typeof ของ response
+- **แก้ปุ่ม Disconnect Facebook/GitHub ไม่ทำงาน:** เพิ่มใน whitelist ของ `disconnectSocial` พร้อมกันตัดการเชื่อมต่อวิธีเข้าสู่ระบบสุดท้าย (ต้องมีรหัสผ่านหรือโซเชียลอื่นก่อน)
+- **แก้ Social Login + 2FA พัง:** session key ชื่อต่างกัน (`temp_user_id` vs `2fa_pending_user_id`) — unify แล้วพร้อม expiry 5 นาที
+- **RateLimiter เลิกเชื่อ X-Forwarded-For ตามอำเภอใจ:** ใช้ REMOTE_ADDR เป็นหลัก เชื่อ XFF เฉพาะเมื่อตั้ง `TRUSTED_PROXIES` (ปิดช่องบายพาส brute-force lockout)
+- **`?debug=1` ไม่เปิด stack trace บน production แล้ว:** ผูกกับ `APP_DEBUG=true` เท่านั้น หน้า error ใน production แสดงข้อความ generic (ไม่มี file:line) และตอบ JSON สำหรับ AJAX
+- **Token ความปลอดภัย:** reset/verify token เก็บเป็น SHA-256 hash ใน DB, JWT ปฏิเสธ secret ค่า default, อัปเกรด encryption จาก AES-256-CBC เป็น AES-256-GCM (authenticated)
+- **APP_KEY จริงรั่วผ่าน .env.example:** หมุนค่าใหม่, example เว้นว่าง (installer/CLI สุ่มให้อัตโนมัติ), `APP_DEBUG=false` เป็นค่าเริ่มต้น
+- **Stored XSS ผ่านระบบคำแปล:** sanitize ค่าแปลก่อนบันทึก + escape ข้อมูลก่อน highlight ใน Search Palette + escape การแจ้งเตือน + `json_encode` ฝัง `<script>` ใส่ JSON_HEX_* ครบทุกจุด
+- **OAuth Client Secret ไม่ถูก echo กลับหน้าเว็บ:** เปลี่ยนเป็น `type="password"` + ช่องว่าง = คงค่าเดิม
+- **Module Isolation:** ไฟล์ route ของ Module ใดพัง ระบบ log แล้วข้าม — เส้นทางอื่นไม่ล่มตาม (เคยเกิดเหตุจริง)
+- **Router:** ตอบ 405 Method Not Allowed เมื่อ path ตรงแต่ method ไม่ตรง + เตือน log เมื่อ route ซ้ำ
+- **`Logger::error()` ที่ถูกเรียกแต่ไม่มีอยู่จริง** ใน SettingController (เคยเป็น fatal ซ้อนเมื่อเกิด exception)
+- **DataTables:** LIKE search escape `%`/`_`, รองรับ `length=-1` (All), LogController ใช้ `DataTableHelper` ตามกฎ Rule 14 (ลดโค้ดซ้ำ ~140 บรรทัด)
+- **Delete users/roles** reload ตารางแบบเนียน (`ajax.reload`) ไม่กระพริบทั้งหน้า + payload รูปแบบเดียว `{success, message}` + non-AJAX fallback ครบ
+- **ถอด DDL (ALTER TABLE) ออกจาก request จริง** ใน ProfileController (ย้ายเป็น migration เฉยๆ)
+- **2FA pending มีอายุ 5 นาที**, login กัน timing-based username enumeration (dummy verify), `/reset-password` และ `/install/upgrade` มี throttle กัน brute-force และไม่ leak error message
+
+### เปลี่ยนแปลงโครงสร้าง (Changed)
+- **เก็บกวาด Repository:** ลบไฟล์เก่า/ขยะออกจาก git ทั้งหมด (old_*.txt, test_*.php, diff*.txt, AuthController_backup*, scratch/, .mimosa/, รูป uploads จริง, implementation_plan.md, walkthrough.md) + ปรับ `.gitignore` ครอบคลุม (เก็บโครง uploads ผ่าน .gitkeep)
+- **Session Cookie:** เพิ่ม `secure` flag อัตโนมัติเมื่อรันบน HTTPS + เคลียร์ cookie ตอน logout
+- **`.htaccess`:** บล็อกไฟล์อ่อนไหว (.env, .git, storage/, *.log, *.zip, old_/test_/diff files) ทำงานแม้ไม่มี mod_rewrite
+- **เอกสารซิงก์กับโค้ด:** README (phinx → `php cli/migrate.php`, APP_KEY, TRUSTED_PROXIES, Tests/CI), rules.md (§26-27 ใหม่), GEMINI.md (กฎ 19-20 ใหม่), SKILL.md (หัวข้อ 33-34 ใหม่), INSTALL.md (PHP 8.4), .cursor rule
 - เพิ่ม **Global AJAX Form Engine** (`app/Views/layouts/partials/ajax_engine.php`) สำหรับดักจับการส่งฟอร์มทั้งหมดที่มี `data-ajax="true"` ให้ทำงานผ่าน axios โดยหน้าเว็บไม่ต้องรีเฟรช พร้อมปุ่ม Loading (Rule 27), Toast บนกลาง (Rule 28), ไฮไลต์ข้อผิดพลาดรายฟิลด์ และระบบ Pending Toast ที่แสดงต่อเนื่องหลังเปลี่ยนหน้า
 - เพิ่ม **Dual-Response Pattern** ใน `App\Core\Controller` เมธอด `isAjax()` และ `respond()` — ตอบ JSON เมื่อเป็น AJAX และตอบ Redirect + Flash ตามเดิมเมื่อเป็นฟอร์มปกติ (ไม่มี Breaking Changes ต่อโปรเจกต์ที่เชื่อมต่อ)
 - ยกระดับฟอร์มทั้งระบบเป็น AJAX: Settings (ทุกแท็บ), Profile (ข้อมูล/รหัสผ่าน), Users & Roles (สร้าง/แก้ไข) และ Authentication ทั้งหมด (Login, Register, 2FA, Resend Verification, Forgot/Reset Password)

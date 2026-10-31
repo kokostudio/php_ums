@@ -142,7 +142,7 @@
 
 
 <script>
-let currentAuditData = <?= json_encode($auditDataMap ?? new stdClass()) ?>;
+let currentAuditData = <?= json_encode($auditDataMap ?? new stdClass(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 
 $(document).ready(function() {
     const table = $('#auditTable').DataTable({

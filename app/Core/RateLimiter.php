@@ -89,11 +89,23 @@ class RateLimiter
 
     private static function getIpAddress(): string
     {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-        // HTTP_X_FORWARDED_FOR can be a comma-separated list, take the first one
-        if (strpos($ip, ',') !== false) {
-            $ip = explode(',', $ip)[0];
+        // ค่าเริ่มต้น: ใช้ REMOTE_ADDR เท่านั้น (เชื่อถือได้จาก TCP connection)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        // X-Forwarded-For ถูกอ่านได้ "เฉพาะเมื่อ" ระบุ Trusted Proxies ไว้ใน .env (TRUSTED_PROXIES)
+        // มิฉะนั้น header นี้สามารถปลอมแปลงได้จากผู้ใช้งานตรงๆ และจะกลายเป็นช่องทาง
+        // บายพาส brute-force lockout ทั้งระบบ (ส่งค่าสุ่มใหม่ทุก request)
+        $trustedProxies = array_filter(array_map('trim', explode(',', (string) Config::get('TRUSTED_PROXIES', ''))));
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        if ($trustedProxies !== [] && in_array($remoteAddr, $trustedProxies, true)) {
+            $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+            if ($forwarded !== '') {
+                // รายการแรกคือ client ตัวจริงตามมาตรฐาน proxy chain
+                $ip = trim(explode(',', $forwarded)[0]);
+            }
         }
-        return trim($ip);
+
+        return $ip;
     }
 }

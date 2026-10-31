@@ -30,9 +30,14 @@ class AuthController
         }
 
         $db = Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
-        $stmt->execute(['username' => $username]);
-        $user = $stmt->fetch();
+        try {
+            $stmt = $db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+            $stmt->execute(['username' => $username]);
+            $user = $stmt->fetch();
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error('API login query failed: ' . $e->getMessage());
+            return $this->json(['error' => 'Internal server error'], 500);
+        }
 
         if ($user && Security::verifyPassword($password, $user['password'])) {
             if ($user['status'] !== 'active') {
@@ -50,8 +55,11 @@ class AuthController
                 }
             }
 
-            // Generate JWT
-            $secret = $_ENV['JWT_SECRET'] ?? Settings::get('jwt_secret') ?? 'default_secret_please_change';
+            // Generate JWT — ห้ามใช้ secret ค่า default (สอดคล้อง JwtMiddleware ที่ปฏิเสธค่า default)
+            $secret = $_ENV['JWT_SECRET'] ?? Settings::get('jwt_secret') ?? '';
+            if (!is_string($secret) || $secret === '' || $secret === 'default_secret_please_change') {
+                return $this->json(['error' => 'JWT secret is not configured'], 500);
+            }
             $issuedAt = time();
             $expire = $issuedAt + 3600; // 1 hour token
 

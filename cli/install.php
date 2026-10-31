@@ -12,6 +12,15 @@ if (!file_exists($envFile)) {
     if (file_exists($envExample)) {
         copy($envExample, $envFile);
         echo "[-] Copied .env.example to .env\n";
+
+        // สุ่ม APP_KEY ให้อัตโนมัติถ้ายังว่างอยู่ (ใช้ทั้ง Hashids salt และ AES-256-GCM)
+        $envContent = file_get_contents($envFile);
+        $generatedKey = 'base64:' . base64_encode(random_bytes(32));
+        if (preg_match('/^APP_KEY=(.*)$/m', $envContent, $m) && trim($m[1]) === '') {
+            $envContent = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $generatedKey, $envContent, 1);
+            file_put_contents($envFile, $envContent);
+            echo "[-] Generated random APP_KEY\n";
+        }
     } else {
         echo "[!] .env.example not found. Please create .env manually.\n";
     }

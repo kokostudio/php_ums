@@ -81,6 +81,8 @@ return [
     'success'       => 'Success',
     'error'         => 'Error',
     'warning'       => 'Warning',
+    'no_permission' => 'You do not have permission to access this resource',
+    'page_not_found' => 'The page you are looking for could not be found',
 
     // Table
     'id'            => 'ID',

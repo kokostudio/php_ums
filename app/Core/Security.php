@@ -77,14 +77,21 @@ class Security
     }
 
     /**
-     * Encrypt an arbitrary string (e.g. Session ID, tokens) into a URL-safe token using AES-256-CBC
+     * Encrypt an arbitrary string (e.g. Session ID, tokens) into a URL-safe token.
+     *
+     * ใช้ AES-256-GCM (Authenticated Encryption) — ตรวจจับการแก้ไข ciphertext ได้ (tamper-proof)
+     * รูปแบบผลลัพธ์: "v2." + base64url(iv(12) + tag(16) + ciphertext)
      */
     public static function encrypt(string $data): string
     {
-        $key = hash('sha256', $_ENV['APP_KEY'] ?? 'ums_secret_key', true);
-        $iv = openssl_random_pseudo_bytes(16);
-        $ciphertext = openssl_encrypt($data, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
-        return rtrim(strtr(base64_encode($iv . $ciphertext), '+/', '-_'), '=');
+        $key = self::encryptionKey();
+        $iv = random_bytes(12); // GCM แนะนำ IV 12 ไบต์
+        $tag = '';
+        $ciphertext = openssl_encrypt($data, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        if ($ciphertext === false) {
+            throw new \Exception('Encryption failed: unable to encrypt data.', 500);
+        }
+        return 'v2.' . rtrim(strtr(base64_encode($iv . $tag . $ciphertext), '+/', '-_'), '=');
     }
 
     /**
@@ -93,15 +100,32 @@ class Security
      */
     public static function decrypt(string $token): ?string
     {
-        $key = hash('sha256', $_ENV['APP_KEY'] ?? 'ums_secret_key', true);
-        $decoded = base64_decode(strtr($token, '-_', '+/'));
-        if (!$decoded || strlen($decoded) <= 16) {
+        $key = self::encryptionKey();
+
+        if (!str_starts_with($token, 'v2.')) {
+            return null; // รองรับเฉพาะรูปแบบ v2 (GCM)
+        }
+
+        $decoded = base64_decode(strtr(substr($token, 3), '-_', '+/'));
+        if ($decoded === false || strlen($decoded) <= 12 + 16) {
             return null;
         }
-        $iv = substr($decoded, 0, 16);
-        $ciphertext = substr($decoded, 16);
-        $decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        $iv = substr($decoded, 0, 12);
+        $tag = substr($decoded, 12, 16);
+        $ciphertext = substr($decoded, 28);
+        $decrypted = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
         return $decrypted !== false ? $decrypted : null;
+    }
+
+    /**
+     * คีย์สำหรับเข้ารหัส — บังคับให้มี APP_KEY เสมอ (ห้าม fallback ค่า default)
+     */
+    private static function encryptionKey(): string
+    {
+        if (empty($_ENV['APP_KEY'])) {
+            throw new \Exception('APP_KEY is missing in .env file. Encryption key is required.', 500);
+        }
+        return hash('sha256', $_ENV['APP_KEY'], true);
     }
 
     /**

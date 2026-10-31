@@ -316,9 +316,12 @@ php_ums/
 │   └── helpers.php                        <span class="text-blue-400"># Global Helpers (__, formatDate, getSystemThemeConfig, etc.)</span>
 ├── database/migrations/                   <span class="text-blue-400"># 16+ Database Migration Files (12 Core Tables Schema)</span>
 ├── public/                                <span class="text-amber-400"># Web Root (.htaccess, index.php, assets, uploads)</span>
-├── storage/                               <span class="text-red-400"># Logs & Cache (storage/logs/error.log)</span>
-├── compare_lang.php                       <span class="text-yellow-400"># Automated CLI tool verifying 100% TH &lt;-&gt; EN key parity</span>
-└── sync_lang.php                          <span class="text-yellow-400"># Sync file translations to MySQL database</span>
+├── storage/                               <span class="text-red-400"># Logs & Cache (storage/logs/error.log, auto-rotation)</span>
+├── tests/                                 <span class="text-emerald-400"># PHPUnit Tests (Security, UploadManager, Router, Language Parity)</span>
+├── cli/                                   <span class="text-yellow-400"># CLI Tools (install, migrate, deploy, package, compare_lang, sync_lang)</span>
+│   ├── compare_lang.php                   <span class="text-yellow-400"># Automated CLI tool verifying 100% TH &lt;-&gt; EN key parity</span>
+│   └── sync_lang.php                      <span class="text-yellow-400"># Sync file translations to MySQL database</span>
+└── .github/workflows/ci.yml               <span class="text-emerald-400"># CI: lint + phpunit + language parity on every push</span>
 </pre>
         </div>
     </div>

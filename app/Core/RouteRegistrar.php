@@ -106,9 +106,24 @@ class RouteRegistrar
 
     /**
      * require ไฟล์ Route โดยส่ง $router เข้าไป
+     *
+     * Module Isolation: ถ้าไฟล์ Route ของ "Module" ใดพัง (syntax error / logic error)
+     * ระบบจะข้าม Module นั้นแล้วทำงานต่อ — เส้นทางอื่นทั้งระบบไม่ล่มตาม
+     * (เคยเกิดเหตุจริง: TypeError ใน routes.php ของ Module เดียวทำทั้งเว็บ 500 ทุกหน้า)
      */
     private function requireRouteFile(string $file, Router $router): void
     {
-        require $file;
+        $isModule = str_contains($file, $this->modulesPath);
+
+        if (!$isModule) {
+            require $file; // Core System route — พังคือพังจริง ให้โชว์ error ตรงๆ
+            return;
+        }
+
+        try {
+            require $file;
+        } catch (\Throwable $e) {
+            Logger::error('Module route failed to load (skipped): ' . $file . ' — ' . $e->getMessage());
+        }
     }
 }

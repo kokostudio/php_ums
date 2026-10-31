@@ -189,11 +189,11 @@
                         <h4 class="text-sm font-bold text-green-800 dark:text-green-400 mb-1"><?= __('profile.2fa_enabled') ?></h4>
                         <p class="text-xs text-green-700 dark:text-green-500 mb-3"><?= __('profile.2fa_enabled_desc') ?></p>
                         
-                        <form action="/profile/2fa/disable" method="POST" class="flex gap-2">
+                        <form action="/profile/2fa/disable" method="POST" class="flex gap-2" data-ajax="true" data-confirm-text="<?= htmlspecialchars(__('profile.disable_2fa_confirm')) ?>">
                             <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                             <input type="password" name="password" placeholder="<?= __('profile.current_password_placeholder') ?>" required
                                 class="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 rounded border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500">
-                            <button type="submit" onclick="return confirm('<?= __('profile.disable_2fa_confirm') ?>')" class="px-4 py-1.5 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition-colors shadow-sm">
+                            <button type="submit" class="px-4 py-1.5 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition-colors shadow-sm">
                                 <?= __('profile.disable_2fa') ?>
                             </button>
                         </form>
@@ -214,7 +214,7 @@
                             <?= htmlspecialchars($twoFactorSecret) ?>
                         </code>
 
-                        <form action="/profile/2fa/enable" method="POST">
+                        <form action="/profile/2fa/enable" method="POST" data-ajax="true">
                             <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                             <label for="totp_code" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('profile.enter_verification_code') ?></label>
                             <div class="flex gap-2">
@@ -271,7 +271,7 @@
                     </div>
                     <div>
                         <?php if (!empty($user['google_id'])): ?>
-                            <form action="/profile/social/google/disconnect" method="POST" class="inline" onsubmit="event.preventDefault(); confirmDisconnect(this, '<?= addslashes(__('profile.disconnect_confirm_google')) ?>');">
+                            <form action="/profile/social/google/disconnect" method="POST" class="inline" data-ajax="true" data-confirm-text="<?= htmlspecialchars(__('profile.disconnect_confirm_google')) ?>">
                                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                                 <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-xs">
                                     <?= __('profile.disconnect') ?>
@@ -308,7 +308,7 @@
                     </div>
                     <div>
                         <?php if (!empty($user['line_id'])): ?>
-                            <form action="/profile/social/line/disconnect" method="POST" class="inline" onsubmit="event.preventDefault(); confirmDisconnect(this, '<?= addslashes(__('profile.disconnect_confirm_line')) ?>');">
+                            <form action="/profile/social/line/disconnect" method="POST" class="inline" data-ajax="true" data-confirm-text="<?= htmlspecialchars(__('profile.disconnect_confirm_line')) ?>">
                                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                                 <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-xs">
                                     <?= __('profile.disconnect') ?>
@@ -345,7 +345,7 @@
                     </div>
                     <div>
                         <?php if (!empty($user['facebook_id'])): ?>
-                            <form action="/profile/social/facebook/disconnect" method="POST" class="inline" onsubmit="event.preventDefault(); confirmDisconnect(this, '<?= addslashes(__('profile.disconnect_confirm_facebook')) ?>');">
+                            <form action="/profile/social/facebook/disconnect" method="POST" class="inline" data-ajax="true" data-confirm-text="<?= htmlspecialchars(__('profile.disconnect_confirm_facebook')) ?>">
                                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                                 <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-xs">
                                     <?= __('profile.disconnect') ?>
@@ -382,7 +382,7 @@
                     </div>
                     <div>
                         <?php if (!empty($user['github_id'])): ?>
-                            <form action="/profile/social/github/disconnect" method="POST" class="inline" onsubmit="event.preventDefault(); confirmDisconnect(this, '<?= addslashes(__('profile.disconnect_confirm_github')) ?>');">
+                            <form action="/profile/social/github/disconnect" method="POST" class="inline" data-ajax="true" data-confirm-text="<?= htmlspecialchars(__('profile.disconnect_confirm_github')) ?>">
                                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::getCsrfToken() ?>">
                                 <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-xs">
                                     <?= __('profile.disconnect') ?>
@@ -532,29 +532,40 @@
         });
     });
 
-    function confirmDisconnect(form, message) {
+    // ── Confirm Dialog กลางสำหรับฟอร์มที่มี data-confirm-text (กติกา Rule 5: ห้าม confirm() native) ──
+    // ทำงานใน capture phase ก่อน AJAX Engine — ยืนยันผ่าน SweetAlert2 แล้วค่อยปล่อยให้ engine ส่งแบบ AJAX
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+        if (!form.matches || !form.matches('form[data-confirm-text]')) return;
+        if (form.dataset.confirmOk === '1') {
+            form.dataset.confirmOk = '';
+            return; // ผ่านการยืนยันแล้ว — ปล่อยให้ AJAX Engine รับช่วงต่อ
+        }
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         Swal.fire({
             title: '<?= addslashes(__('common.confirm')) ?>',
-            text: message,
+            text: form.dataset.confirmText,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: '<?= addslashes(__('profile.disconnect')) ?>',
+            confirmButtonText: '<?= addslashes(__('common.confirm')) ?>',
             cancelButtonText: '<?= addslashes(__('common.cancel')) ?>',
             reverseButtons: true,
             customClass: {
                 popup: 'dark:bg-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 shadow-2xl rounded-2xl'
             }
         }).then((result) => {
-            if (result.isConfirmed) {
-                const btn = form.querySelector('button[type="submit"]');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base mr-1.5"></i><?= addslashes(__('common.please_wait')) ?>';
-                }
+            if (!result.isConfirmed) return;
+            form.dataset.confirmOk = '1';
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
                 form.submit();
             }
         });
-    }
+    }, true);
 </script>

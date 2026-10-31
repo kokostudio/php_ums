@@ -64,7 +64,7 @@ php_ums/
 │   │   └── logs/                  # หน้าประวัติกิจกรรมและประวัติการแก้ไขข้อมูล
 │   └── helpers.php                # ฟังก์ชันระดับ Global (__, url, asset, formatDate, etc.)
 ├── database/                      # ฐานข้อมูลและการจัดการ Schema
-│   ├── migrations/                # ประวัติการสร้างตาราง (Phinx Migrations)
+│   ├── migrations/                # ประวัติการสร้างตาราง (MigrationRunner ในตัว — php cli/migrate.php)
 │   └── seeds/                     # ข้อมูลเริ่มต้นสำหรับระบบ
 ├── public/                        # เว็บรูทที่เปิดให้เข้าถึงได้จากภายนอก
 │   ├── assets/                    # CSS, JS, รูปภาพ, โลโก้
@@ -115,7 +115,7 @@ php_ums/
    แก้ไขข้อมูลการเชื่อมต่อฐานข้อมูลใน `.env`:
    ```ini
    APP_ENV=local
-   APP_DEBUG=true
+   APP_DEBUG=false
    APP_URL=http://php_ums.localhost
 
    DB_HOST=127.0.0.1
@@ -125,15 +125,21 @@ php_ums/
    DB_PASSWORD=
    ```
 
-4. **รัน Migration และ Seed ข้อมูลเริ่มต้น:**
+   **ความปลอดภัยที่ต้องตั้งเสมอ:**
+   - **`APP_KEY`** — คีย์หลักของระบบ (ใช้ทั้ง Hashids salt และ AES-256-GCM encryption) เว้นว่างได้ Web Installer หรือ `php cli/install.php` จะสุ่มให้อัตโนมัติ หรือสุ่มเองด้วย `php -r "echo 'base64:' . base64_encode(random_bytes(32));"` — **ห้ามใช้ค่าที่เดาได้/ตาม example**
+   - **`TRUSTED_PROXIES`** — ใส่เฉพาะเมื่อรันหลัง reverse proxy (เช่น `127.0.0.1,10.0.0.5`) เพื่อให้ RateLimiter ใช้ `X-Forwarded-For` ได้ ถ้าไม่แน่ใจให้เว้นว่าง
+
+4. **รัน Migration และ Seed ข้อมูลเริ่มต้น (ระบบ Migration ในตัว ไม่ใช้ Phinx):**
    ```bash
-   vendor/bin/phinx migrate
-   vendor/bin/phinx seed:run
+   php cli/install.php   # สร้าง .env + โฟลเดอร์ที่จำเป็น + รัน migration แบบ interactive
+   # หรือรัน migration ตรงๆ:
+   php cli/migrate.php
    ```
+   *(ทางลัด: เปิด `/install` ผ่านเบราว์เซอร์เพื่อใช้ Web Installer Wizard ที่ครบทุกขั้นตอน)*
 
 5. **ซิงค์พจนานุกรมภาษาเข้าสู่ฐานข้อมูล MySQL:**
    ```bash
-   php sync_lang.php
+   php cli/sync_lang.php
    ```
 
 6. **ข้อมูลเข้าสู่ระบบเริ่มต้น (Default Superadmin):**
@@ -147,14 +153,19 @@ php_ums/
 ## 🧪 4. Test: คำสั่งทดสอบและข้อควรระวัง
 
 ### คำสั่งตรวจสอบและทดสอบคุณภาพ:
+* **รัน Unit Tests (PHPUnit):**
+  ```bash
+  vendor/bin/phpunit
+  ```
+  *ครอบคลุม:* Security (encryption/hashids/sanitize), UploadManager (ป้องกันไฟล์ปลอม/polyglot), Router (route compilation), Language Parity — ทั้งหมดรันอัตโนมัติใน CI (`.github/workflows/ci.yml`) ทุก push
 * **ตรวจสอบความสมบูรณ์ของคู่ภาษา (100% Language Parity Check):**
   ```bash
-  php compare_lang.php
+  php cli/compare_lang.php
   ```
   *เกณฑ์ผ่าน:* ผลลัพธ์ต้องแสดง `[]` (Array ว่าง มี Missing Key เป็น 0 เท่านั้น)
 * **ซิงค์คำแปลเข้าสู่ฐานข้อมูล:**
   ```bash
-  php sync_lang.php
+  php cli/sync_lang.php
   ```
 * **รีเฟรช Code Context Graph (Graft Context Engine):**
   ```bash
@@ -206,7 +217,7 @@ php_ums/
 * **Activity Log:** บันทึกการกระทำของผู้ใช้ เช่น ล็อกอิน, สร้าง, แก้ไข, ลบข้อมูล
 * **Audit Log:** บันทึกความเปลี่ยนแปลงของข้อมูลระดับลึก โดยจัดเก็บค่าเก่าและค่าใหม่เป็น JSON เพื่อใช้แสดงผลใน JSON Diff Viewer
 * **Date Formatting:** วันที่ในทุกจุดของระบบต้องแสดงผลในรูปแบบ `d/m/Y` หรือ `d/m/Y H:i:s` ผ่านฟังก์ชัน `formatDate()` เสมอ
-* **PHP 8.1+ Null Safety:** ตัวแปรที่ดึงจากฐานข้อมูลและอาจมีค่าเป็น `null` ต้องครอบด้วย `?? ''` เสมอเมื่อนำไปใช้งานกับฟังก์ชันจัดการ String เพื่อป้องกัน Fatal Error
+* **PHP 8.4+ Null Safety:** ตัวแปรที่ดึงจากฐานข้อมูลและอาจมีค่าเป็น `null` ต้องครอบด้วย `?? ''` เสมอเมื่อนำไปใช้งานกับฟังก์ชันจัดการ String เพื่อป้องกัน Fatal Error
 
 ---
 

@@ -289,7 +289,7 @@ $locale = \App\Core\Lang::locale(); // 'th' or 'en'
 - **Global Effect:** Because Tailwind utilizes `rem` for spacing, padding, and fonts, changing the root font size scales the entire UI proportionally and flawlessly.
 - **Real-time Active State:** For Settings pages with radio/card selectors (e.g., Font Size, Theme), use JavaScript (jQuery) to instantly toggle the active Tailwind classes (`border-primary-*`, `bg-primary-*`) upon click. Always provide a real-time preview (e.g., swapping the class on `<html>`) before the user submits the form.
 
-### 14. PHP 8.1+ Null Safety (Strict Types)
+### 14. PHP 8.4+ Null Safety (Strict Types)
 - **String Functions Compatibility:** In PHP 8.1+, passing `null` to string-expecting functions like `htmlspecialchars()` or `preg_match()` throws a Fatal Error / TypeError.
 - **Null Coalescing Operator:** ALWAYS use the null coalescing operator `?? ''` when working with potentially null values from the database (e.g., `$session['ip_address'] ?? ''`) before rendering them or using them in string operations.
 
@@ -347,7 +347,7 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - [ ] **DOM Standard:** NEVER override `dom:` locally unless absolutely necessary (e.g. removing default search). If you do, use the perfectly balanced grouped layout: `dom: 'rt<"flex flex-col md:flex-row justify-between items-center p-4 border-t border-gray-100 dark:border-slate-800"<"flex items-center text-sm text-gray-500 dark:text-slate-400 gap-4"li>p><"clear">',`. Do NOT use the old `"lip"` grouped flex container as it distorts alignment.
 - [ ] **Layout Footer Balancing:** If adjusting global layout margins, ensure `<main>` does not have excessive bottom padding (`pb-0`) that pushes the footer up, and ensure `<footer>` has symmetrical vertical padding (e.g., `py-4`) so it centers beautifully between the content separator and the bottom of the screen.
 
-### 4. PHP 8.1+ Null Safety
+### 4. PHP 8.4+ Null Safety
 - [ ] Any nullable string variable fetched from the DB MUST use the `?? ''` null coalescing operator before being passed to string functions.
 
 ### 5. Advanced Security & Error Handling
@@ -415,8 +415,8 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - **The Solution:**
   1. Whenever creating any new feature or module, define translation keys in BOTH `app/Lang/th/{file}.php` and `app/Lang/en/{file}.php` simultaneously.
   2. Enforce 1:1 symmetry (0 missing keys) between Thai and English dictionaries.
-  3. Run `php compare_lang.php` to verify parity (must return empty array `[]`).
-  4. Run `php sync_lang.php` to synchronize new keys into the database cache/system.
+  3. Run `php cli/compare_lang.php` to verify parity (must return empty array `[]`).
+  4. Run `php cli/sync_lang.php` to synchronize new keys into the database cache/system.
 
 ### 27. Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม)
 - **The Issue:** Submitting forms or triggering AJAX actions without disabling buttons or providing immediate visual feedback leads to double submissions, duplicate database records, or user confusion.
@@ -512,4 +512,22 @@ To ensure absolute compliance with the system architecture, always verify the fo
 - **The Architecture:**
   1. **File Baseline:** `App\Core\Lang::load()` loads the static PHP language dictionary (`app/Lang/{locale}/{namespace}.php`) as the baseline.
   2. **Database Overlay:** Dynamic translations from MySQL `translations` table are overlaid on top of the file baseline, preserving user custom translations while ensuring all code keys have valid text.
-  3. **100% Symmetric Parity:** All keys must exist identically in both `app/Lang/th/` and `app/Lang/en/`. Always verify with `php compare_lang.php` (must be `[]`) and sync with `php sync_lang.php`.
+  3. **100% Symmetric Parity:** All keys must exist identically in both `app/Lang/th/` and `app/Lang/en/`. Always verify with `php cli/compare_lang.php` (must be `[]`) and sync with `php cli/sync_lang.php`.
+
+### 33. Security Standards: Global CSRF, Security Headers & Upload Manager (SECURITY STANDARD)
+- **Global CSRF (บังคับอัตโนมัติ):** Router บังคับตรวจ CSRF token ทุก POST/PUT/PATCH/DELETE อยู่แล้ว (`App\Core\Router::resolve()`) — **ห้ามเขียน `Security::checkCsrf()` เองใน controller ใหม่** (ซ้ำซ้อน) ยกเว้น route ที่ป้ายยกเว้นไว้ชัดเจน ข้อยกเว้นอัตโนมัติ: `/api/*` (JWT) และ `/install/*` ก่อนมี lock
+- **CSRF fail:** ตอบ 419 JSON `{success, type, message, session_expired, redirect}` สำหรับ AJAX / Flash+Redirect สำหรับฟอร์มปกติ
+- **Security Headers:** `App\Core\SecurityHeaders::send()` ทำงานทุก request (X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, HSTS เมื่อ HTTPS, CSP Report-Only) — ห้ามลบ/แก้โดยไม่เข้าใจผลกระทบ
+- **Upload ทุกจุดต้องผ่าน `App\Core\UploadManager`:** ตรวจ extension whitelist คู่กับ MIME จริง (finfo/magic bytes) + สร้างชื่อไฟล์สุ่ม + จำกัดขนาด — ห้ามเขียน `move_uploaded_file`/`file_put_contents` เองใน controller
+- **Redirect กลาง:** ใช้ `$this->redirect('/path')` (relative เท่านั้น) และ `$this->redirectExternal($url, $allowedHosts)` (host allowlist) — ห้ามเรียก `header('Location: ...')` ตรง
+- **Token:** reset/verify token เก็บเป็น SHA-256 hash ใน DB เสมอ ไม่เก็บค่าดิบ
+- **Trusted Proxies:** `RateLimiter` ใช้ REMOTE_ADDR เป็นหลัก — จะเชื่อ `X-Forwarded-For` เฉพาะเมื่อตั้ง `TRUSTED_PROXIES` ใน .env
+
+### 34. AJAX Dual-Response & Error Contract (FORM STANDARD)
+- **Contract ของ `respond()` (server) ↔ `ajax_engine.php` (client):**
+  `{ success, type, message, redirect, stay, reset_form, reload_table, modal_close, errors, session_expired, updated_files }`
+- **ห้าม setFlash+redirect ในเมธอดที่ฟอร์มเป็น `data-ajax="true"`** — AJAX จะตาม redirect ไปเจอ HTML แล้วเกิด "toast สำเร็จปลอม" ต้องใช้ `respond()` พร้อม `errors` รายฟิลด์เสมอ
+- **Session หมดอายุระหว่าง AJAX:** AuthMiddleware ตอบ 401 JSON พร้อม `session_expired: true` → engine แสดง toast "เซสชันหมดอายุ" แล้วพาไป `/login` — อย่าเขียน logic ซ้ำในหน้าอื่น
+- **ErrorHandler ตอบ JSON** สำหรับ AJAX ทุก 4xx/5xx (ตรวจผ่าน `App\Core\Request::wantsJson()`) — ใช้ helper นี้แทนการเขียนเช็ค header เอง
+- **Confirm dialog ของฟอร์ม AJAX:** ใส่ `data-confirm-text="..."` บน form แล้วใช้ capture-phase listener (ดูตัวอย่างใน `profile/index.php`) — ห้าม `onclick="return confirm()"` (Rule 5)
+- **Delete flow:** controller ใช้ `respond('/path', msg, type, code, ['reload_table' => true])` + JS reload DataTable (`table.ajax.reload(null, false)`) — ไม่ reload ทั้งหน้า

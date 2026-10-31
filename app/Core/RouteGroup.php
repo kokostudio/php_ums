@@ -41,8 +41,7 @@ class RouteGroup extends Router
         $this->post($path, $handler, $middlewares);
 
         $this->get($path, function () use ($redirectUrl): void {
-            header('Location: ' . $redirectUrl);
-            exit;
+            Redirect::to($redirectUrl);
         }, $middlewares);
     }
 

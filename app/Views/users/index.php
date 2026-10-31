@@ -260,13 +260,12 @@ $(document).ready(function() {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 })
                 .then(response => {
-                    Swal.fire('<?= __('common.success') ?>!', response.data.message, 'success')
-                    .then(() => {
-                        window.location.reload();
-                    });
+                    // Toast บนกลาง (Rule 28) + reload ตารางแบบเนียน ไม่กระพริบทั้งหน้า
+                    window.showTopToast('success', response.data.message || '<?= __('common.delete_success') ?>');
+                    table.ajax.reload(null, false);
                 })
                 .catch(error => {
-                    Swal.fire('<?= __('common.error') ?>!', error.response?.data?.message || '<?= __('users.failed_delete') ?>', 'error');
+                    window.showTopToast('error', error.response?.data?.message || '<?= __('users.failed_delete') ?>', 4000);
                 });
             }
         });

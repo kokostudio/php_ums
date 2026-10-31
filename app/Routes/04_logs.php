@@ -11,7 +11,7 @@ use App\Core\Router;
 
 /** @var Router $router */
 
-$router->group('/logs', Groups::auth(), function (Router $r) {
+$router->group('/logs', Groups::authPermission('logs', 'view'), function (Router $r) {
     // ── Activity Log ──
     $r->get('/activity', [LogController::class, 'activity']);
     $r->get('/activity/data', [LogController::class, 'activityData']);

@@ -686,7 +686,7 @@
                     togglePicker(!!(customRadio && customRadio.checked));
 
                     // ── Brand Icon & Logo/Favicon Live Customizer ──
-                    const brandIcons = <?= json_encode(\App\Core\BrandIcon::all()) ?>;
+                    const brandIcons = <?= json_encode(\App\Core\BrandIcon::all(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
                     const logoIconInput = document.getElementById('logo_icon');
                     const logoColorInput = document.getElementById('logo_icon_color');
                     const logoColorPicker = document.getElementById('logo_icon_color_picker');
@@ -1482,7 +1482,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_client_secret') ?></label>
-                                <input type="text" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret'] ?? '') ?>" placeholder="e.g. GOCSPX-xxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <input type="password" name="google_client_secret" autocomplete="new-password" value="" placeholder="<?= !empty($settings['google_client_secret']) ? '•••••••• — ' . __('settings.secret_keep_placeholder') : 'e.g. GOCSPX-xxxxxxxxxxxxxxxx' ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.google_redirect_uri') ?></label>
@@ -1527,7 +1527,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_client_secret') ?></label>
-                                <input type="text" name="line_client_secret" value="<?= htmlspecialchars($settings['line_client_secret'] ?? '') ?>" placeholder="e.g. 84xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <input type="password" name="line_client_secret" autocomplete="new-password" value="" placeholder="<?= !empty($settings['line_client_secret']) ? '•••••••• — ' . __('settings.secret_keep_placeholder') : 'e.g. 84xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.line_redirect_uri') ?></label>
@@ -1572,7 +1572,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.facebook_client_secret') ?></label>
-                                <input type="text" name="facebook_client_secret" value="<?= htmlspecialchars($settings['facebook_client_secret'] ?? '') ?>" placeholder="e.g. a1b2c3d4e5f6xxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <input type="password" name="facebook_client_secret" autocomplete="new-password" value="" placeholder="<?= !empty($settings['facebook_client_secret']) ? '•••••••• — ' . __('settings.secret_keep_placeholder') : 'e.g. a1b2c3d4e5f6xxxxxxxxxxxxxxxx' ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.facebook_redirect_uri') ?></label>
@@ -1617,7 +1617,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.github_client_secret') ?></label>
-                                <input type="text" name="github_client_secret" value="<?= htmlspecialchars($settings['github_client_secret'] ?? '') ?>" placeholder="e.g. 5bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+                                <input type="password" name="github_client_secret" autocomplete="new-password" value="" placeholder="<?= !empty($settings['github_client_secret']) ? '•••••••• — ' . __('settings.secret_keep_placeholder') : 'e.g. 5bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' ?>" class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"><?= __('settings.github_redirect_uri') ?></label>

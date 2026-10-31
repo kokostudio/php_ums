@@ -18,8 +18,7 @@ class GuestMiddleware implements MiddlewareInterface
         Session::init();
 
         if (Session::has('user_id')) {
-            header('Location: /dashboard');
-            exit;
+            \App\Core\Redirect::to('/dashboard');
         }
 
         return true;

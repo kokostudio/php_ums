@@ -43,8 +43,7 @@ class SocialAuthController extends Controller
         ];
 
         $authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
-        header('Location: ' . $authUrl);
-        exit;
+        $this->redirectExternal($authUrl, ['accounts.google.com']);
     }
 
     public function handleGoogleCallback()
@@ -164,8 +163,7 @@ class SocialAuthController extends Controller
         ];
 
         $authUrl = 'https://access.line.me/oauth2/v2.1/authorize?' . http_build_query($params);
-        header('Location: ' . $authUrl);
-        exit;
+        $this->redirectExternal($authUrl, ['access.line.me']);
     }
 
     public function handleLineCallback()
@@ -296,8 +294,7 @@ class SocialAuthController extends Controller
         ];
 
         $authUrl = 'https://www.facebook.com/v19.0/dialog/oauth?' . http_build_query($params);
-        header('Location: ' . $authUrl);
-        exit;
+        $this->redirectExternal($authUrl, ['www.facebook.com']);
     }
 
     public function handleFacebookCallback()
@@ -405,8 +402,7 @@ class SocialAuthController extends Controller
         ];
 
         $authUrl = 'https://github.com/login/oauth/authorize?' . http_build_query($params);
-        header('Location: ' . $authUrl);
-        exit;
+        $this->redirectExternal($authUrl, ['github.com']);
     }
 
     public function handleGithubCallback()
@@ -649,9 +645,11 @@ class SocialAuthController extends Controller
 
     private function finalizeLogin($user, $db)
     {
-        // Check for 2FA
+        // Check for 2FA — ใช้ชื่อ session key เดียวกับ flow ล็อกอินปกติ
+        // (เดิมตั้ง temp_user_id แต่หน้า /login/2fa อ่าน 2fa_pending_user_id ทำให้ flow พัง)
         if (!empty($user['two_factor_enabled'])) {
-            Session::set('temp_user_id', $user['id']);
+            Session::set('2fa_pending_user_id', $user['id']);
+            Session::set('2fa_pending_expires', time() + 300); // หมดอายุใน 5 นาที
             $this->redirect('/login/2fa');
         }
 

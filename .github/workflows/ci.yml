@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo, gd, fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Syntax check (php -l)
+        run: |
+          find app public/index.php cli tests -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+
+      - name: Language parity check (must be [])
+        run: |
+          RESULT=$(php cli/compare_lang.php)
+          echo "$RESULT"
+          [ "$RESULT" = "[]" ]

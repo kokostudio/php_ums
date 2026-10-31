@@ -29,7 +29,6 @@ $router->group('/users', Groups::auth(), function (Router $r) {
 
     // ── GET Fallback: กันไม่ให้เปิด URL ตรง ๆ แล้วได้ 404 (ตามกฎ Rule 8) ──
     $r->get('/{id}/delete', function (): void {
-        header('Location: /users');
-        exit;
+        \App\Core\Redirect::to('/users');
     });
 });

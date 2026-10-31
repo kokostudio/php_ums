@@ -29,8 +29,7 @@ $router->group('/profile', Groups::auth(), function (Router $r) {
 
     // ── GET Fallback (ตามกฎ Rule 8) ──
     $r->get('/sessions/{id}/revoke', function (): void {
-        header('Location: /profile/sessions');
-        exit;
+        \App\Core\Redirect::to('/profile/sessions');
     });
 
     // ── ยกเลิกการเชื่อมต่อบัญชีโซเชียล ──

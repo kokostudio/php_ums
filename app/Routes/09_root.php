@@ -11,8 +11,7 @@ use App\Core\Router;
 
 // ── หน้าแรก → Redirect ไปหน้า Login ──
 $router->get('/', function (): void {
-    header('Location: /login');
-    exit;
+    \App\Core\Redirect::to('/login');
 });
 
 // ── 404 Handler ──

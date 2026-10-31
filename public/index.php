@@ -9,7 +9,8 @@
  */
 
 // Production Diagnostic & Debug Trigger (?debug=1)
-if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+// เปิด display_errors ได้เฉพาะเมื่อ APP_DEBUG=true ใน .env เท่านั้น (กัน stack trace รั่วบน production)
+if (isset($_GET['debug']) && $_GET['debug'] === '1' && getenv('APP_DEBUG') === 'true') {
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
     error_reporting(E_ALL);
@@ -55,6 +56,9 @@ Config::load($rootDir . '/.env');
 
 // 5. Initialize Session (Globally)
 \App\Core\Session::init();
+
+// 5.1 ส่ง Security Headers กลาง (ครอบทุก response รวม 404/error)
+\App\Core\SecurityHeaders::send();
 
 // 6. Initialize Router & Load Modular Routes
 $router = new Router();

@@ -30,7 +30,7 @@ $router->group('', Groups::guest(), function (Router $r) {
     $r->post('/forgot-password', [AuthController::class, 'sendResetLink'], Groups::throttle());
 
     $r->get('/reset-password', [AuthController::class, 'resetPassword']);
-    $r->post('/reset-password', [AuthController::class, 'updatePassword']);
+    $r->post('/reset-password', [AuthController::class, 'updatePassword'], Groups::throttle());
 });
 
 // ── 2FA Login (ต้องยังไม่ Login แบบเต็มระบบ) ──

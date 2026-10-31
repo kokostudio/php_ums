@@ -4,6 +4,13 @@ graft/
 # AutoCode agent memory — local session state, not committed.
 .autocode/
 
+# Agent / scanner local state (Mimosa, ZCode session artifacts)
+.mimosa/
+.zcode/
+
+# One-off working scripts — ใช้เสร็จลบ ไม่เก็บใน repo
+scratch/
+
 # PHP
 vendor/
 .env
@@ -17,10 +24,18 @@ package-lock.json
 *.log
 *.sqlite
 
-# User Uploads & Cache
+# User Uploads & Cache (เก็บโครงสร้างโฟลเดอร์ไว้ผ่าน .gitkeep)
 storage/cache/
 storage/installed.lock
-public/uploads/
+public/uploads/*
+!public/uploads/*/.gitkeep
 
 # Build & Archives
 *.zip
+
+# ไฟล์ทดสอบ/สำรองชั่วคราวที่ห้ามติด repo
+test_*.php
+test_*.html
+old_*
+diff*.txt
+*_backup*

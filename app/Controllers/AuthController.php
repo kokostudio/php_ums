@@ -50,9 +50,20 @@ class AuthController extends Controller
         }
 
         $db = Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
-        $stmt->execute(['username' => $username]);
-        $user = $stmt->fetch();
+        try {
+            $stmt = $db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+            $stmt->execute(['username' => $username]);
+            $user = $stmt->fetch();
+        } catch (\Throwable $e) {
+            Logger::error('Login query failed: ' . $e->getMessage());
+            $this->respond('/login', __('common.unexpected_error'), 'error', 500);
+        }
+
+        // กัน timing-based username enumeration: ถ้าไม่เจอ user ให้ verify กับ hash หลอก
+        // เพื่อให้เวลาตอบสนองใกล้เคียงกรณีเจอ user จริง
+        if (!$user) {
+            Security::verifyPassword($password, '$2y$12$K0t3STUdI0.Dummy.Hash.For.Timing.Xxxxxxxxxxxxxxxxxxxxxxxx');
+        }
 
         if ($user && Security::verifyPassword($password, $user['password'])) {
             if ($user['status'] !== 'active') {
@@ -73,6 +84,7 @@ class AuthController extends Controller
             // Check if 2FA is enabled
             if ($user['two_factor_enabled']) {
                 Session::set('2fa_pending_user_id', $user['id']);
+                Session::set('2fa_pending_expires', time() + 300); // หมดอายุใน 5 นาที
                 $this->respond('/login/2fa', __('common.please_wait'), 'info');
             }
 
@@ -156,6 +168,12 @@ class AuthController extends Controller
             $this->respond('/register', __('messages.password_mismatch'), 'error', 422, ['errors' => ['confirm_password' => [__('messages.password_mismatch')]]]);
         }
 
+        // บังคับนโยบายความซับซ้อนของรหัสผ่านเหมือน flow อื่นของระบบ
+        $complexityErrors = Security::validatePasswordComplexity($password);
+        if ($complexityErrors !== []) {
+            $this->respond('/register', __('messages.password_requirements_not_met'), 'error', 422, ['errors' => ['password' => $complexityErrors]]);
+        }
+
         $db = Database::getInstance();
 
         // Check existing
@@ -175,13 +193,14 @@ class AuthController extends Controller
         
         if ($requireVerification) {
             $token = bin2hex(random_bytes(32));
+            // เก็บเฉพาะ hash ของ token (DB leak ไม่สามารถนำไปยืนยันอีเมลแทนได้)
             $insert = $db->prepare("INSERT INTO users (username, email, password, role_id, status, email_verify_token) VALUES (:username, :email, :password, :role, 'active', :token)");
             $insert->execute([
                 'username' => $username,
                 'email' => $email,
                 'password' => $hashedPassword,
                 'role' => $defaultRole,
-                'token' => $token
+                'token' => hash('sha256', $token)
             ]);
             $verifyLink = \App\Core\Config::get('APP_URL') . "/verify-email?token=" . $token;
             $subject = "Verify your email address";
@@ -216,7 +235,7 @@ class AuthController extends Controller
         
         $db = Database::getInstance();
         $stmt = $db->prepare("SELECT id FROM users WHERE email_verify_token = :token AND email_verified_at IS NULL");
-        $stmt->execute(['token' => $token]);
+        $stmt->execute(['token' => hash('sha256', $token)]);
         $userId = $stmt->fetchColumn();
         
         if (!$userId) {
@@ -247,7 +266,8 @@ class AuthController extends Controller
         
         if ($user && empty($user['email_verified_at'])) {
             $token = bin2hex(random_bytes(32));
-            $db->prepare("UPDATE users SET email_verify_token = :token WHERE id = :id")->execute(['token' => $token, 'id' => $user['id']]);
+            // เก็บเฉพาะ hash ของ token
+            $db->prepare("UPDATE users SET email_verify_token = :token WHERE id = :id")->execute(['token' => hash('sha256', $token), 'id' => $user['id']]);
             $verifyLink = \App\Core\Config::get('APP_URL') . "/verify-email?token=" . $token;
             $subject = "Verify your email address";
             $body = \App\Core\View::renderToString('emails/verify', [
@@ -263,11 +283,22 @@ class AuthController extends Controller
     public function show2faForm()
     {
         Session::init();
-        if (!Session::has('2fa_pending_user_id')) {
+        if (!Session::has('2fa_pending_user_id') || $this->twofaPendingExpired()) {
+            Session::remove('2fa_pending_user_id');
+            Session::remove('2fa_pending_expires');
             $this->redirect('/login');
         }
 
         $this->view('auth/2fa', ['pageTitle' => 'Two-Factor Authentication'], 'auth');
+    }
+
+    /**
+     * สถานะ 2FA pending หมดอายุหรือยัง (5 นาทีหลังกรอกรหัสผ่านสำเร็จ)
+     */
+    private function twofaPendingExpired(): bool
+    {
+        $expires = Session::get('2fa_pending_expires');
+        return !is_int($expires) || time() > $expires;
     }
 
     public function verify2faLogin()
@@ -275,7 +306,9 @@ class AuthController extends Controller
         Session::init();
         Security::checkCsrf();
 
-        if (!Session::has('2fa_pending_user_id')) {
+        if (!Session::has('2fa_pending_user_id') || $this->twofaPendingExpired()) {
+            Session::remove('2fa_pending_user_id');
+            Session::remove('2fa_pending_expires');
             $this->respond('/login', __('messages.session_expired'), 'error', 401);
         }
 
@@ -300,6 +333,7 @@ class AuthController extends Controller
             // Login success
             session_regenerate_id(true);
             Session::remove('2fa_pending_user_id');
+            Session::remove('2fa_pending_expires');
             
             Session::set('user_id', $user['id']);
             Session::set('username', $user['username']);
@@ -351,9 +385,9 @@ class AuthController extends Controller
             // Delete old tokens for this email
             $db->prepare("DELETE FROM password_resets WHERE email = :email")->execute(['email' => $email]);
 
-            // Insert new token
+            // Insert new token — เก็บเฉพาะ hash (DB leak ≠ account takeover)
             $db->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (:email, :token, :expires_at)")
-               ->execute(['email' => $email, 'token' => $token, 'expires_at' => $expiresAt]);
+               ->execute(['email' => $email, 'token' => hash('sha256', $token), 'expires_at' => $expiresAt]);
 
             // Send email
             // Note: Update APP_URL in .env in the future, using localhost for now
@@ -383,8 +417,8 @@ class AuthController extends Controller
 
         $db = Database::getInstance();
         $stmt = $db->prepare("SELECT email FROM password_resets WHERE token = :token AND expires_at > NOW()");
-        $stmt->execute(['token' => $token]);
-        
+        $stmt->execute(['token' => hash('sha256', $token)]);
+
         if (!$stmt->fetchColumn()) {
             Session::setFlash('error', __('messages.invalid_reset_token'));
             $this->redirect('/forgot-password');
@@ -409,9 +443,15 @@ class AuthController extends Controller
             $this->respond('/reset-password?token=' . $token, __('messages.passwords_not_match'), 'error', 422, ['errors' => ['confirm_password' => [__('messages.passwords_not_match')]]]);
         }
 
+        // บังคับนโยบายความซับซ้อนของรหัสผ่านเหมือน flow อื่นของระบบ
+        $complexityErrors = Security::validatePasswordComplexity($newPassword);
+        if ($complexityErrors !== []) {
+            $this->respond('/reset-password?token=' . $token, __('messages.password_requirements_not_met'), 'error', 422, ['errors' => ['new_password' => $complexityErrors]]);
+        }
+
         $db = Database::getInstance();
         $stmt = $db->prepare("SELECT email FROM password_resets WHERE token = :token AND expires_at > NOW()");
-        $stmt->execute(['token' => $token]);
+        $stmt->execute(['token' => hash('sha256', $token)]);
         $email = $stmt->fetchColumn();
 
         if (!$email) {

@@ -13,7 +13,7 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
 2. **100% Complete Bilingual Localization (ใส่ภาษาให้ครบทุกครั้งที่สร้างใหม่):**
    - Never hardcode text strings in views, modals, forms, tables, controllers, or JS. Always use `<?= __('namespace.key') ?>` (or `addslashes(__('namespace.key'))` in JS).
    - Every key added to `app/Lang/th/*.php` MUST be symmetrically added to `app/Lang/en/*.php` with 0 missing keys.
-   - Verify with `php compare_lang.php` (must return `[]`) and run `php sync_lang.php` to update MySQL `translations`.
+   - Verify with `php cli/compare_lang.php` (must return `[]`) and run `php cli/sync_lang.php` to update MySQL `translations`.
 
 3. **Button Preloading & Double-Submit Prevention (สถานะ Preloading ของปุ่ม):**
    - All action and submit buttons must be disabled on click/submit (`btn.disabled = true;`) to prevent duplicate submissions.
@@ -27,7 +27,10 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
 
 5. **Security & Hashids First:** 
    - Never expose raw database IDs. Always use `\App\Core\Security::encodeId($id)` for outbound data and `decodeId($hash)` for inbound data.
-   - All POST/PUT/DELETE requests must include `csrf_token` and be validated with `\App\Core\Security::checkCsrf()`.
+   - **CSRF is enforced globally by the Router** on every POST/PUT/PATCH/DELETE — do NOT call `Security::checkCsrf()` manually in new controllers (only `/api/*` JWT routes and pre-install `/install/*` are exempt).
+   - All file uploads MUST go through `\App\Core\UploadManager` (extension whitelist paired with real MIME/magic-byte checks + randomized filenames). Never call `move_uploaded_file` directly.
+   - Redirects MUST use `$this->redirect('/relative')` / `App\Core\Redirect::to()` (relative paths only) or `$this->redirectExternal($url, $allowedHosts)` — never a raw `header('Location: ...')`.
+   - Reset/verify tokens are stored as SHA-256 hashes; internal encryption uses AES-256-GCM via `Security::encrypt()`.
    - For destructive actions (e.g. Delete, Revoke), NEVER use browser `confirm()`, use `Swal.fire` with `axios.post`.
 
 6. **UI/UX, Styling & Rules:** 
@@ -38,12 +41,21 @@ You are working in a custom PHP 8.4+ MVC Core System. Follow these strict guidel
    - **YouTube Progress Bar:** Keep `progress_bar.php` preloader before `</body>` in layouts.
    - **Sticky Navigation:** Multi-column settings tabs/sidebars must stay sticky on scroll (`lg:sticky lg:top-6 self-start z-10`).
 
-7. **Null Safety (PHP 8.1+):**
+7. **Null Safety (PHP 8.4+):**
    - Variables fetched from the database that may be null MUST use the null coalescing operator (`$var ?? ''`) before being passed to string functions to prevent Fatal Errors.
 
-8. **Error Handling & Rate Limiting:**
-   - Use `App\Core\ErrorHandler` for exceptions. Do not show raw errors in production.
-   - Protect sensitive endpoints against brute-force using `RateLimiter` with sliding time window. Reset on successful login (`RateLimiter::reset('/login')`).
+8. **Error Handling, Logging & Rate Limiting:**
+   - Use `App\Core\ErrorHandler` for exceptions. Do not show raw errors in production. AJAX requests receive JSON per the dual-response contract (checked via `App\Core\Request::wantsJson()`).
+   - Never swallow exceptions silently — every `catch` must log via `Logger::error()` / `Logger::warning()` before responding.
+   - Protect sensitive endpoints against brute-force using `RateLimiter` with sliding time window. Reset on successful login (`RateLimiter::reset('/login')`). `X-Forwarded-For` is honored only when `TRUSTED_PROXIES` is configured in `.env`.
+   - Run `vendor/bin/phpunit` (all green) and `php cli/compare_lang.php` (`[]`) before finishing any task.
+
+12. **AJAX Dual-Response Contract:**
+    - Forms with `data-ajax="true"` MUST be handled by `respond()` only — never `Session::setFlash()` + `redirect()` (produces a fake success toast).
+    - Full contract: `{ success, type, message, redirect, stay, reset_form, reload_table, modal_close, errors, session_expired, updated_files }`.
+    - Session expiry during AJAX: `AuthMiddleware` answers 401 JSON with `session_expired: true`; `ajax_engine` toasts and redirects to `/login` automatically.
+    - Confirmed AJAX forms use `data-confirm-text="..."` + the capture-phase SweetAlert2 listener (see `profile/index.php`); never `onclick="return confirm()"`.
+    - Standard delete flow: `respond(..., ['reload_table' => true])` + `table.ajax.reload(null, false)` — no full page reload.
 
 9. **Social Login & Clipboard UX Standards:**
    - Use clean, self-contained inline vector SVGs for all brand icons (Google, LINE, Facebook, GitHub). Never use external hotlinks (e.g. Wikimedia) that can fail offline or get blocked.

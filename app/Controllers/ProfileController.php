@@ -146,70 +146,46 @@ class ProfileController extends Controller
             ];
 
             if ($usernameChanged) {
-                // Ensure columns exist on users table (Zero-500 Guarantee if migration not yet run)
-                try {
-                    $db->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS username_changes_count INT UNSIGNED NOT NULL DEFAULT 0 AFTER role_id");
-                    $db->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS username_changed_at DATETIME NULL DEFAULT NULL AFTER username_changes_count");
-                } catch (\Throwable $e) {}
-
                 $setClauses[] = 'username = :username';
                 $setClauses[] = 'username_changes_count = username_changes_count + 1';
                 $setClauses[] = 'username_changed_at = NOW()';
                 $params['username'] = $finalUsername;
             }
 
-            // Handle Cropped Profile Image Upload (Base64)
-            if (!empty($_POST['cropped_image'])) {
-                $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $base64Image = $_POST['cropped_image'];
-                list($type, $data) = explode(';', $base64Image);
-                list(, $data)      = explode(',', $data);
-                $data = base64_decode($data);
-                
-                // Determine extension
-                $ext = 'png';
-                if (str_contains($type, 'jpeg') || str_contains($type, 'jpg')) $ext = 'jpg';
-                elseif (str_contains($type, 'webp')) $ext = 'webp';
-                
-                $filename = 'profile_' . $userId . '_' . time() . '.' . $ext;
-                $targetPath = $uploadDir . $filename;
-
-                if (file_put_contents($targetPath, $data)) {
+            // Handle Cropped Profile Image Upload (Base64) — ผ่าน UploadManager
+            // (ตรวจ magic bytes ของข้อมูลจริง + จำกัดขนาด + สร้างชื่อไฟล์สุ่ม)
+            try {
+                if (!empty($_POST['cropped_image'])) {
+                    $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
+                    $filename = \App\Core\UploadManager::handleBase64Image(
+                        (string) $_POST['cropped_image'],
+                        $uploadDir,
+                        'profile_' . $userId . '_'
+                    );
                     $setClauses[] = 'profile_image = :profile_image';
                     $params['profile_image'] = '/uploads/profiles/' . $filename;
                     Session::set('profile_image', '/uploads/profiles/' . $filename);
                 }
-            }
-            // Handle regular Profile Image Upload (Fallback)
-            elseif (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-                $file = $_FILES['profile_image'];
-                $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
-                
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
+                // Handle regular Profile Image Upload (Fallback) — ผ่าน UploadManager
+                elseif (isset($_FILES['profile_image'])) {
+                    $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
+                    $filename = \App\Core\UploadManager::handle(
+                        $_FILES['profile_image'],
+                        $uploadDir,
+                        ['jpg', 'jpeg', 'png', 'gif', 'webp']
+                    );
 
-                // Simple validation
-                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                $fileMimeType = mime_content_type($file['tmp_name']);
-
-                if (in_array($fileMimeType, $allowedMimeTypes)) {
-                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $filename = 'profile_' . $userId . '_' . time() . '.' . $ext;
-                    $targetPath = $uploadDir . $filename;
-
-                    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    if ($filename !== null) {
                         $setClauses[] = 'profile_image = :profile_image';
                         $params['profile_image'] = '/uploads/profiles/' . $filename;
-                        
                         // Update session with new image
                         Session::set('profile_image', '/uploads/profiles/' . $filename);
                     }
                 }
+            } catch (\Exception $e) {
+                // ข้อผิดพลาดของไฟล์อัปโหลด — แสดงสาเหตุจริงให้ผู้ใช้เห็น (ข้อความ i18n จาก UploadManager)
+                $this->respond('/profile', $e->getMessage(), 'error', 422);
+                return;
             }
 
             $updateSql = "UPDATE users SET " . implode(', ', $setClauses) . " WHERE id = :id";
@@ -226,6 +202,7 @@ class ProfileController extends Controller
             $this->respond('/profile', __('messages.profile_updated'), 'success');
             return;
         } catch (\Exception $e) {
+            \App\Core\Logger::error('Failed to update profile: ' . $e->getMessage());
             $this->respond('/profile', __('messages.failed_update_profile'), 'error', 500);
         }
     }
@@ -282,8 +259,7 @@ class ProfileController extends Controller
         $secret = Session::get('2fa_secret');
 
         if (!$secret || empty($code)) {
-            Session::setFlash('error', 'Invalid request.');
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.invalid_2fa_code'), 'error', 422, ['errors' => ['totp_code' => [__('messages.invalid_2fa_code')]]]);
         }
 
         $google2fa = new Google2FA();
@@ -293,16 +269,15 @@ class ProfileController extends Controller
             $db = Database::getInstance();
             $stmt = $db->prepare("UPDATE users SET two_factor_secret = :secret, two_factor_enabled = 1 WHERE id = :id");
             $stmt->execute(['secret' => $secret, 'id' => Session::get('user_id')]);
-            
+
             Session::remove('2fa_secret');
             Session::set('2fa_enabled', true);
             Logger::activity("Enabled Two-Factor Authentication.");
-            Session::setFlash('success', __('messages.2fa_enabled'));
-        } else {
-            Session::setFlash('error', 'Invalid verification code. Please try again.');
+            // redirect กลับหน้าโปรไฟล์เพื่อซ่อน QR/แสดงสถานะเปิดใช้งาน (AJAX ได้ toast ต่อเนื่องที่ปลายทาง)
+            $this->respond('/profile', __('messages.2fa_enabled'), 'success');
         }
 
-        $this->redirect('/profile');
+        $this->respond('/profile', __('messages.invalid_2fa_code'), 'error', 422, ['errors' => ['totp_code' => [__('messages.invalid_2fa_code')]]]);
     }
 
     public function disable2fa()
@@ -318,8 +293,7 @@ class ProfileController extends Controller
         $hash = $stmt->fetchColumn();
 
         if (!Security::verifyPassword($password, $hash)) {
-            Session::setFlash('error', 'Incorrect password. Cannot disable 2FA.');
-            $this->redirect('/profile');
+            $this->respond('/profile', __('messages.incorrect_password_2fa'), 'error', 403, ['errors' => ['password' => [__('messages.incorrect_password_2fa')]]]);
         }
 
         $stmt = $db->prepare("UPDATE users SET two_factor_secret = NULL, two_factor_enabled = 0 WHERE id = :id");
@@ -327,8 +301,8 @@ class ProfileController extends Controller
 
         Session::set('2fa_enabled', false);
         Logger::activity("Disabled Two-Factor Authentication.");
-        Session::setFlash('success', __('messages.2fa_disabled'));
-        $this->redirect('/profile');
+        // redirect กลับมาหน้าโปรไฟล์เพื่อ render สถานะ 2FA ใหม่ (AJAX ได้ toast ต่อเนื่องที่ปลายทาง)
+        $this->respond('/profile', __('messages.2fa_disabled'), 'success');
     }
 
     public function sessions()
@@ -354,8 +328,7 @@ class ProfileController extends Controller
     public function revokeSession($id)
     {
         Security::checkCsrf();
-        $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') || 
-                  (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+        $isAjax = \App\Core\Request::wantsJson();
 
         $db = Database::getInstance();
         $userId = Session::get('user_id');
@@ -391,30 +364,35 @@ class ProfileController extends Controller
         $db = Database::getInstance();
         $userId = Session::get('user_id');
 
-        if (!in_array($provider, ['google', 'line'])) {
-            Session::setFlash('error', 'Invalid provider.');
-            $this->redirect('/profile');
+        // รองรับครบทั้ง 4 ผู้ให้บริการ (เดิมมีเพียง google/line ทำให้ปุ่ม Facebook/GitHub กดแล้วไม่ตัดการเชื่อมต่อ)
+        if (!in_array($provider, ['google', 'line', 'facebook', 'github'], true)) {
+            $this->respond('/profile', __('messages.invalid_provider'), 'error', 422);
         }
 
         $providerColumn = $provider . '_id';
 
-        // Check if user has a password set. If not, they can't disconnect their only login method
-        $stmt = $db->prepare("SELECT password FROM users WHERE id = :id");
+        // ตรวจว่ายังมีวิธีเข้าสู่ระบบเหลืออยู่: ต้องมีรหัสผ่าน หรือบัญชีโซเชียลอื่นที่ยังเชื่อมต่อ
+        $stmt = $db->prepare("SELECT password, google_id, line_id, facebook_id, github_id FROM users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
-        $hash = $stmt->fetchColumn();
+        $user = $stmt->fetch();
 
-        if (empty($hash) || strpos($hash, '$2y$') !== 0) {
-            // User doesn't have a valid password, maybe generated randomly
-            // But wait, we always generate a hashed password. 
-            // So to be safe, we should enforce that they set a password before disconnecting,
-            // but for now we just allow it or we could check if they have at least one other login method.
+        $hasPassword = !empty($user['password']) && str_starts_with((string) $user['password'], '$2y$');
+        $otherSocials = ['google_id', 'line_id', 'facebook_id', 'github_id'];
+        $connectedOthers = 0;
+        foreach ($otherSocials as $col) {
+            if ($col !== $providerColumn && !empty($user[$col])) {
+                $connectedOthers++;
+            }
+        }
+
+        if (!$hasPassword && $connectedOthers === 0) {
+            $this->respond('/profile', __('messages.cannot_disconnect_last_method'), 'error', 422);
         }
 
         $stmt = $db->prepare("UPDATE users SET {$providerColumn} = NULL WHERE id = :id");
         $stmt->execute(['id' => $userId]);
 
         Logger::activity("Disconnected " . ucfirst($provider) . " account.");
-        Session::setFlash('success', ucfirst($provider) . ' account disconnected successfully.');
-        $this->redirect('/profile');
+        $this->respond('/profile', __('messages.provider_disconnected', ['provider' => ucfirst($provider)]), 'success');
     }
 }

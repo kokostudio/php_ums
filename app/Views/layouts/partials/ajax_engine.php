@@ -17,6 +17,7 @@
     var FALLBACK_SUCCESS = <?= json_encode(__('common.success')) ?>;
     var FALLBACK_ERROR   = <?= json_encode(__('common.unexpected_error')) ?>;
     var PLEASE_WAIT      = <?= json_encode(__('common.please_wait')) ?>;
+    var SESSION_EXPIRED  = <?= json_encode(__('messages.session_expired')) ?>;
 
     /* ── Toast CSS (Fade Down/Up) — inject เมื่อหน้านั้นยังไม่มี เช่น layouts/auth.php
           (บน layouts/app.php มีอยู่แล้ว การ inject ซ้ำเป็น CSS ชุดเดียวกัน ไม่กระทบผล) ── */
@@ -154,7 +155,7 @@
         btn.type = 'submit';
         btn.className = 'w-full flex justify-center items-center px-4 py-2 rounded-xl text-sm font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors';
         btn.innerHTML = '<i class="ph ph-envelope-simple mr-2"></i> <span></span>';
-        btn.querySelector('span').textContent = <?= json_encode(__('auth.resend_verification_email')) ?>;
+        btn.querySelector('span').textContent = <?= json_encode(__('auth.resend_verification_email'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 
         form.appendChild(csrf);
         form.appendChild(emailInput);
@@ -163,13 +164,45 @@
         afterForm.insertAdjacentElement('afterend', wrap);
     };
 
+    /* ── ปิด Modal ที่เปิดอยู่ (ใช้กับ flag modal_close จาก respond()) ──
+       รองรับทั้ง modal แบบ <dialog> และ container ที่ซ่อนด้วย class 'hidden' */
+    window.closeActiveModal = function () {
+        var openDialog = document.querySelector('dialog[open]');
+        if (openDialog) {
+            openDialog.close();
+            return true;
+        }
+
+        var modal = document.querySelector('.modal-container:not(.hidden), [data-modal]:not(.hidden)');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.dispatchEvent(new CustomEvent('modal:closed', { bubbles: true }));
+            return true;
+        }
+        return false;
+    };
+
     /* ── ตัวจัดการผลลัพธ์ JSON จาก Controller::respond() ──
-       Contract: { success, type, message, redirect, errors, reload_table, modal_close } */
+       Contract: { success, type, message, redirect, errors, reload_table, modal_close, session_expired } */
     window.handleAjaxFormResult = function (form, payload) {
-        payload = payload || {};
+        // กัน "toast สำเร็จปลอม": ถ้า server ตอบกลับมาเป็น HTML (เช่น ตาม redirect ไปหน้า login
+        // หลัง session หมดอายุ) ไม่ใช่ object ตาม contract — ถือว่าเซสชันหมดอายุ ไม่ใช่ความสำเร็จ
+        if (!payload || typeof payload !== 'object') {
+            payload = { success: false, type: 'error', session_expired: true, message: SESSION_EXPIRED };
+        }
+
         var type = payload.type || (payload.success === false ? 'error' : 'success');
         var isError = payload.success === false || type === 'error' || type === 'warning';
         var message = payload.message || (isError ? FALLBACK_ERROR : FALLBACK_SUCCESS);
+
+        // เซสชันหมดอายุ (401 จาก AuthMiddleware หรือ 419 CSRF): แจ้งแล้วพาไปหน้าเข้าสู่ระบบ
+        if (payload.session_expired) {
+            window.showTopToast('error', message, 4000);
+            setTimeout(function () {
+                window.location.href = payload.redirect || '/login';
+            }, 1200);
+            return;
+        }
 
         if (isError) {
             window.showTopToast(type === 'warning' ? 'warning' : 'error', message, 4000);
@@ -246,12 +279,20 @@
                     url: form.getAttribute('action') || window.location.href,
                     data: formData
                 });
+                // ตรวจชนิดข้อมูลก่อนส่งต่อ — กัน HTML/string หลุดเข้ามาถูกตีความเป็นความสำเร็จ
                 window.handleAjaxFormResult(form, response.data);
             } catch (error) {
                 var res = error && error.response;
                 var payload = (res && res.data && typeof res.data === 'object')
                     ? res.data
                     : { success: false, type: 'error', message: FALLBACK_ERROR };
+
+                // 401 = เซสชันหมดอายุ (AuthMiddleware ตอบ JSON พร้อม flag) — ให้ branch session_expired จัดการ
+                if (res && res.status === 401 && !payload.session_expired) {
+                    payload.session_expired = true;
+                    payload.message = payload.message || SESSION_EXPIRED;
+                }
+
                 window.handleAjaxFormResult(form, payload);
             } finally {
                 form.dataset.ajaxBusy = 'false';

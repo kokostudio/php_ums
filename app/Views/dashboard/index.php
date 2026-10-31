@@ -223,7 +223,7 @@ $username = Session::get('user_username') ?? 'Admin';
                     const ctx = document.getElementById('<?= htmlspecialchars($chart['id']) ?>');
                     if (!ctx) return;
                     
-                    const datasets = <?= json_encode($chart['datasets']) ?>.map(ds => {
+                    const datasets = <?= json_encode($chart['datasets'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>.map(ds => {
                         let colorHex = '#3b82f6';
                         let bgColorHex = 'rgba(59, 130, 246, 0.1)';
                         let hoverBgColorHex = 'rgba(59, 130, 246, 0.2)';
@@ -354,7 +354,7 @@ $username = Session::get('user_username') ?? 'Admin';
                     new Chart(ctx.getContext('2d'), {
                         type: '<?= htmlspecialchars($chart['type'] ?? 'line') ?>',
                         data: {
-                            labels: <?= json_encode($chart['labels'] ?? []) ?>,
+                            labels: <?= json_encode($chart['labels'] ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>,
                             datasets: datasets
                         },
                         options: chartOptions

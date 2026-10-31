@@ -485,6 +485,17 @@ class InstallController extends Controller
     {
         header('Content-Type: application/json; charset=utf-8');
 
+        // Throttle: กันการ brute-force ข้อมูล Super Admin ผ่านหน้านี้ (ใช้กลไกเดียวกับ login)
+        if (!\App\Core\RateLimiter::check('/install/upgrade')) {
+            http_response_code(429);
+            echo json_encode([
+                'success' => false,
+                'message' => 'คุณพยายามเรียกใช้งานบ่อยเกินไป โปรดลองอีกครั้งในภายหลัง'
+            ]);
+            return;
+        }
+        \App\Core\RateLimiter::increment('/install/upgrade');
+
         $isSuperAdmin = (\App\Core\Session::get('role_id') == 1);
 
         $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
@@ -507,6 +518,7 @@ class InstallController extends Controller
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$user || !password_verify($password, $user['password']) || (int)$user['role_id'] !== 1) {
+                    \App\Core\Logger::warning("Failed super admin credential check during web upgrade.");
                     echo json_encode([
                         'success' => false,
                         'message' => 'ชื่อผู้ใช้หรือรหัสผ่าน Super Admin ไม่ถูกต้อง'
@@ -514,9 +526,11 @@ class InstallController extends Controller
                     return;
                 }
             } catch (\Throwable $e) {
+                // ไม่เปิดเผยรายละเอียดข้อผิดพลาดต่อผู้ใช้ภายนอก — เก็บไว้ใน log
+                \App\Core\Logger::error('Upgrade credential check failed: ' . $e->getMessage());
                 echo json_encode([
                     'success' => false,
-                    'message' => 'เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์: ' . $e->getMessage()
+                    'message' => 'เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์ กรุณาลองใหม่อีกครั้ง'
                 ]);
                 return;
             }
@@ -548,6 +562,9 @@ class InstallController extends Controller
             $lockData['upgrade_method'] = 'web_installer';
             @file_put_contents($this->lockFile, json_encode($lockData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
+            // อัปเกรดสำเร็จ — เคลียร์คิว throttle ของ IP นี้
+            \App\Core\RateLimiter::reset('/install/upgrade');
+
             echo json_encode([
                 'success' => true,
                 'message' => empty($applied)
@@ -557,9 +574,11 @@ class InstallController extends Controller
                 'logs' => $logs
             ]);
         } catch (\Throwable $e) {
+            // รายละเอียดผิดพลาดเก็บลง log เท่านั้น (กันเปิดเผยโครงสร้าง/path ของเซิร์ฟเวอร์)
+            \App\Core\Logger::error('Upgrade migration failed: ' . $e->getMessage());
             echo json_encode([
                 'success' => false,
-                'message' => 'เกิดข้อผิดพลาดในการรัน Migration: ' . $e->getMessage()
+                'message' => 'เกิดข้อผิดพลาดในการรัน Migration กรุณาตรวจสอบ log ของระบบ (storage/logs/error.log)'
             ]);
         }
     }

@@ -4,6 +4,7 @@ namespace App\Middlewares;
 
 use App\Core\MiddlewareInterface;
 use App\Core\RBAC;
+use App\Core\Session;
 
 class PermissionMiddleware implements MiddlewareInterface
 {
@@ -18,19 +19,27 @@ class PermissionMiddleware implements MiddlewareInterface
 
     public function handle(): bool
     {
-        if (!RBAC::hasPermission($this->module, $this->action)) {
-            // Check if it's an AJAX request
-            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                http_response_code(403);
-                echo json_encode(['success' => false, 'message' => 'You do not have permission to access this resource.']);
-                exit;
-            }
+        if (RBAC::hasPermission($this->module, $this->action)) {
+            return true;
+        }
 
-            \App\Core\Session::setFlash('error', 'You do not have permission to access this resource.');
-            header("Location: /dashboard");
+        $message = __('common.no_permission');
+
+        // AJAX: ตอบ JSON ตาม contract ของระบบ (Dual-Response Pattern)
+        $isAjax = \App\Core\Request::wantsJson();
+
+        if ($isAjax) {
+            http_response_code(403);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'success' => false,
+                'type'    => 'error',
+                'message' => $message,
+            ], JSON_UNESCAPED_UNICODE);
             exit;
         }
 
-        return true;
+        Session::setFlash('error', $message);
+        \App\Core\Redirect::to('/dashboard');
     }
 }

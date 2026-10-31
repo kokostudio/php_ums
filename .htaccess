@@ -1,5 +1,18 @@
+# ============================================================
+# Standard Core System — Root .htaccess
+# บังคับให้ทุก request วิ่งเข้า public/ และปิดการเข้าถึงไฟล์อ่อนไหว
+# ============================================================
+
+# ── 1. บล็อกไฟล์/โฟลเดอร์อ่อนไหวโดยตรง (ทำงานแม้ไม่มี mod_rewrite เช่น nginx ไม่ใช้ แต่ Apache ใช้ได้ทันที) ──
+<FilesMatch "^\.env|\.env\.(.*)|composer\.(json|lock)|\.git.*|.*\.(log|sql|zip|md)$|^(old_|test_|diff|find_).*$">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # บล็อกโฟลเดอร์ที่ไม่เปิดเผยต่อสาธารณะ
+    RewriteRule ^(storage|database|app|cli|scratch)(/|$) - [F,L]
 
     # Prevent infinite internal recursion loop
     RewriteCond %{REQUEST_URI} ^/public/ [NC]

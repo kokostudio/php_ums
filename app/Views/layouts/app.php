@@ -7,7 +7,7 @@
     // ── Dynamic Theme (Preset หรือ Custom Color Picker) ──
     $theme       = Theme::resolve();
     $sidebarHex  = $theme['background'];
-    $paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
+    $paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
     // ── Cookie-backed Theme Detection (Zero-FOUC Paint-Holding) ──
     $isDark = isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark') : true;
@@ -466,6 +466,15 @@
                     }
                 ?>
                 <div class="sidebar-group">
+                    <?php
+                    // แสดงเมนูบริหารระบบเฉพาะรายการที่ผู้ใช้มีสิทธิ์เข้าถึงเท่านั้น (RBAC)
+                    $canViewUsers    = \App\Core\RBAC::hasPermission('users', 'view');
+                    $canViewRoles    = \App\Core\RBAC::hasPermission('roles', 'view');
+                    $canViewLogs     = \App\Core\RBAC::hasPermission('logs', 'view');
+                    $canViewSettings = \App\Core\RBAC::hasPermission('settings', 'view');
+                    $hasAdminMenu    = $canViewUsers || $canViewRoles || $canViewLogs || $canViewSettings;
+                    ?>
+                    <?php if ($hasAdminMenu): ?>
                     <button type="button" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium <?php echo $isSystemActive ? 'text-white bg-primary-900/50' : 'text-slate-200 hover:text-white hover:bg-primary-900/30' ?>" onclick="$(this).next('.submenu').slideToggle(200); $(this).find('.caret-icon').toggleClass('rotate-90');">
                         <div class="flex items-center">
                             <i class="ph ph-desktop text-lg mr-3"></i>
@@ -477,22 +486,31 @@
                         <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/dashboard') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-squares-four text-lg mr-3 <?php echo strpos($currentUri, '/dashboard') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.dashboard') ?></span>
                         </a>
+                        <?php if ($canViewUsers): ?>
                         <a href="/users" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/users') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-users text-lg mr-3 <?php echo strpos($currentUri, '/users') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.user_management') ?></span>
                         </a>
+                        <?php endif; ?>
+                        <?php if ($canViewRoles): ?>
                         <a href="/roles" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/roles') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-shield-check text-lg mr-3 <?php echo strpos($currentUri, '/roles') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.roles_permissions') ?></span>
                         </a>
+                        <?php endif; ?>
+                        <?php if ($canViewLogs): ?>
                         <a href="/logs/activity" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-activity text-lg mr-3 <?php echo strpos($currentUri, '/logs/activity') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.activity_logs') ?></span>
                         </a>
                         <a href="/logs/audit" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-file-search text-lg mr-3 <?php echo strpos($currentUri, '/logs/audit') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.audit_logs') ?></span>
                         </a>
+                        <?php endif; ?>
+                        <?php if ($canViewSettings): ?>
                         <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium transition-colors <?php echo strpos($currentUri, '/settings') === 0 ? 'text-white bg-primary-900/40 border-l-[3px] border-primary-400' : 'text-slate-300 hover:text-white hover:bg-primary-900/30 border-l-[3px] border-transparent' ?>">
                             <i class="ph ph-gear text-lg mr-3 <?php echo strpos($currentUri, '/settings') === 0 ? 'opacity-100 text-primary-400' : 'opacity-80' ?>"></i> <span><?php echo __('common.system_settings') ?></span>
                         </a>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </nav>
         </div>
@@ -679,6 +697,16 @@
 
             let notificationsOpen = false;
 
+            // Escape HTML สำหรับข้อมูลจาก server ก่อนแทรกด้วย innerHTML (กัน XSS)
+            function escapeHtml(string) {
+                return String(string)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             function fetchNotifications() {
                 axios.get('/api/notifications')
                     .then(response => {
@@ -713,8 +741,8 @@
                     item.innerHTML = `
                         <div class="mt-0.5"><i class="ph-fill ${icon} text-lg"></i></div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${n.title}</p>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 line-clamp-2 mt-0.5">${n.message}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${escapeHtml(String(n.title ?? ''))}</p>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 line-clamp-2 mt-0.5">${escapeHtml(String(n.message ?? ''))}</p>
                             <p class="text-[10px] text-gray-400 mt-1">${formatDate(n.created_at, true)}</p>
                         </div>
                     `;
@@ -994,7 +1022,7 @@
                         color: 'bg-blue-50 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400',
                         getUrl: item => `/users?search=${encodeURIComponent(item.username)}`,
                         formatName: item => `${highlight(item.username, query)} <span class="text-xs text-slate-400 dark:text-slate-500">(${highlight(item.email, query)})</span>`,
-                        formatSub: item => `<span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${item.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400'}">${item.status}</span>`
+                        formatSub: item => `<span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${item.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400'}">${escapeHtml(String(item.status ?? ''))}</span>`
                     },
                     roles: {
                         title: '<?php echo __('common.roles_permissions') ?>',
@@ -1024,8 +1052,9 @@
 
                 function highlight(text, search) {
                     if (!text) return '';
-                    const pattern = new RegExp(`(${escapeRegExp(search)})`, 'gi');
-                    return text.replace(pattern, '<mark class="bg-yellow-100 dark:bg-yellow-500/30 text-yellow-950 dark:text-yellow-100 rounded-sm px-0.5">$1</mark>');
+                    // Escape HTML ของข้อมูลก่อนทุกครั้ง แล้วจึงแทรก <mark> — กัน XSS จากค่าในฐานข้อมูล
+                    const pattern = new RegExp(`(${escapeRegExp(escapeHtml(String(search)))})`, 'gi');
+                    return escapeHtml(String(text)).replace(pattern, '<mark class="bg-yellow-100 dark:bg-yellow-500/30 text-yellow-950 dark:text-yellow-100 rounded-sm px-0.5">$1</mark>');
                 }
 
                 function escapeRegExp(string) {

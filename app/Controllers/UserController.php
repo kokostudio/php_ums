@@ -77,6 +77,7 @@ class UserController extends Controller
             $searchableColumns,
             $orderableColumns,
             'u.id',
+            'DESC',
             $extraWhere,
             $extraParams,
             $baseCountQuery
@@ -224,8 +225,7 @@ class UserController extends Controller
 
         if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin']) || $oldUser['role_id'] == 1) {
             if (Session::get('role_id') != 1 && Session::get('user_id') != $oldUser['id']) {
-                Session::setFlash('error', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.');
-                $this->redirect('/users');
+                $this->respond('/users', __('messages.cannot_edit_superadmin') ?? 'System administrators cannot be edited by lower roles.', 'error', 403);
             }
         }
 
@@ -235,8 +235,7 @@ class UserController extends Controller
         ]);
 
         if (!empty($errors)) {
-            $errorMsg = implode('<br>', array_map(fn($e) => implode('<br>', $e), $errors));
-            $this->respond("/users/{$id}/edit", $errorMsg, 'error', 422, ['errors' => $errors ?? []]);
+            $this->respond("/users/{$id}/edit", __('messages.validation_failed') ?? 'Please correct the errors and try again.', 'error', 422, ['errors' => $errors]);
         }
 
         $username = Security::sanitize($_POST['username']);
@@ -245,9 +244,8 @@ class UserController extends Controller
         if (!empty($password)) {
             $pwdErrors = Security::validatePasswordComplexity($password);
             if (!empty($pwdErrors)) {
-                $errorMsg = implode('<br>', $pwdErrors);
-                Session::setFlash('error', $errorMsg);
-                $this->redirect("/users/{$id}/edit");
+                // ส่ง errors รายฟิลด์ตาม contract — ห้าม setFlash+redirect (ฟอร์มเป็น data-ajax จะได้ toast สำเร็จปลอม)
+                $this->respond("/users/{$id}/edit", __('messages.password_requirements_not_met'), 'error', 422, ['errors' => ['password' => $pwdErrors]]);
             }
         }
         $roleIdHash = $_POST['role_id'] ?? null;
@@ -321,13 +319,13 @@ class UserController extends Controller
         Security::checkCsrf();
         $realId = Security::decodeId($id);
         if (!$realId) {
-            $this->json(['status' => 'error', 'message' => __('messages.invalid_user_id')], 400);
+            $this->respond('/users', __('messages.invalid_user_id'), 'error', 400);
         }
 
         $db = Database::getInstance();
 
         if ($realId == Session::get('user_id')) {
-            $this->json(['success' => false, 'message' => 'You cannot delete yourself.'], 403);
+            $this->respond('/users', __('messages.cannot_delete_self'), 'error', 403);
         }
 
         // Get user for audit
@@ -337,18 +335,19 @@ class UserController extends Controller
 
         if ($oldUser) {
             if (in_array(strtolower($oldUser['username']), ['admin', 'superadmin']) || $oldUser['role_id'] == 1) {
-                $this->json(['success' => false, 'message' => 'System administrators cannot be deleted.'], 403);
+                $this->respond('/users', __('messages.cannot_delete_superadmin'), 'error', 403);
             }
 
             unset($oldUser['password']);
             $db->prepare("DELETE FROM users WHERE id = :id")->execute(['id' => $realId]);
-            
+
             Logger::audit('users', $realId, 'delete', $oldUser, null);
             Logger::activity("Deleted user: {$oldUser['username']}");
-            
-            $this->json(['success' => true, 'message' => 'User deleted successfully.']);
+
+            // respond(): AJAX ได้ JSON {success, message} + non-AJAX ได้ redirect + flash (ตาม Rule 8)
+            $this->respond('/users', __('messages.user_deleted'), 'success', 200, ['reload_table' => true]);
         } else {
-            $this->json(['success' => false, 'message' => __('messages.user_not_found')], 404);
+            $this->respond('/users', __('messages.user_not_found'), 'error', 404);
         }
     }
 }

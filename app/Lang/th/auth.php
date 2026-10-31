@@ -59,4 +59,5 @@ return [
     'all_auth_methods_disabled' => 'การเข้าสู่ระบบถูกปิดชั่วคราว กรุณาติดต่อผู้ดูแลระบบ',
     'login_with_provider'       => 'เข้าสู่ระบบด้วย :provider',
     'username_or_email_placeholder' => 'name@example.com หรือ username',
+    'too_many_attempts'         => 'คุณพยายามส่งคำขอบ่อยเกินไป โปรดลองอีกครั้งในภายหลัง',
 ];

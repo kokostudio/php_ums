@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\DataTableHelper;
 use App\Core\Database;
+use App\Core\Logger;
 use App\Core\Security;
 use App\Core\Session;
 
@@ -19,7 +21,7 @@ class LogController extends Controller
         $db = Database::getInstance();
         $exclusion = $this->getRoleExclusionClause();
         $whereSql = $exclusion ? "WHERE $exclusion" : "";
-        
+
         $query = "
             SELECT a.id, a.action, a.ip_address, a.created_at, u.username
             FROM activity_logs a
@@ -36,72 +38,47 @@ class LogController extends Controller
         ]);
     }
 
+    /**
+     * Activity Logs — Server-side Processing ผ่าน DataTableHelper (Rule 14)
+     */
     public function activityData()
     {
-        $db = Database::getInstance();
-        
-        $draw = $_GET['draw'] ?? 1;
-        $start = $_GET['start'] ?? 0;
-        $length = $_GET['length'] ?? 10;
-        $searchValue = $_GET['search']['value'] ?? '';
+        try {
+            $db = Database::getInstance();
+            $exclusion = $this->getRoleExclusionClause();
 
-        $params = [];
-        $whereConditions = [];
-        
-        $exclusion = $this->getRoleExclusionClause();
-        if ($exclusion) {
-            $whereConditions[] = $exclusion;
+            $result = DataTableHelper::process(
+                $db,
+                $_GET,
+                "SELECT a.id, a.action, a.ip_address, a.created_at, u.username
+                 FROM activity_logs a
+                 LEFT JOIN users u ON a.user_id = u.id",
+                ['a.action', 'u.username', 'a.ip_address'],
+                [0 => 'a.id', 1 => 'a.action', 2 => 'a.ip_address', 3 => 'a.created_at', 4 => 'u.username'],
+                'a.id',
+                'DESC',
+                $exclusion ? [$exclusion] : [],
+                [],
+                $exclusion
+                    ? "SELECT COUNT(a.id) FROM activity_logs a LEFT JOIN users u ON a.user_id = u.id WHERE {$exclusion}"
+                    : null
+            );
+
+            foreach ($result['data'] as &$row) {
+                $row['id'] = Security::encodeId((int) $row['id']);
+            }
+
+            $this->json($result);
+        } catch (\Throwable $e) {
+            Logger::error('Activity logs data failed: ' . $e->getMessage());
+            $this->json([
+                'draw' => intval($_GET['draw'] ?? 1),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => __('common.unexpected_error'),
+            ], 500);
         }
-
-        if (!empty($searchValue)) {
-            $whereConditions[] = "(a.action LIKE :search1 OR u.username LIKE :search2 OR a.ip_address LIKE :search3)";
-            $params['search1'] = "%{$searchValue}%";
-            $params['search2'] = "%{$searchValue}%";
-            $params['search3'] = "%{$searchValue}%";
-        }
-
-        $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
-
-        // Total records (respecting role exclusion)
-        $totalRecordsQuery = "SELECT COUNT(a.id) FROM activity_logs a LEFT JOIN users u ON a.user_id = u.id";
-        if ($exclusion) {
-            $totalRecordsQuery .= " WHERE $exclusion";
-        }
-        $totalRecords = $db->query($totalRecordsQuery)->fetchColumn();
-
-        $stmtFiltered = $db->prepare("SELECT COUNT(a.id) FROM activity_logs a LEFT JOIN users u ON a.user_id = u.id {$whereClause}");
-        $stmtFiltered->execute($params);
-        $totalFiltered = $stmtFiltered->fetchColumn();
-
-        $query = "
-            SELECT a.id, a.action, a.ip_address, a.created_at, u.username
-            FROM activity_logs a
-            LEFT JOIN users u ON a.user_id = u.id
-            {$whereClause}
-            ORDER BY a.id DESC
-            LIMIT :start, :length
-        ";
-        
-        $stmt = $db->prepare($query);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(":$key", $value);
-        }
-        $stmt->bindValue(':start', (int)$start, \PDO::PARAM_INT);
-        $stmt->bindValue(':length', (int)$length, \PDO::PARAM_INT);
-        $stmt->execute();
-        
-        $data = $stmt->fetchAll();
-
-        foreach ($data as &$row) {
-            $row['id'] = Security::encodeId((int)$row['id']);
-        }
-
-        $this->json([
-            "draw" => intval($draw),
-            "recordsTotal" => intval($totalRecords),
-            "recordsFiltered" => intval($totalFiltered),
-            "data" => $data
-        ]);
     }
 
     public function audit()
@@ -109,7 +86,7 @@ class LogController extends Controller
         $db = Database::getInstance();
         $exclusion = $this->getRoleExclusionClause();
         $whereSql = $exclusion ? "WHERE $exclusion" : "";
-        
+
         $query = "
             SELECT a.id, a.table_name, a.record_id, a.action, a.old_values, a.new_values, a.created_at, u.username
             FROM audit_logs a
@@ -126,72 +103,47 @@ class LogController extends Controller
         ]);
     }
 
+    /**
+     * Audit Logs — Server-side Processing ผ่าน DataTableHelper (Rule 14)
+     */
     public function auditData()
     {
-        $db = Database::getInstance();
-        
-        $draw = $_GET['draw'] ?? 1;
-        $start = $_GET['start'] ?? 0;
-        $length = $_GET['length'] ?? 10;
-        $searchValue = $_GET['search']['value'] ?? '';
+        try {
+            $db = Database::getInstance();
+            $exclusion = $this->getRoleExclusionClause();
 
-        $params = [];
-        $whereConditions = [];
-        
-        $exclusion = $this->getRoleExclusionClause();
-        if ($exclusion) {
-            $whereConditions[] = $exclusion;
+            $result = DataTableHelper::process(
+                $db,
+                $_GET,
+                "SELECT a.id, a.table_name, a.record_id, a.action, a.old_values, a.new_values, a.created_at, u.username
+                 FROM audit_logs a
+                 LEFT JOIN users u ON a.user_id = u.id",
+                ['a.table_name', 'a.action', 'u.username'],
+                [0 => 'a.id', 1 => 'a.table_name', 2 => 'a.record_id', 3 => 'a.action', 4 => 'a.created_at', 5 => 'u.username'],
+                'a.id',
+                'DESC',
+                $exclusion ? [$exclusion] : [],
+                [],
+                $exclusion
+                    ? "SELECT COUNT(a.id) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id WHERE {$exclusion}"
+                    : null
+            );
+
+            foreach ($result['data'] as &$row) {
+                $row['id'] = Security::encodeId((int) $row['id']);
+                $row['record_id'] = Security::encodeId((int) $row['record_id']);
+            }
+
+            $this->json($result);
+        } catch (\Throwable $e) {
+            Logger::error('Audit logs data failed: ' . $e->getMessage());
+            $this->json([
+                'draw' => intval($_GET['draw'] ?? 1),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => __('common.unexpected_error'),
+            ], 500);
         }
-
-        if (!empty($searchValue)) {
-            $whereConditions[] = "(a.table_name LIKE :search1 OR a.action LIKE :search2 OR u.username LIKE :search3)";
-            $params['search1'] = "%{$searchValue}%";
-            $params['search2'] = "%{$searchValue}%";
-            $params['search3'] = "%{$searchValue}%";
-        }
-
-        $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
-
-        // Total records (respecting role exclusion)
-        $totalRecordsQuery = "SELECT COUNT(a.id) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id";
-        if ($exclusion) {
-            $totalRecordsQuery .= " WHERE $exclusion";
-        }
-        $totalRecords = $db->query($totalRecordsQuery)->fetchColumn();
-
-        $stmtFiltered = $db->prepare("SELECT COUNT(a.id) FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id {$whereClause}");
-        $stmtFiltered->execute($params);
-        $totalFiltered = $stmtFiltered->fetchColumn();
-
-        $query = "
-            SELECT a.id, a.table_name, a.record_id, a.action, a.old_values, a.new_values, a.created_at, u.username
-            FROM audit_logs a
-            LEFT JOIN users u ON a.user_id = u.id
-            {$whereClause}
-            ORDER BY a.id DESC
-            LIMIT :start, :length
-        ";
-        
-        $stmt = $db->prepare($query);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(":$key", $value);
-        }
-        $stmt->bindValue(':start', (int)$start, \PDO::PARAM_INT);
-        $stmt->bindValue(':length', (int)$length, \PDO::PARAM_INT);
-        $stmt->execute();
-        
-        $data = $stmt->fetchAll();
-
-        foreach ($data as &$row) {
-            $row['id'] = Security::encodeId((int)$row['id']);
-            $row['record_id'] = Security::encodeId((int)$row['record_id']);
-        }
-
-        $this->json([
-            "draw" => intval($draw),
-            "recordsTotal" => intval($totalRecords),
-            "recordsFiltered" => intval($totalFiltered),
-            "data" => $data
-        ]);
     }
 }

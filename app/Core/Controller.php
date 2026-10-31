@@ -13,12 +13,21 @@ abstract class Controller
     }
 
     /**
-     * Redirect to a specific URL
+     * Redirect ไปยังเส้นทางภายในระบบ (relative path เท่านั้น)
+     * การตรวจปลายทางรวมศูนย์อยู่ที่ App\Core\Redirect
      */
     protected function redirect(string $url): void
     {
-        header("Location: {$url}");
-        exit;
+        Redirect::to($url);
+    }
+
+    /**
+     * Redirect ไปยัง URL ภายนอก (เช่น หน้า Authorize ของ OAuth Provider)
+     * บังคับตรวจ host ต่อ allowlist ก่อนเสมอ — ป้องกัน Open Redirect
+     */
+    protected function redirectExternal(string $url, array $allowedHosts): void
+    {
+        Redirect::external($url, $allowedHosts);
     }
 
     /**
@@ -34,13 +43,11 @@ abstract class Controller
 
     /**
      * ตรวจสอบว่า Request ถูกส่งมาแบบ AJAX (axios / fetch) หรือไม่
+     * (logic รวมศูนย์อยู่ที่ App\Core\Request::wantsJson)
      */
     protected function isAjax(): bool
     {
-        $requestedWith = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
-        $accept        = strtolower($_SERVER['HTTP_ACCEPT'] ?? '');
-
-        return $requestedWith === 'xmlhttprequest' || str_contains($accept, 'application/json');
+        return Request::wantsJson();
     }
 
     /**

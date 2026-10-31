@@ -12,9 +12,26 @@ class Session
             ini_set('session.use_only_cookies', '1');
             ini_set('session.cookie_samesite', 'Lax');
 
+            // ส่ง cookie เฉพาะผ่าน HTTPS เท่านั้นเมื่อระบบรันบน HTTPS
+            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+                || ($_SERVER['SERVER_PORT'] ?? '') == '443';
+            if ($isHttps) {
+                ini_set('session.cookie_secure', '1');
+            }
+
             $lifetime = (int)Settings::get('session_lifetime', 120) * 60;
             ini_set('session.gc_maxlifetime', (string)$lifetime);
-            session_set_cookie_params($lifetime);
+
+            $cookieParams = session_get_cookie_params();
+            session_set_cookie_params([
+                'lifetime' => $lifetime,
+                'path'     => $cookieParams['path'] ?? '/',
+                'domain'   => $cookieParams['domain'] ?? '',
+                'secure'   => $isHttps,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
 
             $handler = new DatabaseSessionHandler();
             session_set_save_handler($handler, true);
@@ -50,6 +67,19 @@ class Session
 
     public static function destroy(): void
     {
+        // เคลียร์ session cookie ที่ฝั่ง browser ด้วย (หมดอายุทันที)
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', [
+                'expires'  => time() - 42000,
+                'path'     => $params['path'] ?? '/',
+                'domain'   => $params['domain'] ?? '',
+                'secure'   => (bool) ($params['secure'] ?? false),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+
         session_destroy();
         $_SESSION = [];
     }

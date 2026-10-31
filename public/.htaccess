@@ -5,6 +5,11 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # บล็อกไฟล์ที่อาจหลุดขึ้นมาใน webroot (กันซ้ำซ้อนกับ root rules)
+    <FilesMatch "^\.env|\.(log|sql|zip)$">
+        Require all denied
+    </FilesMatch>
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$

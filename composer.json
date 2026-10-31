@@ -18,10 +18,18 @@
             "app/helpers.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Developer",
             "email": "dev@example.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^13.4"
+    }
 }

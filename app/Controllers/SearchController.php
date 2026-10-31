@@ -72,86 +72,90 @@ class SearchController extends Controller
             ];
         }
 
-        $menus[] = [
-            'title' => __('common.activity_logs') . ' (Activity Logs)',
-            'description' => 'ประวัติกิจกรรมการเข้าใช้งานและการกระทำของผู้ใช้ / User activity history',
-            'url' => '/logs/activity',
-            'icon' => 'ph-activity',
-            'color' => 'bg-teal-50 text-teal-500 dark:bg-teal-900/20 dark:text-teal-400',
-            'keywords' => 'activity logs บันทึกกิจกรรม ประวัติการใช้งาน history actions login'
-        ];
+        if (RBAC::hasPermission('logs', 'view')) {
+            $menus[] = [
+                'title' => __('common.activity_logs') . ' (Activity Logs)',
+                'description' => 'ประวัติกิจกรรมการเข้าใช้งานและการกระทำของผู้ใช้ / User activity history',
+                'url' => '/logs/activity',
+                'icon' => 'ph-activity',
+                'color' => 'bg-teal-50 text-teal-500 dark:bg-teal-900/20 dark:text-teal-400',
+                'keywords' => 'activity logs บันทึกกิจกรรม ประวัติการใช้งาน history actions login'
+            ];
 
-        $menus[] = [
-            'title' => __('common.audit_logs') . ' (Audit Logs)',
-            'description' => 'ประวัติการเปลี่ยนแปลงข้อมูล ตรวจสอบค่าก่อน-หลังแก้ไข / Data changes audit',
-            'url' => '/logs/audit',
-            'icon' => 'ph-file-search',
-            'color' => 'bg-cyan-50 text-cyan-500 dark:bg-cyan-900/20 dark:text-cyan-400',
-            'keywords' => 'audit logs บันทึกการตรวจสอบ ประวัติการแก้ไข diff changes tracking'
-        ];
+            $menus[] = [
+                'title' => __('common.audit_logs') . ' (Audit Logs)',
+                'description' => 'ประวัติการเปลี่ยนแปลงข้อมูล ตรวจสอบค่าก่อน-หลังแก้ไข / Data changes audit',
+                'url' => '/logs/audit',
+                'icon' => 'ph-file-search',
+                'color' => 'bg-cyan-50 text-cyan-500 dark:bg-cyan-900/20 dark:text-cyan-400',
+                'keywords' => 'audit logs บันทึกการตรวจสอบ ประวัติการแก้ไข diff changes tracking'
+            ];
+        }
 
-        $menus[] = [
-            'title' => __('common.system_settings') . ' (System Settings)',
-            'description' => 'การตั้งค่าระบบหลัก ข้อมูลเว็บไซต์ โลโก้ และความปลอดภัย / Core system settings',
-            'url' => '/settings',
-            'icon' => 'ph-gear',
-            'color' => 'bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400',
-            'keywords' => 'settings ตั้งค่าระบบ config configuration ระบบ'
-        ];
+        if (RBAC::hasPermission('settings', 'view')) {
+            $menus[] = [
+                'title' => __('common.system_settings') . ' (System Settings)',
+                'description' => 'การตั้งค่าระบบหลัก ข้อมูลเว็บไซต์ โลโก้ และความปลอดภัย / Core system settings',
+                'url' => '/settings',
+                'icon' => 'ph-gear',
+                'color' => 'bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400',
+                'keywords' => 'settings ตั้งค่าระบบ config configuration ระบบ'
+            ];
 
-        $menus[] = [
-            'title' => 'ตั้งค่าทั่วไป (General Settings)',
-            'description' => 'ชื่อระบบ, โลโก้, Favicon, โหมดปิดปรับปรุง และการเปิดรับสมัครสมาชิก / Site info & maintenance',
-            'url' => '/settings/general',
-            'icon' => 'ph-sliders',
-            'color' => 'bg-orange-50 text-orange-500 dark:bg-orange-900/20 dark:text-orange-400',
-            'keywords' => 'general settings ตั้งค่าทั่วไป logo โลโก้ maintenance ปิดปรับปรุง registration'
-        ];
+            $menus[] = [
+                'title' => 'ตั้งค่าทั่วไป (General Settings)',
+                'description' => 'ชื่อระบบ, โลโก้, Favicon, โหมดปิดปรับปรุง และการเปิดรับสมัครสมาชิก / Site info & maintenance',
+                'url' => '/settings/general',
+                'icon' => 'ph-sliders',
+                'color' => 'bg-orange-50 text-orange-500 dark:bg-orange-900/20 dark:text-orange-400',
+                'keywords' => 'general settings ตั้งค่าทั่วไป logo โลโก้ maintenance ปิดปรับปรุง registration'
+            ];
 
-        $menus[] = [
-            'title' => 'ความปลอดภัย & รหัสผ่าน (Security Settings)',
-            'description' => 'นโยบายรหัสผ่าน บังคับใช้ 2FA สำหรับ Admin / Password policy & 2FA',
-            'url' => '/settings/security',
-            'icon' => 'ph-lock-key',
-            'color' => 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400',
-            'keywords' => 'security password policy ความปลอดภัย รหัสผ่าน 2fa two factor admin'
-        ];
+            $menus[] = [
+                'title' => 'ความปลอดภัย & รหัสผ่าน (Security Settings)',
+                'description' => 'นโยบายรหัสผ่าน บังคับใช้ 2FA สำหรับ Admin / Password policy & 2FA',
+                'url' => '/settings/security',
+                'icon' => 'ph-lock-key',
+                'color' => 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400',
+                'keywords' => 'security password policy ความปลอดภัย รหัสผ่าน 2fa two factor admin'
+            ];
 
-        $menus[] = [
-            'title' => 'ดีไซน์หน้าเข้าสู่ระบบ (Login Appearance)',
-            'description' => 'ลวดลายพื้นหลัง (Pattern) โลโก้ และข้อความหน้าเข้าสู่ระบบ / Login screen design',
-            'url' => '/settings/login',
-            'icon' => 'ph-paint-brush',
-            'color' => 'bg-pink-50 text-pink-500 dark:bg-pink-900/20 dark:text-pink-400',
-            'keywords' => 'login design appearance พื้นหลัง pattern ล็อกอิน หน้าเข้าสู่ระบบ'
-        ];
+            $menus[] = [
+                'title' => 'ดีไซน์หน้าเข้าสู่ระบบ (Login Appearance)',
+                'description' => 'ลวดลายพื้นหลัง (Pattern) โลโก้ และข้อความหน้าเข้าสู่ระบบ / Login screen design',
+                'url' => '/settings/login',
+                'icon' => 'ph-paint-brush',
+                'color' => 'bg-pink-50 text-pink-500 dark:bg-pink-900/20 dark:text-pink-400',
+                'keywords' => 'login design appearance พื้นหลัง pattern ล็อกอิน หน้าเข้าสู่ระบบ'
+            ];
 
-        $menus[] = [
-            'title' => 'เข้าสู่ระบบด้วยโซเชียล (Social Login)',
-            'description' => 'เปิดใช้งานและตั้งค่า API Keys สำหรับ Google และ LINE Login / Google & LINE OAuth',
-            'url' => '/settings/social',
-            'icon' => 'ph-share-network',
-            'color' => 'bg-lime-50 text-lime-600 dark:bg-lime-900/20 dark:text-lime-400',
-            'keywords' => 'social login google line oauth ไลน์ กูเกิล api keys'
-        ];
+            $menus[] = [
+                'title' => 'เข้าสู่ระบบด้วยโซเชียล (Social Login)',
+                'description' => 'เปิดใช้งานและตั้งค่า API Keys สำหรับ Google และ LINE Login / Google & LINE OAuth',
+                'url' => '/settings/social',
+                'icon' => 'ph-share-network',
+                'color' => 'bg-lime-50 text-lime-600 dark:bg-lime-900/20 dark:text-lime-400',
+                'keywords' => 'social login google line oauth ไลน์ กูเกิล api keys'
+            ];
 
-        $menus[] = [
-            'title' => 'จัดการคำแปลภาษา (Translations Manager)',
-            'description' => 'จัดการข้อความแปลภาษาไทย-อังกฤษในระบบ / Multi-language manager',
-            'url' => '/settings/translations',
-            'icon' => 'ph-translate',
-            'color' => 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
-            'keywords' => 'translations language แปลภาษา จัดการภาษา พจนานุกรม i18n locale ภาษาไทย english'
-        ];
+            $menus[] = [
+                'title' => 'จัดการคำแปลภาษา (Translations Manager)',
+                'description' => 'จัดการข้อความแปลภาษาไทย-อังกฤษในระบบ / Multi-language manager',
+                'url' => '/settings/translations',
+                'icon' => 'ph-translate',
+                'color' => 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
+                'keywords' => 'translations language แปลภาษา จัดการภาษา พจนานุกรม i18n locale ภาษาไทย english'
+            ];
 
-        $menus[] = [
-            'title' => __('settings.design_spec') . ' (Design Specification)',
-            'description' => 'เอกสารข้อกำหนดการออกแบบระบบ สถาปัตยกรรม ฐานข้อมูล และมาตรฐาน UI/UX / System architecture & design spec',
-            'url' => '/settings/design_spec',
-            'icon' => 'ph-file-text',
-            'color' => 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 dark:text-indigo-400',
-            'keywords' => 'design spec specification ข้อกำหนดการออกแบบ สถาปัตยกรรม architecture database schema ui ux'
-        ];
+            $menus[] = [
+                'title' => __('settings.design_spec') . ' (Design Specification)',
+                'description' => 'เอกสารข้อกำหนดการออกแบบระบบ สถาปัตยกรรม ฐานข้อมูล และมาตรฐาน UI/UX / System architecture & design spec',
+                'url' => '/settings/design_spec',
+                'icon' => 'ph-file-text',
+                'color' => 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 dark:text-indigo-400',
+                'keywords' => 'design spec specification ข้อกำหนดการออกแบบ สถาปัตยกรรม architecture database schema ui ux'
+            ];
+        }
 
         $menus[] = [
             'title' => (__('profile.title') ?? 'โปรไฟล์ของฉัน') . ' (My Profile)',
@@ -218,48 +222,66 @@ class SearchController extends Controller
         $likeQuery = '%' . $q . '%';
         $db = Database::getInstance();
 
+        // ค้นหาได้เฉพาะหมวดที่ผู้ใช้มีสิทธิ์เข้าถึงเท่านั้น (RBAC) — กันการรั่วข้อมูลข้ามสิทธิ์
+        $canSearchUsers         = RBAC::hasPermission('users', 'view');
+        $canSearchRoles         = RBAC::hasPermission('roles', 'view');
+        $canSearchLogs          = RBAC::hasPermission('logs', 'view');
+        $canSearchTranslations  = RBAC::hasPermission('settings', 'view');
+
         try {
             // 1. Search Users
-            $stmt = $db->prepare("
-                SELECT id, username, email, status 
-                FROM users 
-                WHERE username LIKE :q1 OR email LIKE :q2 
-                LIMIT 5
-            ");
-            $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
-            $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $users = [];
+            if ($canSearchUsers) {
+                $stmt = $db->prepare("
+                    SELECT id, username, email, status
+                    FROM users
+                    WHERE username LIKE :q1 OR email LIKE :q2
+                    LIMIT 5
+                ");
+                $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
+                $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
 
             // 2. Search Roles
-            $stmt = $db->prepare("
-                SELECT id, name, description 
-                FROM roles 
-                WHERE name LIKE :q1 OR description LIKE :q2 
-                LIMIT 5
-            ");
-            $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
-            $roles = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $roles = [];
+            if ($canSearchRoles) {
+                $stmt = $db->prepare("
+                    SELECT id, name, description
+                    FROM roles
+                    WHERE name LIKE :q1 OR description LIKE :q2
+                    LIMIT 5
+                ");
+                $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
+                $roles = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
 
             // 3. Search Activity Logs
-            $stmt = $db->prepare("
-                SELECT al.id, al.action, al.created_at, u.username 
-                FROM activity_logs al 
-                LEFT JOIN users u ON al.user_id = u.id 
-                WHERE al.action LIKE :q1 OR u.username LIKE :q2 
-                ORDER BY al.created_at DESC 
-                LIMIT 5
-            ");
-            $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
-            $logs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $logs = [];
+            if ($canSearchLogs) {
+                $stmt = $db->prepare("
+                    SELECT al.id, al.action, al.created_at, u.username
+                    FROM activity_logs al
+                    LEFT JOIN users u ON al.user_id = u.id
+                    WHERE al.action LIKE :q1 OR u.username LIKE :q2
+                    ORDER BY al.created_at DESC
+                    LIMIT 5
+                ");
+                $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery]);
+                $logs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
 
             // 4. Search Translations
-            $stmt = $db->prepare("
-                SELECT id, namespace, key_name, text_value 
-                FROM translations 
-                WHERE text_value LIKE :q1 OR key_name LIKE :q2 OR namespace LIKE :q3
-                LIMIT 5
-            ");
-            $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery, 'q3' => $likeQuery]);
-            $translations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $translations = [];
+            if ($canSearchTranslations) {
+                $stmt = $db->prepare("
+                    SELECT id, namespace, key_name, text_value
+                    FROM translations
+                    WHERE text_value LIKE :q1 OR key_name LIKE :q2 OR namespace LIKE :q3
+                    LIMIT 5
+                ");
+                $stmt->execute(['q1' => $likeQuery, 'q2' => $likeQuery, 'q3' => $likeQuery]);
+                $translations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
 
             foreach ($users as &$u) {
                 $u['id'] = \App\Core\Security::encodeId((int)$u['id']);
@@ -286,9 +308,10 @@ class SearchController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \App\Core\Logger::error('Search failed: ' . $e->getMessage());
             return $this->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => __('common.unexpected_error')
             ], 500);
         }
     }

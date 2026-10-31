@@ -154,8 +154,8 @@
 - **Global Effect:** ด้วยหลักการนี้ ทำให้ค่า `rem` ทั้งหมดใน Tailwind (เช่น p-4, m-2, text-sm) ถูกยืด/หดตามขนาดที่ผู้ใช้เลือกโดยอัตโนมัติอย่างสมบูรณ์แบบ
 - **Real-time Active State:** หน้าจอตั้งค่า (Settings UI) ควรใช้ JavaScript (jQuery) ในการปรับปรุง Active Class (`border-primary-xxx`, `bg-primary-xxx`) ทันทีที่ผู้ใช้คลิกเลือก และต้องมีการจำลอง (Preview) ข้อมูลทันทีโดยไม่ต้องรอให้โหลดหน้าใหม่ (เช่นเปลี่ยน Class บน <html> ทันที)
 
-## 16. PHP 8.1+ Null Safety (Strict Types)
-- **String Functions Compatibility:** ใน PHP 8.1+ ฟังก์ชันที่รับพารามิเตอร์เป็นข้อความ (เช่น `htmlspecialchars()`, `preg_match()`) จะโยนข้อผิดพลาด Fatal Error / TypeError หากมีการส่งค่า `NULL` เข้าไป
+## 16. PHP 8.4+ Null Safety (Strict Types)
+- **String Functions Compatibility:** ใน PHP 8.1+ ฟังก์ชันที่รับพารามิเตอร์เป็นข้อความ (เช่น `htmlspecialchars()`, `preg_match()`) จะโยนข้อผิดพลาด Fatal Error / TypeError หากมีการส่งค่า `NULL` เข้าไป (โปรเจกต์กำหนด PHP ^8.4 ตาม composer.json)
 - **Null Coalescing Operator:** ต้องใช้การเช็คและใส่ค่าเริ่มต้นด้วยโอเปอเรเตอร์ `?? ''` เสมอเวลาแสดงผลหรือใช้งานตัวแปรที่มาจาก Database ซึ่งอาจจะเป็น `NULL` ได้ (เช่น `$session['ip_address'] ?? ''`) เพื่อความสเถียรของระบบ
 
 ---
@@ -169,12 +169,12 @@
 ### 1. Routing & Controller (หลังบ้าน)
 - [ ] ใช้ **Clean URL** เสมอ (เช่น `/users/create`) ห้ามใช้ Query String เพื่อเปลี่ยนหน้า (เช่น `?page=create`)
 - [ ] ชื่อ Parameter ใน Route ต้อง **ตรงกับตัวแปรใน Controller** เสมอ (ป้องกัน PHP 8 Named Argument Error)
-- [ ] ป้องกัน CSRF เสมอเมื่อรับ POST (ใช้ `\App\Core\Security::checkCsrf()`)
+- [ ] ป้องกัน CSRF: **Router บังคับตรวจ CSRF ให้อัตโนมัติทุก POST/PUT/PATCH/DELETE แล้ว** — ไม่ต้องเรียก `Security::checkCsrf()` เองในโค้ดใหม่ (ดู §26)
 - [ ] ถอดรหัส ID (`decodeId`) ทันทีเมื่อรับค่าจากหน้าเว็บ และเข้ารหัส ID (`encodeId`) ก่อนส่งออกไปที่หน้าเว็บ
 
 ### 2. View, UI, Buttons & Notifications (หน้าบ้าน)
 - [ ] **ใส่ภาษาให้ครบ 100%:** ห้าม Hardcode ข้อความภาษาไทยหรืออังกฤษใน View, JS หรือ Controller — ต้องเรียกผ่าน `__('namespace.key')`
-- [ ] **ความสมมาตรของพจนานุกรม:** มีคีย์คำแปลตรงกัน 1:1 ครบทั้ง `app/Lang/th/` และ `app/Lang/en/` (รัน `php compare_lang.php` ต้องได้ `[]`) และรัน `php sync_lang.php` ซิงค์เข้า MySQL DB
+- [ ] **ความสมมาตรของพจนานุกรม:** มีคีย์คำแปลตรงกัน 1:1 ครบทั้ง `app/Lang/th/` และ `app/Lang/en/` (รัน `php cli/compare_lang.php` ต้องได้ `[]`) และรัน `php cli/sync_lang.php` ซิงค์เข้า MySQL DB
 - [ ] **ระบบภาษา 2 ชั้น & Zero Raw Keys:** ห้ามมีข้อความคีย์ดิบ (เช่น `settings.preset_*`) หลุดออกหน้าจอเด็ดขาด โดย `App\Core\Lang::load()` จะโหลดไฟล์ภาษาในเครื่องเป็น Baseline + DB Overlay เสมอ
 - [ ] **ปุ่มมีสถานะ Preloading:** ปุ่ม Submit และปุ่ม Action ทุกปุ่ม ต้องมีกลไก Disable (`btn.disabled = true;`) ป้องกันการกดซ้ำซ้อน พร้อมแสดงไอคอนหมุน `<i class="ph ph-circle-notch animate-spin mr-2"></i>` และข้อความกำลังโหลดที่แปลภาษาแล้ว
 - [ ] **SweetAlert2 Toast ตำแหน่งบนกลาง:** การแจ้งเตือน Toast ทุกจุดต้องตั้งค่า `position: 'top'` (บนกลาง) เสมอ ห้ามใช้ `top-end`, `top-right` หรือ Native `alert()`
@@ -221,9 +221,13 @@
 ## 19. System Maintenance & Error Handling
 - **Maintenance Mode:** ระบบรองรับโหมดบำรุงรักษา (Maintenance Mode) โดยแสดงหน้า `app/Views/errors/maintenance.php` ป้องกันผู้ใช้ทั่วไปเข้าใช้งานระหว่างอัปเดตระบบ
 - **Error Handling:** จัดการข้อผิดพลาดและ Exception ทั้งหมดผ่าน `App\Core\ErrorHandler` โดยในโหมด Production (`APP_DEBUG=false`) จะซ่อนข้อผิดพลาดไม่ให้แสดงออกหน้าจอ แต่จะบันทึกรายละเอียด (Stack Trace) ลงใน `storage/logs/error.log` แทนเพื่อความปลอดภัย
+- **AJAX ต้องได้ JSON:** เมื่อ request เป็น AJAX (ตรวจผ่าน `App\Core\Request::wantsJson()`) ErrorHandler จะตอบ JSON ตาม contract ของระบบ ไม่ใช่ HTML
+- **Logging ใน catch:** ทุก catch block ต้องบันทึก exception ด้วย `Logger::error()` หรือ `Logger::warning()` ก่อนตอบ error — ห้ามกลืน exception เงียบ (`catch (\Throwable $e) {}`)
+- **Log Rotation:** ไฟล์ `storage/logs/error.log` ถูกหมุนอัตโนมัติเมื่อเกิน 5MB (เก็บสำเนาไว้ 3 ฉบับ)
 
 ## 20. Rate Limiting (Security)
 - **Brute Force Protection:** ระบบมีตาราง `rate_limits` (`ip_address`, `endpoint`, `attempts`, `lockout_time`) เพื่อป้องกันการโจมตีแบบ Brute Force หรือสแปม Request ในจุดสำคัญ เช่น หน้า Login, OTP หรือการร้องขอรีเซ็ตรหัสผ่าน
+- **Trusted Proxies:** `RateLimiter` ใช้ `REMOTE_ADDR` เป็นหลักเสมอ — จะอ่าน `X-Forwarded-For` เฉพาะเมื่อระบุรายการ proxy ที่เชื่อถือได้ใน `.env` (`TRUSTED_PROXIES`) เท่านั้น มิฉะนั้น header นี้ถูกปลอมได้และจะกลายเป็นช่องทางบายพาส lockout
 
 ## 21. Social Login & OAuth Architecture (Google, LINE, Facebook, GitHub)
 - **Multi-Provider Support:** ระบบรองรับ Social Login มาตรฐาน 4 ผู้ให้บริการหลัก ได้แก่ Google, LINE, Facebook และ GitHub ผ่าน `SocialAuthController`
@@ -252,7 +256,7 @@
   - **ผลประโยชน์:** ป้องกันปัญหาคีย์หลุดเป็น Raw Key แม้จะยังไม่ได้รันคำสั่งซิงค์เข้าฐานข้อมูล หรือแม้กระทั่งกรณีฐานข้อมูลขัดข้อง
 - **Symmetric 1:1 Parity & DB Sync:**
   - ต้องประกาศคีย์คำแปลให้ตรงกัน 1:1 ทั้งใน `app/Lang/th/` และ `app/Lang/en/` เสมอ
-  - ก่อนส่งมอบงาน ต้องรัน `php compare_lang.php` (ผลลัพธ์ต้องได้ `[]` เท่านั้น) และรัน `php sync_lang.php` เพื่อซิงค์คำแปลล่าสุดเข้าตาราง `translations`
+  - ก่อนส่งมอบงาน ต้องรัน `php cli/compare_lang.php` (ผลลัพธ์ต้องได้ `[]` เท่านั้น) และรัน `php cli/sync_lang.php` เพื่อซิงค์คำแปลล่าสุดเข้าตาราง `translations`
 
 ## 25. Modular Routing Architecture & php_health Compatibility (สถาปัตยกรรม Route แบบแยก Domain และความเข้ากันได้กับ php_health)
 - **แยกไฟล์ Route ตาม Domain (Domain-Driven):** Route หลักของระบบต้องถูกแยกออกเป็นไฟล์ย่อยใน `app/Routes/` (เช่น `01_auth.php`, `02_users.php`, `03_roles.php`, `04_logs.php`, `05_settings.php`, `06_profile.php`, `07_dashboard.php`, `08_api.php`, `09_root.php`) ห้ามเขียน Route รวมกันใน `public/index.php` เด็ดขาด เพื่อให้ไฟล์ `public/index.php` มีขนาดกะทัดรัดและคลีนที่สุด
@@ -262,3 +266,21 @@
   2. แบบ Shorthand สไตล์ `php_ums`: `$router->group('/prefix', Groups::auth(), function(Router $r) { ... })`
   3. มีเมธอด `$router->deleteWithFallback($path, $handler, $redirectUrl)` เพื่อรองรับการลบข้อมูลพร้อม Fallback ตาม Rule 8 ได้อย่างสะดวก
 - **PHP 8+ Parameter Reflection Safety:** Router ต้องใช้ `ReflectionFunctionAbstract` ในการตรวจสอบพารามิเตอร์ของ Callback เพื่อส่งเฉพาะ Named Parameters ที่ฟังก์ชันยอมรับ ป้องกัน Error `Fatal error: Unknown named parameter` เมื่อเรียกใช้งาน Closure ที่ไม่มีการประกาศพารามิเตอร์กับ Route ที่มีไดนามิกพารามิเตอร์ (เช่น `{id}`)
+- **Module Isolation:** ถ้าไฟล์ route ของ Module ใดพัง (syntax/logic error) ระบบจะบันทึก `Logger::error` แล้วข้าม Module นั้นไป — เส้นทางอื่นทั้งระบบต้องใช้งานได้ตามปกติ
+
+## 26. Global CSRF, Security Headers & Safe Redirects (ความปลอดภัยระดับระบบ)
+- **CSRF บังคับอัตโนมัติ:** `App\Core\Router` ตรวจ CSRF token ทุก POST/PUT/PATCH/DELETE ให้อยู่แล้ว — controller ใหม่ **ห้ามเรียก `Security::checkCsrf()` เอง** (ซ้ำซ้อน) ข้อยกเว้นอัตโนมัติมีเพียง `/api/*` (ยืนยันด้วย JWT) และ `/install/*` ก่อนสร้าง lock file
+- **CSRF Failure:** ตอบ 419 — เป็น AJAX ได้ JSON `{success:false, session_expired:true, redirect}` ตาม contract / ฟอร์มปกติได้ Flash + Redirect กลับหน้าเดิม
+- **Security Headers:** `App\Core\SecurityHeaders::send()` ทำงานทุก request (X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy, Permissions-Policy, HSTS เมื่อ HTTPS, CSP โหมด Report-Only) — ห้ามลบออกโดยพลการ
+- **Session Cookie:** httponly + SameSite=Lax เสมอ และเป็น `secure` อัตโนมัติเมื่อระบบรันบน HTTPS
+- **Upload ผ่าน UploadManager เท่านั้น:** ทุก flow อัปโหลดต้องใช้ `App\Core\UploadManager` (extension whitelist คู่กับ MIME จริง + ตรวจ magic bytes สำหรับ base64 + สร้างชื่อไฟล์สุ่ม + จำกัดขนาด) — ห้ามเรียก `move_uploaded_file` หรือเขียนไฟล์ผู้ใช้ลงดิสก์เองใน controller
+- **Safe Redirects:** ใช้ `$this->redirect('/relative/path')` หรือ `App\Core\Redirect::to()` (ยอมรับเฉพาะ relative path — กัน open redirect) และ `$this->redirectExternal($url, $allowedHosts)` สำหรับ URL ภายนอก (host allowlist) — **ห้ามเรียก `header('Location: ...')` ตรงในโค้ดใหม่**
+- **Token Storage:** reset token / email verify token ต้องเก็บเป็น SHA-256 hash ในฐานข้อมูลเสมอ (ไม่เก็บค่าดิบ)
+- **Encryption:** การเข้ารหัสภายในระบบใช้ AES-256-GCM (authenticated) ผ่าน `Security::encrypt()` — ห้ามใช้ CBC หรือ algorithm ที่ไม่มี authentication
+
+## 27. AJAX Dual-Response & Session Contract (สัญญา AJAX สองทาง)
+- **respond() เท่านั้นสำหรับฟอร์ม `data-ajax="true"`:** ห้าม `Session::setFlash()` + `redirect()` ในเมธอดที่รับฟอร์ม AJAX (axios จะตาม redirect ไปเจอ HTML แล้วเกิด toast สำเร็จปลอม) — ใช้ `respond()` พร้อม `errors` รายฟิลด์เมื่อ validation fail
+- **Contract เต็ม:** `{ success, type, message, redirect, stay, reset_form, reload_table, modal_close, errors, session_expired, updated_files }`
+- **Session หมดอายุระหว่าง AJAX:** `AuthMiddleware` ตอบ 401 JSON พร้อม `session_expired: true` → `ajax_engine` แสดง toast และพาไป `/login` อัตโนมัติ — ห้ามเขียน logic นี้ซ้ำในหน้าอื่น
+- **ฟอร์มยืนยันก่อนส่ง (AJAX):** ใช้ `data-confirm-text="..."` บน form + capture-phase SweetAlert2 listener (ตัวอย่างใน `profile/index.php`) — ห้าม `onclick="return confirm()"`
+- **Delete Flow มาตรฐาน:** controller ตอบ `respond('/path', msg, type, code, ['reload_table' => true])` + JS เรียก `table.ajax.reload(null, false)` — ไม่ reload ทั้งหน้า

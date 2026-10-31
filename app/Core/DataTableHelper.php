@@ -27,6 +27,7 @@ class DataTableHelper
         array $searchableColumns,
         array $orderableColumns,
         string $defaultOrderColumn = 'id',
+        string $defaultOrderDir = 'DESC',
         array $extraWhereConditions = [],
         array $extraParams = [],
         ?string $countQuery = null
@@ -42,10 +43,13 @@ class DataTableHelper
         // 1. Global Search
         if (!empty($searchValue) && !empty($searchableColumns)) {
             $searchConditions = [];
+            // Escape อักขระพิเศษของ LIKE (% _ \) ให้เป็นตัวอักษรธรรมดา —
+            // ไม่งั้นผู้ใช้พิมพ์ "%" หนึ่งตัวจะกลายเป็น wildcard จับคู่ทุกแถว
+            $escapedSearch = addcslashes($searchValue, '\\%_');
             foreach ($searchableColumns as $i => $column) {
                 $paramName = "dt_search_{$i}";
                 $searchConditions[] = "{$column} LIKE :{$paramName}";
-                $params[$paramName] = "%{$searchValue}%";
+                $params[$paramName] = "%{$escapedSearch}%";
             }
             $whereConditions[] = "(" . implode(" OR ", $searchConditions) . ")";
         }
@@ -57,7 +61,7 @@ class DataTableHelper
 
         // 2. Ordering
         $orderColumnIndex = $request['order'][0]['column'] ?? 0;
-        $orderDir = $request['order'][0]['dir'] ?? 'desc';
+        $orderDir = $request['order'][0]['dir'] ?? $defaultOrderDir;
         $orderColumn = $orderableColumns[$orderColumnIndex] ?? $defaultOrderColumn;
         $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
 
@@ -80,14 +84,20 @@ class DataTableHelper
         $totalFiltered = $stmtFiltered->fetchColumn();
 
         // 5. Fetch Data
-        $query = "{$baseQuery} {$whereClause} ORDER BY {$orderColumn} {$orderDir} LIMIT :start, :length";
-        
+        // length = -1 (ตัวเลือก "All" ของ DataTables) ใช้ LIMIT ไม่ได้ — ดึงทั้งหมดแทน
+        $isFetchAll = ((int) $length) < 0;
+        $query = $isFetchAll
+            ? "{$baseQuery} {$whereClause} ORDER BY {$orderColumn} {$orderDir}"
+            : "{$baseQuery} {$whereClause} ORDER BY {$orderColumn} {$orderDir} LIMIT :start, :length";
+
         $stmt = $db->prepare($query);
         foreach ($params as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
-        $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
-        $stmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
+        if (!$isFetchAll) {
+            $stmt->bindValue(':start', (int) $start, PDO::PARAM_INT);
+            $stmt->bindValue(':length', (int) $length, PDO::PARAM_INT);
+        }
         $stmt->execute();
         
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

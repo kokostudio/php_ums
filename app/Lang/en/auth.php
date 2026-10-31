@@ -59,4 +59,5 @@ return [
     'all_auth_methods_disabled' => 'Sign in is currently disabled. Please contact the system administrator.',
     'login_with_provider'       => 'Sign in with :provider',
     'username_or_email_placeholder' => 'name@example.com or username',
+    'too_many_attempts'         => 'Too many attempts. Please try again later.',
 ];

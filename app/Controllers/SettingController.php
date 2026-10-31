@@ -82,9 +82,22 @@ class SettingController extends Controller
         $textKeys = $textKeysByTab[$tab] ?? [];
         $fileKeys = $fileKeysByTab[$tab] ?? [];
 
+        // ค่าลับ (Client Secret): หน้าเว็บไม่ echo ค่ากลับมา — ช่องว่างจึงหมายถึง "คงค่าเดิม"
+        $secretKeys = [
+            'google_client_secret', 'line_client_secret',
+            'facebook_client_secret', 'github_client_secret',
+        ];
+
         try {
             // 1. Text Inputs
             foreach ($textKeys as $key) {
+                if (in_array($key, $secretKeys, true)) {
+                    $value = trim((string) ($_POST[$key] ?? ''));
+                    if ($value !== '') {
+                        Settings::set($key, Security::sanitize($value));
+                    }
+                    continue;
+                }
                 if (isset($_POST[$key])) {
                     Settings::set($key, Security::sanitize($_POST[$key]));
                 }
@@ -217,35 +230,40 @@ class SettingController extends Controller
                 }
             }
 
-            // 2. File Uploads
+            // 2. File Uploads — ผ่าน UploadManager (extension whitelist + ตรวจ MIME ตรงคู่ + ชื่อไฟล์สุ่ม)
             $uploadDir = __DIR__ . '/../../public/uploads/settings/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
             $updatedFiles = []; // เก็บ path รูปใหม่เพื่อส่งกลับไปอัปเดต preview แบบ AJAX
 
             foreach ($fileKeys as $fileKey) {
-                if (isset($_FILES[$fileKey]) && $_FILES[$fileKey]['error'] === UPLOAD_ERR_OK) {
-                    $tmpName = $_FILES[$fileKey]['tmp_name'];
-                    $name    = basename($_FILES[$fileKey]['name']);
-                    $mime    = mime_content_type($tmpName);
+                if (!isset($_FILES[$fileKey])) {
+                    continue;
+                }
 
-                    if (strpos($mime, 'image/') === 0) {
-                        $ext      = pathinfo($name, PATHINFO_EXTENSION);
-                        $safeName = $fileKey . '_' . time() . '.' . $ext;
-                        $destination = $uploadDir . $safeName;
-                        if (move_uploaded_file($tmpName, $destination)) {
-                            Settings::set($fileKey, '/uploads/settings/' . $safeName);
-                            $updatedFiles[$fileKey] = '/uploads/settings/' . $safeName;
-                            if ($fileKey === 'site_logo') {
-                                Settings::set('logo_type', 'image');
-                            } elseif ($fileKey === 'site_favicon') {
-                                Settings::set('favicon_type', 'image');
-                            }
+                try {
+                    // favicon รองรับ .ico เพิ่ม, ส่วนโลโก้/พื้นหลังเป็นรูปทั่วไป
+                    $allowedExt = $fileKey === 'site_favicon'
+                        ? ['ico', 'png', 'gif', 'jpg', 'jpeg']
+                        : ['jpg', 'jpeg', 'png', 'gif', 'webp', 'ico'];
+
+                    $safeName = \App\Core\UploadManager::handle(
+                        $_FILES[$fileKey],
+                        $uploadDir,
+                        $allowedExt
+                    );
+
+                    if ($safeName !== null) {
+                        Settings::set($fileKey, '/uploads/settings/' . $safeName);
+                        $updatedFiles[$fileKey] = '/uploads/settings/' . $safeName;
+                        if ($fileKey === 'site_logo') {
+                            Settings::set('logo_type', 'image');
+                        } elseif ($fileKey === 'site_favicon') {
+                            Settings::set('favicon_type', 'image');
                         }
-                    } else {
-                        throw new \Exception("File uploaded for {$fileKey} is not a valid image.");
                     }
+                } catch (\Exception $e) {
+                    // ข้อผิดพลาดไฟล์ — แสดงสาเหตุจริง (ข้อความ i18n จาก UploadManager)
+                    $this->respond("/settings/{$tab}", $e->getMessage(), 'error', 422);
+                    return;
                 }
             }
 
@@ -256,7 +274,7 @@ class SettingController extends Controller
 
         } catch (\Throwable $e) {
             \App\Core\Logger::error("Failed to update system settings (tab: {$tab}): " . $e->getMessage());
-            $this->respond("/settings/{$tab}", __('settings.failed_update_settings') . ' ' . $e->getMessage(), 'error', 500);
+            $this->respond("/settings/{$tab}", __('settings.failed_update_settings'), 'error', 500);
         }
     }
 
@@ -264,10 +282,11 @@ class SettingController extends Controller
     {
         Security::checkCsrf();
 
-        $namespace = $_POST['namespace'] ?? '';
-        $keyName = $_POST['key_name'] ?? '';
-        $thValue = $_POST['th_value'] ?? '';
-        $enValue = $_POST['en_value'] ?? '';
+        $namespace = Security::sanitize($_POST['namespace'] ?? '');
+        $keyName = Security::sanitize($_POST['key_name'] ?? '');
+        // คำแปลถูก render ผ่าน __() แบบไม่ escape ทั่วทั้งระบบ — ต้อง sanitize ก่อนเก็บเสมอ (กัน Stored XSS)
+        $thValue = Security::sanitize($_POST['th_value'] ?? '');
+        $enValue = Security::sanitize($_POST['en_value'] ?? '');
 
         if (!$namespace || !$keyName) {
             $this->json(['success' => false, 'type' => 'error', 'message' => __('settings.translation_invalid')], 422);
@@ -275,17 +294,17 @@ class SettingController extends Controller
 
         try {
             $db = Database::getInstance();
-            
+
             $stmt = $db->prepare("
-                INSERT INTO translations (locale, namespace, key_name, text_value) 
-                VALUES ('th', ?, ?, ?) 
+                INSERT INTO translations (locale, namespace, key_name, text_value)
+                VALUES ('th', ?, ?, ?)
                 ON DUPLICATE KEY UPDATE text_value = VALUES(text_value)
             ");
             $stmt->execute([$namespace, $keyName, $thValue]);
 
             $stmt = $db->prepare("
-                INSERT INTO translations (locale, namespace, key_name, text_value) 
-                VALUES ('en', ?, ?, ?) 
+                INSERT INTO translations (locale, namespace, key_name, text_value)
+                VALUES ('en', ?, ?, ?)
                 ON DUPLICATE KEY UPDATE text_value = VALUES(text_value)
             ");
             $stmt->execute([$namespace, $keyName, $enValue]);
@@ -294,7 +313,7 @@ class SettingController extends Controller
             $this->json(['success' => true, 'type' => 'success', 'message' => __('settings.translation_updated')]);
         } catch (\Throwable $e) {
             \App\Core\Logger::error("Failed to update translation for {$namespace}.{$keyName}: " . $e->getMessage());
-            $this->json(['success' => false, 'type' => 'error', 'message' => $e->getMessage()], 500);
+            $this->json(['success' => false, 'type' => 'error', 'message' => __('settings.translation_update_failed')], 500);
         }
     }
 }

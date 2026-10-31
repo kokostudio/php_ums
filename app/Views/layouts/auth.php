@@ -5,7 +5,7 @@ use App\Core\Theme;
 
 // ── Dynamic Theme (Preset หรือ Custom Color Picker) — ต้องตรงกับ Layout หลัก ──
 $theme       = Theme::resolve();
-$paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES);
+$paletteJson = json_encode(Theme::paletteForTailwind($theme), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
 // ── Cookie-backed Theme Detection (Zero-FOUC Paint-Holding) ──
 $isDark = isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark') : true;
@@ -248,7 +248,7 @@ $currentLocale = \App\Core\Lang::locale();
             </script>
             <?php require __DIR__ . '/partials/ajax_engine.php'; ?>
             
-            <!-- Flash Messages (ผ่าน showTopToast มาตรฐานของระบบจาก ajax_engine) -->
+            <!-- Flash Messages (ผ่าน showTopToast มาตรฐานของระบบจาก ajax_engine) — ครบทุกประเภทเทียบเท่า layouts/app.php -->
             <?php if ($flashSuccess = Session::getFlash('success')): ?>
                 <script>
                     document.addEventListener("DOMContentLoaded", function() {
@@ -256,11 +256,27 @@ $currentLocale = \App\Core\Lang::locale();
                     });
                 </script>
             <?php endif; ?>
-            
+
             <?php if ($flashError = Session::getFlash('error')): ?>
                 <script>
                     document.addEventListener("DOMContentLoaded", function() {
                         window.showTopToast('error', <?= json_encode(htmlspecialchars($flashError)) ?>, 4000);
+                    });
+                </script>
+            <?php endif; ?>
+
+            <?php if ($flashWarning = Session::getFlash('warning')): ?>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        window.showTopToast('warning', <?= json_encode(htmlspecialchars($flashWarning)) ?>, 3500);
+                    });
+                </script>
+            <?php endif; ?>
+
+            <?php if ($flashInfo = Session::getFlash('info')): ?>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        window.showTopToast('info', <?= json_encode(htmlspecialchars($flashInfo)) ?>, 3000);
                     });
                 </script>
             <?php endif; ?>

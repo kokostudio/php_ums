@@ -28,7 +28,6 @@ $router->group('/roles', Groups::auth(), function (Router $r) {
 
     // ── GET Fallback (ตามกฎ Rule 8) ──
     $r->get('/{id}/delete', function (): void {
-        header('Location: /roles');
-        exit;
+        \App\Core\Redirect::to('/roles');
     });
 });
